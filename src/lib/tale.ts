@@ -7,6 +7,7 @@ export type TaleState = {
   inv: string[];
   rain: boolean;
   deer: boolean;
+  ring: boolean;
   it: string | null;
 };
 
@@ -98,7 +99,7 @@ const ROOMS: Record<RoomId, Room> = {
   },
 };
 
-export const START: TaleState = { room: "porch", inv: [], rain: false, deer: false, it: null };
+export const START: TaleState = { room: "porch", inv: [], rain: false, deer: false, ring: false, it: null };
 
 function roomOf(state: TaleState): Room {
   return ROOMS[state.room];
@@ -108,11 +109,20 @@ function enter(state: TaleState, id: RoomId): { state: TaleState; lines: string[
   const next = { ...state, room: id };
   if (id === "rain") next.rain = true;
   if (id === "path") next.deer = true;
-  const room = ROOMS[id];
-  return { state: next, lines: [room.name, room.text] };
+  if (id === "ring") next.ring = true;
+  return { state: next, lines: blurb(next) };
+}
+
+function blurb(state: TaleState): string[] {
+  const room = ROOMS[state.room];
+  if (state.room === "well" && state.ring) {
+    return ["the well", "She followed the fight here, and the anger did not. She is crying into the well. The water takes it."];
+  }
+  return [room.name, room.text];
 }
 
 const SCENERY: { names: string[]; rooms: RoomId[]; look: string }[] = [
+  { names: ["she", "her", "girl"], rooms: ["well"], look: "She is crying into the well. She is not angry. The fight stayed on the porch." },
   { names: ["she", "her", "girl"], rooms: ["porch", "ring", "rain"], look: "She notices you. She does not perform. On the porch she is still. In the ring she is getting ready. In the rain the red is the weather." },
   { names: ["door", "doorway"], rooms: ["porch", "loom"], look: "A door. On the porch it stays shut. In the loom room it leads out of this story." },
   { names: ["boards", "floor"], rooms: ["porch", "ring"], look: "The boards are dry. Nobody has been put down on them." },
@@ -156,13 +166,14 @@ function see(state: TaleState, noun: string): { look: string; it: string } | nul
 }
 
 export function roomArt(state: TaleState): string {
+  if (state.room === "well" && state.ring) return "/well-cry.jpg";
   return ROOMS[state.room].art;
 }
 
 export function look(state: TaleState): string[] {
   const room = roomOf(state);
   const here = room.items.filter((id) => !state.inv.includes(id));
-  const lines = [room.name, room.text];
+  const lines = blurb(state);
   if (here.length) lines.push(`You could take the ${here.map((id) => ITEMS[id].name).join(", ")}.`);
   lines.push(...ways(state));
   return lines;
@@ -196,6 +207,7 @@ export function act(state: TaleState, raw: string): { state: TaleState; lines: s
     return { state, lines: [state.inv.length ? `You carry the ${state.inv.map((id) => ITEMS[id].name).join(" and the ")}.` : "Your hands are empty."] };
   }
   if (["talk", "speak", "ask", "greet"].includes(verb)) {
+    if (state.room === "well" && state.ring) return { state, lines: ["She doesn't answer. The tears do. The fight stayed on the porch."] };
     if (state.room === "porch") return { state, lines: ["She does not answer. She notices you. That is the greeting."] };
     if (state.room === "path") return { state, lines: ["The deer stays beside you. It does not lead."] };
     if (state.room === "ring") return { state, lines: ["She is getting ready. If she loses, the story changes. It has not changed yet."] };

@@ -472,6 +472,9 @@ export function Player() {
           <Link to="/her" className="nav-link">
             her
           </Link>
+          <Link to="/fight" className="nav-link">
+            fight
+          </Link>
           <Link to="/tale" className="nav-link">
             words
           </Link>
