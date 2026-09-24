@@ -9,6 +9,14 @@ const LOCK = ["remember", "stare", "farther"];
 const START = Math.max(0, PLATES.findIndex((p) => p.id === "savannah"));
 const BEAT_MS = 6000;
 const SHOWN = new Set(["painted-stare", "savannah", "bambi", "anna", "sisters", "stare", "loom", "weather", "kirby"]);
+const LINES: Record<string, string> = {
+  savannah: "Hi.",
+  "painted-stare": "Same face.",
+  anna: "I'm in pink.",
+  sisters: "Say who. Say hi.",
+  "painted-porch": "I see you.",
+  stare: "Look.",
+};
 const PEACH = ["hold.", "she smiles.", "again."];
 const CASTS: Cast[] = ["porch", "peach", "rain", "well", "kirby"];
 const CAST_NAME: Record<Cast, string> = {
@@ -33,7 +41,9 @@ export function Player() {
   const [phone, setPhone] = useState(false);
   const [leaving, setLeaving] = useState<{ src: string; motion?: string } | null>(null);
   const [pop, setPop] = useState<{ n: number; top: number; left: number } | null>(null);
+  const [hear, setHear] = useState(true);
   const [immersive, setImmersive] = useState(false);
+  const bedRef = useRef<HTMLAudioElement>(null);
   const installRef = useRef<any>(null);
   const shellRef = useRef<HTMLDivElement>(null);
   const iRef = useRef(START);
@@ -192,10 +202,41 @@ export function Player() {
     el?.requestFullscreen?.().catch(() => {});
   };
 
+  useEffect(() => {
+    const bed = bedRef.current;
+    if (!bed) return;
+    bed.volume = 0.16;
+    if (!hear) {
+      bed.pause();
+      window.speechSynthesis?.cancel();
+      return;
+    }
+    bed.play().catch(() => {});
+  }, [hear]);
+
+  useEffect(() => {
+    if (!hear) return;
+    const line = LINES[plate.id];
+    if (!line || typeof window.speechSynthesis === "undefined") return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(line);
+    utterance.rate = 0.8;
+    utterance.pitch = 1.02;
+    utterance.volume = 0.65;
+    const soft = window.speechSynthesis
+      .getVoices()
+      .find((v) => /en/i.test(v.lang) && /female|samantha|google/i.test(v.name));
+    if (soft) utterance.voice = soft;
+    window.speechSynthesis.speak(utterance);
+  }, [hear, plate.id]);
+
   return (
     <div
       className={`player-shell${immersive ? " immersive" : ""}`}
       ref={shellRef}
+      onPointerDown={() => {
+        if (hear) bedRef.current?.play().catch(() => {});
+      }}
       onTouchStart={(e) => {
         touchY.current = e.changedTouches[0]?.clientY ?? null;
       }}
@@ -209,6 +250,7 @@ export function Player() {
         stepShow(dy > 0 ? 1 : -1);
       }}
     >
+      <audio ref={bedRef} src="/audio/bed.mp3" loop preload="auto" />
       <img key={shown} className="world arriving" alt="" src={shown} />
       {leaving ? <img className="world leaving" alt="" src={leaving.src} /> : null}
       {leaving?.motion && motionOn ? (
@@ -265,6 +307,9 @@ export function Player() {
             }}
           >
             {motionOn ? "motion on" : "motion"}
+          </button>
+          <button type="button" className="nav-link" onClick={() => setHear((h) => !h)}>
+            {hear ? "quiet" : "hear"}
           </button>
           <button type="button" className="nav-link immerse" onClick={immerse}>
             {immersive ? "close" : "immerse"}
