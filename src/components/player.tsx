@@ -1,21 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Home, Pause, Play } from "lucide-react";
-import { PLATES } from "@/lib/plates";
+import { PLATES, platesIn, type Cast } from "@/lib/plates";
 
 const STORY = ["remember", "trace", "notice", "beside", "bambi", "farther"];
 const HEADS = [{ id: "stare", src: "/stare.png", label: "face lock" }];
 const LOCK = ["remember", "stare", "farther"];
-const LEAD = ["anna", "bambi", "painted-stare", "painted-porch", "blossom", "weather"];
-const LEAD_AT = LEAD.flatMap((id) => {
-  const n = PLATES.findIndex((p) => p.id === id);
-  return n >= 0 ? [n] : [];
-});
-const START = LEAD_AT[0] ?? 0;
+const START = Math.max(0, PLATES.findIndex((p) => p.id === "painted-porch"));
 const BEAT_MS = 6000;
-const MOTION = LEAD_AT;
-const SHOW = LEAD_AT;
 const PEACH = ["hold.", "she smiles.", "again."];
+const CASTS: Cast[] = ["porch", "peach", "rain", "well"];
+const CAST_NAME: Record<Cast, string> = {
+  porch: "porch fight",
+  peach: "peach ball",
+  rain: "red rain",
+  well: "the well",
+};
 
 export function Player() {
   const [i, setI] = useState(START);
@@ -27,6 +27,7 @@ export function Player() {
   const [reduced, setReduced] = useState(false);
   const [vidOn, setVidOn] = useState(false);
   const [peach, setPeach] = useState(0);
+  const [cast, setCast] = useState<Cast>("porch");
   const iRef = useRef(START);
   const traceRef = useRef<string[]>([]);
   const wheelAt = useRef(0);
@@ -34,9 +35,14 @@ export function Player() {
   const navigate = useNavigate();
 
   const plate = PLATES[i] ?? PLATES[0];
+  const path = platesIn(cast);
+  const pathRef = useRef(path);
+  pathRef.current = path;
 
   const go = useCallback((n: number, keepPlay = false) => {
     const next = ((n % PLATES.length) + PLATES.length) % PLATES.length;
+    const nextCast = PLATES[next]?.cast;
+    if (nextCast) setCast(nextCast);
     iRef.current = next;
     setI(next);
     if (!keepPlay) setPlaying(false);
@@ -44,17 +50,21 @@ export function Player() {
 
   const stepShow = useCallback(
     (dir: number) => {
-      const at = SHOW.indexOf(iRef.current);
+      const list = pathRef.current;
+      if (!list.length) return;
+      const at = list.indexOf(iRef.current);
       const from = at < 0 ? 0 : at;
-      const next = SHOW[(from + dir + SHOW.length) % SHOW.length] ?? 0;
+      const next = list[(from + dir + list.length) % list.length] ?? list[0] ?? 0;
       go(next);
     },
     [go],
   );
 
   const step = useCallback(() => {
-    const at = MOTION.indexOf(iRef.current);
-    const next = MOTION[(at + 1) % MOTION.length] ?? MOTION[0] ?? 0;
+    const list = pathRef.current;
+    if (!list.length) return;
+    const at = list.indexOf(iRef.current);
+    const next = list[(at + 1) % list.length] ?? list[0] ?? 0;
     go(next, true);
   }, [go]);
 
@@ -168,7 +178,7 @@ export function Player() {
           <a className="nav-link" href="/?install=1">
             install
           </a>
-          {Math.max(0, LEAD_AT.indexOf(i)) + 1} / {LEAD_AT.length}
+          {Math.max(0, path.indexOf(i)) + 1} / {Math.max(path.length, 1)}
         </div>
       </header>
 
@@ -213,8 +223,9 @@ export function Player() {
           </div>
           <div className="bubbles">
             {(() => {
-              const at = LEAD_AT.indexOf(i);
-              const n = LEAD_AT[(at < 0 ? 0 : at + 1) % LEAD_AT.length] ?? LEAD_AT[0];
+              const list = path.length ? path : [i];
+              const at = list.indexOf(i);
+              const n = list[(at < 0 ? 0 : at + 1) % list.length] ?? list[0];
               const p = n == null ? undefined : PLATES[n];
               if (!p || n == null) return null;
               return (
@@ -258,7 +269,7 @@ export function Player() {
       </div>
 
       <div className="film" role="list">
-        {SHOW.map((n) => {
+        {path.map((n) => {
           const p = PLATES[n];
           if (!p) return null;
           return (
@@ -272,7 +283,7 @@ export function Player() {
             >
               <img src={p.src} alt="" />
               <span>
-                {p.id === "bambi" ? "peach" : p.id === "anna" ? "pink" : p.id === "blossom" ? "ring" : p.id === "painted-porch" ? "porch" : p.id === "weather" ? "rain" : "stare"}
+                {p.id === "painted-porch" ? "porch" : p.id === "bambi" ? "peach" : p.id === "anna" ? "pink" : p.id === "weather" ? "rain" : p.id === "stare" ? "stare" : p.cast ?? p.id}
               </span>
             </button>
           );
@@ -288,23 +299,28 @@ export function Player() {
                 close
               </button>
             </header>
-            <div className="gallery-grid">
-              {PLATES.map((p, n) =>
-                p.shelf === "study" || p.shelf === "later" ? null : (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => {
-                      go(n);
-                      setGallery(false);
-                    }}
-                  >
-                    <img src={p.src} alt="" />
-                    <span>{p.note}</span>
-                  </button>
-                ),
-              )}
-            </div>
+            {CASTS.map((c) => (
+              <section key={c}>
+                <p className="shelf-label">{CAST_NAME[c]}</p>
+                <div className="gallery-grid">
+                  {PLATES.map((p, n) =>
+                    p.cast === c && p.shelf !== "study" && p.shelf !== "later" ? (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => {
+                          go(n);
+                          setGallery(false);
+                        }}
+                      >
+                        <img src={p.src} alt="" />
+                        <span>{p.note}</span>
+                      </button>
+                    ) : null,
+                  )}
+                </div>
+              </section>
+            ))}
             <p className="shelf-label">kept</p>
             <div className="gallery-grid studies">
               {PLATES.map((p, n) =>
