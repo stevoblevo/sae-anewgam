@@ -983,6 +983,8 @@
 .ball-scene {
   position: relative;
   height: 100dvh;
+  width: min(100vw, calc(100dvh * 9 / 16));
+  margin: 0 auto;
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }

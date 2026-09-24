@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 const SCENES = [
-  { id: "peach", title: "peach fall.", note: "she winks.", src: "/bambi.jpg", motion: "/motion/wink.mp4" },
-  { id: "pink", title: "her, in pink.", note: "anna.", src: "/anna.jpg", motion: "/motion/anna.mp4" },
-  { id: "sisters", title: "say who. say hi.", note: "peach, and her red sister.", src: "/sisters.jpg", motion: "/motion/sisters.mp4" },
-  { id: "painted", title: "the stare, painted.", note: "same face, garden.", src: "/garden-stare.jpg", motion: "/motion/painted-stare.mp4" },
-  { id: "stare", title: "pf stare.", note: "she winks too.", src: "/stare.png", motion: "/motion/stare-wink.mp4" },
-  { id: "reign", title: "red reign.", note: "same place. another feeling.", src: "/weather.jpg", motion: "/motion/rain.mp4" },
+  { id: "peach", title: "peach fall.", note: "she winks.", src: "/portrait/peach.jpg", motion: "/motion/peach-tall.mp4" },
+  { id: "pink", title: "her, in pink.", note: "anna.", src: "/portrait/pink.jpg", motion: "/motion/pink-tall.mp4" },
+  { id: "sisters", title: "say who. say hi.", note: "peach, and her red sister.", src: "/portrait/sisters.jpg", motion: "/motion/sisters-tall.mp4" },
+  { id: "painted", title: "the stare, painted.", note: "same face, garden.", src: "/portrait/painted.jpg", motion: "/motion/painted-tall.mp4" },
+  { id: "stare", title: "pf stare.", note: "she winks too.", src: "/portrait/stare.jpg", motion: "/motion/stare-tall.mp4" },
+  { id: "reign", title: "red reign.", note: "same place. another feeling.", src: "/portrait/rain.jpg", motion: "/motion/rain-tall.mp4" },
 ];
 
 export const Route = createFileRoute("/ball")({
