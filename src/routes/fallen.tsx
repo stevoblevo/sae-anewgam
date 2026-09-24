@@ -1,36 +1,53 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 const BEATS = [
   {
+    act: "I",
     src: "/garden-porch.jpg",
+    motion: "/motion/porch-face.mp4",
     title: "Ever fallen",
-    line: "She is on the painted porch, and she notices you. Nothing has been lost yet.",
+    line: "She is on the painted porch, and she notices you. The lantern is already lit. Nothing has been lost.",
   },
   {
+    act: "I",
     src: "/stare.png",
+    motion: "/motion/stare-wink.mp4",
     title: "The minute before",
-    line: "The ring is drawn. She is still on her feet. This is not the fall.",
+    line: "She holds your eyes. The ring is only a ring. If there is a fight, it has not started.",
   },
   {
+    act: "II",
     src: "/weather.jpg",
+    motion: "/motion/rain.mp4",
     title: "Red rain",
-    line: "The same place, other weather. The red is the rain. It is not a fall.",
+    line: "The red comes down as rain. Reign, if you want the other word. It is the weather, not a fall.",
   },
   {
+    act: "II",
     src: "/farther-well.jpg",
+    motion: "/motion/farther-well.mp4",
     title: "Beside",
-    line: "A deer stands with you, not ahead. Dear. Not a trophy.",
+    line: "A deer stands with you, not ahead. Dear. It will not lead, and it will not leave.",
   },
   {
+    act: "II",
     src: "/well-cry.jpg",
     title: "The well",
-    line: "What was angry stays on the porch. Here she only cries, and the water keeps it.",
+    line: "She was angry in the ring. The anger stayed there. At the well she only cries, and the water keeps it.",
   },
   {
+    act: "III",
     src: "/pink-forest.jpg",
-    title: "Ever fallen",
-    line: "Pink is for rest. She fell into the weather, and the weather held.",
+    motion: "/motion/pink-forest.mp4",
+    title: "Pink, for rest",
+    line: "This is ever fallen. She went down into the weather and came up still herself. Pink is the rest after.",
+  },
+  {
+    act: "III",
+    src: "/everdelve.jpg",
+    title: "Ever delve",
+    line: "One step farther, the same story. You can stay in it, or go back to the porch.",
   },
 ];
 
@@ -40,11 +57,49 @@ export const Route = createFileRoute("/fallen")({
 
 export function Fallen() {
   const [at, setAt] = useState(0);
+  const [moving, setMoving] = useState(false);
+  const [live, setLive] = useState(false);
   const beat = BEATS[at];
+  const last = at === BEATS.length - 1;
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "ArrowRight") setAt((n) => Math.min(BEATS.length - 1, n + 1));
+      if (event.key === "ArrowLeft") setAt((n) => Math.max(0, n - 1));
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  useEffect(() => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setMoving(Boolean(beat.motion) && !reduce);
+    setLive(false);
+  }, [beat.motion]);
+
+  const on = () => {
+    if (!last) setAt((n) => n + 1);
+  };
 
   return (
     <div className="tableau">
-      <img key={beat.src} src={beat.src} alt="" />
+      <button type="button" className="tableau-stage" onClick={on} aria-label={last ? beat.title : "on"}>
+        <img key={beat.src} src={beat.src} alt="" />
+        {moving && beat.motion ? (
+          <video
+            key={beat.motion}
+            src={beat.motion}
+            poster={beat.src}
+            muted
+            loop
+            playsInline
+            autoPlay
+            style={{ opacity: live ? 1 : 0 }}
+            onPlaying={() => setLive(true)}
+            onError={() => setMoving(false)}
+          />
+        ) : null}
+      </button>
       <header className="player-chrome">
         {at === 0 ? (
           <Link to="/walk" className="nav-link">
@@ -55,16 +110,18 @@ export function Fallen() {
             back
           </button>
         )}
-        <p className="brand">{beat.title}</p>
+        <p className="brand">
+          {beat.act} · {beat.title}
+        </p>
         <div className="right">
-          {at < BEATS.length - 1 ? (
-            <button type="button" className="nav-link" onClick={() => setAt((n) => n + 1)}>
-              on
-            </button>
-          ) : (
+          {last ? (
             <Link to="/walk" className="nav-link">
               porch
             </Link>
+          ) : (
+            <button type="button" className="nav-link" onClick={on}>
+              on
+            </button>
           )}
         </div>
       </header>

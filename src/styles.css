@@ -1302,6 +1302,25 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  animation: tableau-in 0.7s ease;
+}
+
+.tableau-stage {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  background: #140e10;
+  cursor: pointer;
+}
+
+.tableau video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: tableau-in 1s ease;
 }
 
 .tableau .player-chrome {
@@ -1345,4 +1364,13 @@
 
 .tableau-dots button.on {
   background: #fff8f2;
+}
+
+@keyframes tableau-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
