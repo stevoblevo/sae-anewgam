@@ -12,3 +12,5 @@ screenshots
 artifacts
 *.log
 .DS_Store
+
+attachments/
