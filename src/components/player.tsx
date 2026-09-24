@@ -41,7 +41,10 @@ export function Player() {
   const [phone, setPhone] = useState(false);
   const [leaving, setLeaving] = useState<{ src: string; motion?: string } | null>(null);
   const [pop, setPop] = useState<{ n: number; top: number; left: number } | null>(null);
+  const [pink, setPink] = useState(false);
   const [hear, setHear] = useState(true);
+  const pinkRef = useRef(false);
+  const seenRef = useRef({ deer: false, reign: false });
   const [immersive, setImmersive] = useState(false);
   const bedRef = useRef<HTMLAudioElement>(null);
   const nextRef = useRef<HTMLAudioElement>(null);
@@ -58,7 +61,7 @@ export function Player() {
 
   const plate = PLATES[i] ?? PLATES[0];
   const shown = phone && plate.srcPhone ? plate.srcPhone : plate.src;
-  const path = platesIn(cast);
+  const path = platesIn(cast, pink);
   const pathRef = useRef(path);
   pathRef.current = path;
 
@@ -69,6 +72,20 @@ export function Player() {
       setLeaving({ src: cur.src, motion: cur.motion });
       window.clearTimeout(leaveTimer.current);
       leaveTimer.current = window.setTimeout(() => setLeaving(null), 900);
+    }
+    const id = PLATES[next]?.id;
+    if (id === "farther" || id === "reach") seenRef.current.deer = true;
+    if (id === "weather") seenRef.current.reign = true;
+    if (seenRef.current.deer && seenRef.current.reign && !pinkRef.current) {
+      pinkRef.current = true;
+      setPink(true);
+      const forest = PLATES.findIndex((p) => p.id === "pink-forest");
+      if (forest >= 0) setPop({ n: forest, top: 22, left: 18 });
+      try {
+        sessionStorage.setItem("sae-pink", "1");
+      } catch {
+        /* ignore */
+      }
     }
     const nextCast = PLATES[next]?.cast;
     if (nextCast) setCast(nextCast);
@@ -126,7 +143,7 @@ export function Player() {
         if (target != null && target !== iRef.current) go(target, true);
         else step();
         const hidden = PLATES.flatMap((p, n) =>
-          n !== iRef.current && p.shelf !== "study" ? [n] : [],
+          n !== iRef.current && p.shelf !== "study" && (!p.gate || pinkRef.current) ? [n] : [],
         );
         if (hidden.length) {
           const n = hidden[Math.floor(Math.random() * hidden.length)] ?? hidden[0];
@@ -176,6 +193,17 @@ export function Player() {
     apply();
     mq.addEventListener("change", apply);
     return () => mq.removeEventListener("change", apply);
+  }, []);
+
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem("sae-pink") === "1") {
+        pinkRef.current = true;
+        setPink(true);
+      }
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   const motionOn = motionChoice ?? !reduced;
@@ -448,7 +476,7 @@ export function Player() {
             ))}
           </div>
           <div className="bubbles">
-            {["remember", "painted-stare", "savannah", "bambi", "anna", "sisters", "stare", "loom", "weather", "kirby"].map((id) => {
+            {(pink ? ["pink-forest", "remember", "painted-stare", "savannah", "bambi", "anna", "sisters", "stare", "loom", "weather", "kirby"] : ["remember", "painted-stare", "savannah", "bambi", "anna", "sisters", "stare", "loom", "weather", "kirby"]).map((id) => {
               const n = PLATES.findIndex((p) => p.id === id);
               const p = PLATES[n];
               if (!p || n < 0) return null;
@@ -469,7 +497,7 @@ export function Player() {
                   ) : (
                     <img src={p.src} alt="" />
                   )}
-                  <span>{id === "remember" ? "" : pip ? "garden" : p.id === "savannah" ? "cute" : p.id === "bambi" ? "peach" : p.id === "anna" ? "pink" : p.id === "sisters" ? "hi" : p.id === "stare" ? "stare" : p.id === "loom" ? "loom" : p.id === "weather" ? "rain" : "kirby"}</span>
+                  <span>{id === "remember" || id === "pink-forest" ? "" : pip ? "garden" : p.id === "savannah" ? "cute" : p.id === "bambi" ? "peach" : p.id === "anna" ? "pink" : p.id === "sisters" ? "hi" : p.id === "stare" ? "stare" : p.id === "loom" ? "loom" : p.id === "weather" ? "rain" : "kirby"}</span>
                 </button>
               );
             })}
@@ -538,7 +566,9 @@ export function Player() {
               </button>
             </header>
             {CASTS.map((c) => {
-              const items = PLATES.flatMap((p, n) => (p.cast === c && p.shelf !== "study" && p.shelf !== "later" ? [{ p, n }] : []));
+              const items = PLATES.flatMap((p, n) =>
+                p.cast === c && p.shelf !== "study" && p.shelf !== "later" && (!p.gate || pink) ? [{ p, n }] : [],
+              );
               return (
                 <details key={c} open={c === cast}>
                   <summary>

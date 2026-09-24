@@ -12,6 +12,7 @@ export type Plate = {
   cast?: Cast;
   seq?: number;
   href?: string;
+  gate?: "deer-reign";
 };
 
 /** Stills stay. Motion is a loop on top of the same plate. */
@@ -29,6 +30,7 @@ export const PLATES: Plate[] = [
   { id: "stare", title: "pf stare.", note: "porch fight · face lock", src: "/stare.png", motion: "/motion/stare-wink.mp4", cast: "porch", seq: 4 },
   { id: "weather", title: "red rain.", note: "same well, other weather", src: "/weather.jpg", motion: "/motion/rain.mp4", cast: "rain" },
   { id: "reach", title: "a little farther.", note: "the well", src: "/farther-well.jpg", motion: "/motion/farther-well.mp4", cast: "well", seq: 6 },
+  { id: "pink-forest", title: "pink forest.", note: "after the deer and the red reign", src: "/pink-forest.jpg", motion: "/motion/pink-forest.mp4", cast: "well", seq: 7, gate: "deer-reign" },
   { id: "reach-kept", title: "sae reach.", note: "kept · the words", src: "/sae-reach.jpg", motion: "/motion/wayhome.mp4", shelf: "later", cast: "well" },
   { id: "delve", title: "everdelve.", note: "weee · different stories, same world", src: "/everdelve.jpg", motion: "/motion/delve.mp4", shelf: "later" },
   { id: "study", title: "chrome study.", note: "kept · study", src: "/scene.jpg", shelf: "study" },
@@ -49,8 +51,10 @@ export const PLATES: Plate[] = [
   { id: "loom", title: "the loom room.", note: "skins · the guardian · the door", src: "/loom.png", motion: "/motion/loom.mp4", cast: "kirby", seq: 1 },
 ];
 
-export function platesIn(cast: Cast) {
-  return PLATES.flatMap((p, n) => (p.cast === cast && p.shelf !== "study" && p.shelf !== "later" ? [{ n, seq: p.seq ?? 99 }] : []))
+export function platesIn(cast: Cast, pink = false) {
+  return PLATES.flatMap((p, n) =>
+    p.cast === cast && p.shelf !== "study" && p.shelf !== "later" && (!p.gate || pink) ? [{ n, seq: p.seq ?? 99 }] : [],
+  )
     .sort((a, b) => a.seq - b.seq || a.n - b.n)
     .map((x) => x.n);
 }
