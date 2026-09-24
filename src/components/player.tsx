@@ -120,7 +120,7 @@ export function Player() {
       const dt = Math.min(now - last, 100);
       last = now;
       acc += dt;
-      if (acc >= BEAT_MS) {
+      if (acc >= BEAT_MS * (PLATES[iRef.current]?.id === "farther" || PLATES[iRef.current]?.id === "reach" ? 2 : 1)) {
         acc = 0;
         const target = popRef.current;
         if (target != null && target !== iRef.current) go(target, true);
@@ -293,6 +293,18 @@ export function Player() {
         stepShow(dy > 0 ? 1 : -1);
       }}
     >
+      <button
+        type="button"
+        className="exit-immerse"
+        aria-label="close"
+        hidden={!immersive}
+        onClick={() => {
+          setImmersive(false);
+          if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+        }}
+      >
+        ×
+      </button>
       <audio ref={bedRef} preload="auto" />
       <audio ref={nextRef} preload="auto" />
       <img key={shown} className="world arriving" alt="" src={shown} />
@@ -409,7 +421,7 @@ export function Player() {
             setPeach((n) => (n + 1) % PEACH.length);
           }}
         >
-          <p className="line">{plate.title}</p>
+          <p key={plate.id} className="line">{plate.title}</p>
           {plate.id === "loom" ? (
             <div className="doors">
               <button type="button" className="nav-link" onClick={() => go(PLATES.findIndex((p) => p.id === "bambi"))}>
@@ -426,7 +438,7 @@ export function Player() {
             </a>
           ) : null}
           {plate.id === "bambi" ? <p className="tag">{PEACH[peach]}</p> : null}
-          <p className="tag">{whisper ? "remember · the face · farther" : `${plate.note} · scroll`}</p>
+          <p key={`${plate.id}-note`} className="tag">{whisper ? "remember · the face · farther" : `${plate.note} · scroll`}</p>
           <div className="heads">
             {HEADS.map((h) => (
               <button key={h.id} type="button" className="face-lock" onClick={() => touch(h.id)}>
@@ -436,7 +448,7 @@ export function Player() {
             ))}
           </div>
           <div className="bubbles">
-            {["painted-stare", "savannah", "bambi", "anna", "sisters", "stare", "loom", "weather", "kirby"].map((id) => {
+            {["remember", "painted-stare", "savannah", "bambi", "anna", "sisters", "stare", "loom", "weather", "kirby"].map((id) => {
               const n = PLATES.findIndex((p) => p.id === id);
               const p = PLATES[n];
               if (!p || n < 0) return null;
@@ -447,14 +459,17 @@ export function Player() {
                   type="button"
                   className={pip ? "glass pip" : "glass"}
                   aria-label={p.note}
-                  onClick={() => go(n)}
+                  onClick={() => {
+                    go(n);
+                    if (id === "remember") setPlaying(true);
+                  }}
                 >
                   {pip && p.motion ? (
                     <video src={p.motion} muted loop playsInline autoPlay />
                   ) : (
                     <img src={p.src} alt="" />
                   )}
-                  <span>{pip ? "garden" : p.id === "savannah" ? "cute" : p.id === "bambi" ? "peach" : p.id === "anna" ? "pink" : p.id === "sisters" ? "hi" : p.id === "stare" ? "stare" : p.id === "loom" ? "loom" : p.id === "weather" ? "rain" : "kirby"}</span>
+                  <span>{id === "remember" ? "" : pip ? "garden" : p.id === "savannah" ? "cute" : p.id === "bambi" ? "peach" : p.id === "anna" ? "pink" : p.id === "sisters" ? "hi" : p.id === "stare" ? "stare" : p.id === "loom" ? "loom" : p.id === "weather" ? "rain" : "kirby"}</span>
                 </button>
               );
             })}
