@@ -971,6 +971,15 @@
   background: #140e10;
 }
 
+.ball > .player-chrome {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  padding: 14px 18px;
+}
+
 .ball-scene {
   position: relative;
   height: 100dvh;
@@ -998,6 +1007,30 @@
   z-index: 2;
   color: #fff8f2;
   text-shadow: 0 2px 16px rgb(0 0 0 / 0.55);
+}
+
+.ball-dots {
+  position: fixed;
+  right: 16px;
+  top: 50%;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transform: translateY(-50%);
+}
+
+.ball-dots button {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid #fff8f2;
+  background: transparent;
+}
+
+.ball-dots button.on {
+  background: #e7a3b0;
 }
 
 .player-chrome .right {
