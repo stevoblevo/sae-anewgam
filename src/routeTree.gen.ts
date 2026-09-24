@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BallRouteImport } from './routes/ball'
 import { Route as FartherRouteImport } from './routes/farther'
+import { Route as HerRouteImport } from './routes/her'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +29,44 @@ const FartherRoute = FartherRouteImport.update({
   path: '/farther',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HerRoute = HerRouteImport.update({
+  id: '/her',
+  path: '/her',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ball': typeof BallRoute
   '/farther': typeof FartherRoute
+  '/her': typeof HerRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ball': typeof BallRoute
   '/farther': typeof FartherRoute
+  '/her': typeof HerRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/ball': typeof BallRoute
   '/farther': typeof FartherRoute
+  '/her': typeof HerRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/ball' | '/farther'
+  fullPaths: '/' | '/ball' | '/farther' | '/her'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/ball' | '/farther'
-  id: '__root__' | '/' | '/ball' | '/farther'
+  to: '/' | '/ball' | '/farther' | '/her'
+  id: '__root__' | '/' | '/ball' | '/farther' | '/her'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BallRoute: typeof BallRoute
   FartherRoute: typeof FartherRoute
+  HerRoute: typeof HerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +92,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FartherRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/her': {
+      id: '/her'
+      path: '/her'
+      fullPath: '/her'
+      preLoaderRoute: typeof HerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BallRoute: BallRoute,
   FartherRoute: FartherRoute,
+  HerRoute: HerRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

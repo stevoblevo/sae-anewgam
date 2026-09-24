@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Home, Pause, Play } from "lucide-react";
 import { PLATES, platesIn, type Cast } from "@/lib/plates";
+import { WAYS } from "@/lib/ways";
 
 const STORY = ["remember", "trace", "notice", "beside", "bambi", "farther"];
 const HEADS = [{ id: "stare", src: "/stare.png", label: "face lock" }];
@@ -9,14 +10,6 @@ const LOCK = ["remember", "stare", "farther"];
 const START = Math.max(0, PLATES.findIndex((p) => p.id === "savannah"));
 const BEAT_MS = 6000;
 const SHOWN = new Set(["painted-stare", "savannah", "bambi", "anna", "sisters", "stare", "loom", "weather", "kirby"]);
-const LINES: Record<string, string> = {
-  savannah: "Hi.",
-  "painted-stare": "Same face.",
-  anna: "I'm in pink.",
-  sisters: "Say who. Say hi.",
-  "painted-porch": "I see you.",
-  stare: "Look.",
-};
 const PEACH = ["hold.", "she smiles.", "again."];
 const CASTS: Cast[] = ["porch", "peach", "rain", "well", "kirby"];
 const CAST_NAME: Record<Cast, string> = {
@@ -271,34 +264,6 @@ export function Player() {
     return () => cancelAnimationFrame(raf);
   }, [hear, plate.id]);
 
-  useEffect(() => {
-    if (!hear || typeof window.speechSynthesis === "undefined") return;
-    const id = plate.id;
-    const line = LINES[id];
-    window.speechSynthesis.cancel();
-    if (!line) return;
-    let spoken = false;
-    const speak = () => {
-      if (spoken) return;
-      const emily = window.speechSynthesis.getVoices().find((v) => /emily/i.test(v.name));
-      if (!emily) return;
-      spoken = true;
-      const utterance = new SpeechSynthesisUtterance(line);
-      utterance.voice = emily;
-      utterance.rate = 0.92;
-      utterance.pitch = 1;
-      utterance.volume = 0.8;
-      window.speechSynthesis.speak(utterance);
-    };
-    const timer = window.setTimeout(speak, 800);
-    window.speechSynthesis.addEventListener("voiceschanged", speak);
-    return () => {
-      window.clearTimeout(timer);
-      window.speechSynthesis.removeEventListener("voiceschanged", speak);
-      window.speechSynthesis.cancel();
-    };
-  }, [hear, plate.id]);
-
   return (
     <div
       className={`player-shell${immersive ? " immersive" : ""}`}
@@ -398,6 +363,9 @@ export function Player() {
           <button type="button" className="nav-link immerse" onClick={immerse}>
             {immersive ? "close" : "immerse"}
           </button>
+          <Link to="/her" className="nav-link">
+            her
+          </Link>
           <Link to="/ball" className="nav-link">
             ball
           </Link>
@@ -565,6 +533,40 @@ export function Player() {
                 close
               </button>
             </header>
+            <details open>
+              <summary>ways</summary>
+              <div className="gallery-grid">
+                {WAYS.map((w) => {
+                  const p = PLATES.find((plate) => plate.id === w.start);
+                  const n = PLATES.findIndex((plate) => plate.id === w.start);
+                  if (!p || n < 0) return null;
+                  return (
+                    <button
+                      key={w.id}
+                      type="button"
+                      onClick={() => {
+                        setCast(w.cast);
+                        go(n);
+                        setPlaying(true);
+                        setGallery(false);
+                      }}
+                    >
+                      <img src={p.src} alt="" />
+                      <span>{w.name}</span>
+                    </button>
+                  );
+                })}
+                <Link to="/her" className="nav-link">
+                  her
+                </Link>
+                <Link to="/ball" className="nav-link">
+                  ball
+                </Link>
+                <Link to="/farther" className="nav-link">
+                  farther
+                </Link>
+              </div>
+            </details>
             {CASTS.map((c) => {
               const items = PLATES.flatMap((p, n) =>
                 p.cast === c && p.shelf !== "study" && p.shelf !== "later" && (!p.gate || pink) ? [{ p, n }] : [],
