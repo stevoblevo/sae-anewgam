@@ -28,6 +28,7 @@ export function Player() {
   const [vidOn, setVidOn] = useState(false);
   const [peach, setPeach] = useState(0);
   const [cast, setCast] = useState<Cast>("porch");
+  const [phone, setPhone] = useState(false);
   const iRef = useRef(START);
   const traceRef = useRef<string[]>([]);
   const wheelAt = useRef(0);
@@ -35,6 +36,7 @@ export function Player() {
   const navigate = useNavigate();
 
   const plate = PLATES[i] ?? PLATES[0];
+  const shown = phone && plate.srcPhone ? plate.srcPhone : plate.src;
   const path = platesIn(cast);
   const pathRef = useRef(path);
   pathRef.current = path;
@@ -118,6 +120,13 @@ export function Player() {
   }, [gallery, stepShow]);
 
   useEffect(() => {
+    const apply = () => setPhone(window.innerWidth / Math.max(window.innerHeight, 1) < 0.9);
+    apply();
+    window.addEventListener("resize", apply);
+    return () => window.removeEventListener("resize", apply);
+  }, []);
+
+  useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     const apply = () => setReduced(mq.matches);
     apply();
@@ -127,7 +136,7 @@ export function Player() {
 
   useEffect(() => {
     setVidOn(false);
-  }, [plate.src, live, reduced]);
+  }, [shown, live, reduced]);
 
   const showVid = live && !reduced && !!plate.motion;
 
@@ -147,7 +156,7 @@ export function Player() {
         stepShow(dy > 0 ? 1 : -1);
       }}
     >
-      <img key={plate.src} className="world" alt="" src={plate.src} />
+      <img key={shown} className="world" alt="" src={shown} />
       {showVid ? (
         <video
           key={plate.motion}
@@ -283,7 +292,7 @@ export function Player() {
             >
               <img src={p.src} alt="" />
               <span>
-                {p.id === "painted-porch" ? "porch" : p.id === "bambi" ? "peach" : p.id === "anna" ? "pink" : p.id === "weather" ? "rain" : p.id === "stare" ? "stare" : p.cast ?? p.id}
+                {p.id === "violet" ? "purple" : p.id === "painted-porch" ? "porch" : p.id === "bambi" ? "peach" : p.id === "anna" ? "pink" : p.id === "weather" ? "rain" : p.id === "stare" ? "stare" : p.id === "recognition" ? "gen 2" : p.id === "crossing" ? "gen 4" : p.id === "further" ? "gen 22" : p.cast ?? p.id}
               </span>
             </button>
           );

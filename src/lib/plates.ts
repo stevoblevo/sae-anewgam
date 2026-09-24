@@ -5,6 +5,7 @@ export type Plate = {
   title: string;
   note: string;
   src: string;
+  srcPhone?: string;
   motion?: string;
   shelf?: "world" | "study" | "later";
   choose?: boolean;
@@ -31,10 +32,14 @@ export const PLATES: Plate[] = [
   { id: "ring", title: "porch ring.", note: "porch fight · ring", src: "/ring.png", cast: "porch" },
   { id: "blossom", title: "a ring of blossoms.", note: "the ring, in the well’s paint", src: "/garden-ring.jpg", motion: "/motion/garden-ring.mp4", cast: "peach" },
   { id: "painted-porch", title: "she notices you.", note: "painted porch", src: "/garden-porch.jpg", motion: "/motion/porch-face.mp4", cast: "porch" },
+  { id: "violet", title: "purple, beside.", note: "the other stare", src: "/violet.jpg", srcPhone: "/violet-phone.jpg", motion: "/motion/violet.mp4", cast: "porch" },
   { id: "painted-stare", title: "the stare, painted.", note: "same face, garden", src: "/garden-stare.jpg", cast: "peach" },
   { id: "anna", title: "her, in pink.", note: "anna · peach fall", src: "/anna.jpg", cast: "peach" },
   { id: "bambi", title: "peach fall.", note: "bambi · the stare, recast", src: "/bambi.jpg", motion: "/motion/wink.mp4", cast: "peach" },
   { id: "sisters", title: "say who. say hi.", note: "peach and red reign", src: "/sisters.jpg", cast: "peach" },
+  { id: "recognition", title: "you came.", note: "gen 2", src: "/gen2.jpg", cast: "peach" },
+  { id: "crossing", title: "another path.", note: "gen 4", src: "/gen4.jpg", cast: "peach" },
+  { id: "further", title: "together, further.", note: "gen 22", src: "/gen22.jpg", cast: "peach" },
 ];
 
 export function platesIn(cast: Cast) {
