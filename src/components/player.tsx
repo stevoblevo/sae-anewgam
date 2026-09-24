@@ -8,6 +8,7 @@ const HEADS = [{ id: "stare", src: "/stare.png", label: "face lock" }];
 const LOCK = ["remember", "stare", "farther"];
 const START = Math.max(0, PLATES.findIndex((p) => p.id === "savannah"));
 const BEAT_MS = 6000;
+const SHOWN = new Set(["painted-stare", "savannah", "bambi", "anna", "sisters", "stare", "loom", "weather", "kirby"]);
 const PEACH = ["hold.", "she smiles.", "again."];
 const CASTS: Cast[] = ["porch", "peach", "rain", "well", "kirby"];
 const CAST_NAME: Record<Cast, string> = {
@@ -30,6 +31,7 @@ export function Player() {
   const [peach, setPeach] = useState(0);
   const [cast, setCast] = useState<Cast>("porch");
   const [phone, setPhone] = useState(false);
+  const [pop, setPop] = useState<{ n: number; top: number; left: number } | null>(null);
   const [immersive, setImmersive] = useState(false);
   const installRef = useRef<any>(null);
   const shellRef = useRef<HTMLDivElement>(null);
@@ -100,12 +102,23 @@ export function Player() {
       if (acc >= BEAT_MS) {
         acc = 0;
         step();
+        const hidden = PLATES.flatMap((p, n) =>
+          n !== iRef.current && !SHOWN.has(p.id) ? [n] : [],
+        );
+        if (hidden.length) {
+          const n = hidden[Math.floor(Math.random() * hidden.length)] ?? hidden[0];
+          setPop({ n, top: 16 + Math.random() * 46, left: 6 + Math.random() * 48 });
+        }
       }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [playing, gallery, step]);
+
+  useEffect(() => {
+    if (!playing) setPop(null);
+  }, [playing]);
 
   useEffect(() => {
     const onWheel = (e: WheelEvent) => {
@@ -198,6 +211,18 @@ export function Player() {
             setVidOn(true);
           }}
         />
+      ) : null}
+
+      {playing && pop && PLATES[pop.n] ? (
+        <button
+          type="button"
+          className="pop"
+          style={{ top: `${pop.top}%`, left: `${pop.left}%` }}
+          onClick={() => go(pop.n, true)}
+        >
+          <img src={PLATES[pop.n]?.src} alt="" />
+          <span>{PLATES[pop.n]?.note}</span>
+        </button>
       ) : null}
 
       <header className="player-chrome">
