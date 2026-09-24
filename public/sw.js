@@ -1,4 +1,4 @@
-const CACHE = "sae-pwa-4";
+const CACHE = "sae-pwa-5";
 
 self.addEventListener("install", () => {
   self.skipWaiting();
@@ -27,33 +27,19 @@ self.addEventListener("fetch", (event) => {
   ) {
     return;
   }
-
-  if (req.mode === "navigate") {
-    event.respondWith(networkFirst(req));
-    return;
-  }
-
-  if (/\.(png|jpe?g|webp|gif|svg|mp4|mp3|woff2?)$/i.test(url.pathname)) {
-    event.respondWith(cacheFirst(req));
-  }
+  event.respondWith(cacheFirst(req));
 });
-
-async function networkFirst(req) {
-  const cache = await caches.open(CACHE);
-  try {
-    const fresh = await fetch(req);
-    if (fresh.ok && fresh.type === "basic") cache.put(req, fresh.clone());
-    return fresh;
-  } catch {
-    return (await cache.match(req)) || new Response("offline", { status: 503, headers: { "content-type": "text/plain" } });
-  }
-}
 
 async function cacheFirst(req) {
   const cache = await caches.open(CACHE);
   const hit = await cache.match(req);
+  const refresh = fetch(req)
+    .then((res) => {
+      if (res.ok && res.type === "basic") cache.put(req, res.clone());
+      return res;
+    })
+    .catch(() => null);
   if (hit) return hit;
-  const fresh = await fetch(req);
-  if (fresh.ok && fresh.type === "basic") cache.put(req, fresh.clone());
-  return fresh;
+  const fresh = await refresh;
+  return fresh || new Response("offline", { status: 503, headers: { "content-type": "text/plain" } });
 }

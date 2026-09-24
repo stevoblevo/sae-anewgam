@@ -14,7 +14,7 @@ export function Fight() {
     const node = canvas.current;
     if (!node) return;
     return mountStare(node, {
-      ring: "/ring.png",
+      ring: "/stare.png",
       face: "/stare.png",
       well: "/well-cry.jpg",
       onLine: setLine,
@@ -25,8 +25,8 @@ export function Fight() {
     <div className="fight">
       <canvas ref={canvas} />
       <header className="player-chrome">
-        <Link to="/walk" className="nav-link">
-          porch
+        <Link to="/" className="nav-link">
+          back
         </Link>
         <p className="brand">porch fight</p>
         <div className="right">

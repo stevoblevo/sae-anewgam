@@ -119,7 +119,7 @@ export function Ball() {
     >
       <header className="player-chrome">
         <Link to="/" className="nav-link">
-          leave
+          back
         </Link>
         <p className="brand">peach ball</p>
         <div className="right">

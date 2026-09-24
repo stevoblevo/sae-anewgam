@@ -29,7 +29,7 @@ export function Tale() {
     <div className="tale">
       <img className="tale-world" alt="" src={roomArt(state)} />
       <header className="player-chrome">
-        <Link to="/walk" className="nav-link">
+        <Link to="/" className="nav-link">
           porch
         </Link>
         <p className="brand">a little farther</p>
