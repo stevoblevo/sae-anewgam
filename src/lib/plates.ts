@@ -1,4 +1,4 @@
-export type Cast = "porch" | "peach" | "rain" | "well";
+export type Cast = "porch" | "peach" | "rain" | "well" | "kirby";
 
 export type Plate = {
   id: string;
@@ -11,6 +11,7 @@ export type Plate = {
   choose?: boolean;
   cast?: Cast;
   seq?: number;
+  href?: string;
 };
 
 /** Stills stay. Motion is a loop on top of the same plate. */
@@ -42,6 +43,7 @@ export const PLATES: Plate[] = [
   { id: "recognition", title: "you came.", note: "gen 2", src: "/gen2.jpg", cast: "peach" },
   { id: "crossing", title: "another path.", note: "gen 4", src: "/gen4.jpg", cast: "peach" },
   { id: "further", title: "together, further.", note: "gen 22", src: "/gen22.jpg", cast: "peach" },
+  { id: "kirby", title: "say kirby.", note: "saelion · anewgam", src: "/kirby.png", cast: "kirby", href: "https://anewgam-liqc.vercel.app" },
 ];
 
 export function platesIn(cast: Cast) {

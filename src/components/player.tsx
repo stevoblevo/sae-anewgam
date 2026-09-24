@@ -9,12 +9,13 @@ const LOCK = ["remember", "stare", "farther"];
 const START = Math.max(0, PLATES.findIndex((p) => p.id === "savannah"));
 const BEAT_MS = 6000;
 const PEACH = ["hold.", "she smiles.", "again."];
-const CASTS: Cast[] = ["porch", "peach", "rain", "well"];
+const CASTS: Cast[] = ["porch", "peach", "rain", "well", "kirby"];
 const CAST_NAME: Record<Cast, string> = {
   porch: "porch fight",
   peach: "peach ball",
   rain: "red rain",
   well: "the well",
+  kirby: "say kirby",
 };
 
 export function Player() {
@@ -220,6 +221,11 @@ export function Player() {
           }}
         >
           <p className="line">{plate.title}</p>
+          {plate.href ? (
+            <a className="nav-link" href={plate.href} target="_blank" rel="noreferrer">
+              saelion · anewgam
+            </a>
+          ) : null}
           {plate.id === "bambi" ? <p className="tag">{PEACH[peach]}</p> : null}
           <p className="tag">{whisper ? "remember · the face · farther" : `${plate.note} · scroll`}</p>
           <div className="heads">
