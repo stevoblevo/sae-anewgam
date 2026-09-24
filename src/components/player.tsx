@@ -44,6 +44,8 @@ export function Player() {
   const [hear, setHear] = useState(true);
   const [immersive, setImmersive] = useState(false);
   const bedRef = useRef<HTMLAudioElement>(null);
+  const nextRef = useRef<HTMLAudioElement>(null);
+  const side = useRef(0);
   const installRef = useRef<any>(null);
   const shellRef = useRef<HTMLDivElement>(null);
   const iRef = useRef(START);
@@ -203,16 +205,33 @@ export function Player() {
   };
 
   useEffect(() => {
-    const bed = bedRef.current;
-    if (!bed) return;
-    bed.volume = 0.16;
+    const incoming = side.current === 0 ? bedRef.current : nextRef.current;
+    const outgoing = side.current === 0 ? nextRef.current : bedRef.current;
+    side.current = 1 - side.current;
+    if (!incoming) return;
+    const src = `/audio/scenes/${plate.id}.mp3`;
+    incoming.src = src;
+    incoming.loop = true;
+    incoming.volume = 0;
     if (!hear) {
-      bed.pause();
+      incoming.pause();
+      outgoing?.pause();
       window.speechSynthesis?.cancel();
       return;
     }
-    bed.play().catch(() => {});
-  }, [hear]);
+    incoming.play().catch(() => {});
+    const start = performance.now();
+    let raf = 0;
+    const fade = (now: number) => {
+      const t = Math.min(1, (now - start) / 700);
+      incoming.volume = 0.55 * t;
+      if (outgoing) outgoing.volume = 0.55 * (1 - t);
+      if (t < 1) raf = requestAnimationFrame(fade);
+      else outgoing?.pause();
+    };
+    raf = requestAnimationFrame(fade);
+    return () => cancelAnimationFrame(raf);
+  }, [hear, plate.id]);
 
   useEffect(() => {
     if (!hear || typeof window.speechSynthesis === "undefined") return;
@@ -247,7 +266,9 @@ export function Player() {
       className={`player-shell${immersive ? " immersive" : ""}`}
       ref={shellRef}
       onPointerDown={() => {
-        if (hear) bedRef.current?.play().catch(() => {});
+        if (!hear) return;
+        const live = side.current === 1 ? bedRef.current : nextRef.current;
+        live?.play().catch(() => {});
       }}
       onTouchStart={(e) => {
         touchY.current = e.changedTouches[0]?.clientY ?? null;
@@ -262,7 +283,8 @@ export function Player() {
         stepShow(dy > 0 ? 1 : -1);
       }}
     >
-      <audio ref={bedRef} src="/audio/bed.mp3" loop preload="auto" />
+      <audio ref={bedRef} preload="auto" />
+      <audio ref={nextRef} preload="auto" />
       <img key={shown} className="world arriving" alt="" src={shown} />
       {leaving ? <img className="world leaving" alt="" src={leaving.src} /> : null}
       {leaving?.motion && motionOn ? (
