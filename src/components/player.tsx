@@ -7,7 +7,7 @@ import { WAYS } from "@/lib/ways";
 const STORY = ["remember", "trace", "notice", "beside", "bambi", "farther"];
 const HEADS = [{ id: "stare", src: "/stare.png", label: "face lock" }];
 const LOCK = ["remember", "stare", "farther"];
-const START = Math.max(0, PLATES.findIndex((p) => p.id === "weather"));
+const START = Math.max(0, PLATES.findIndex((p) => p.id === "painted-porch"));
 const BEAT_MS = 6000;
 const SHOWN = new Set(["painted-stare", "savannah", "bambi", "anna", "sisters", "stare", "loom", "weather", "kirby"]);
 const RING_STORY = [
@@ -472,7 +472,7 @@ export function Player() {
           <Link to="/her" className="nav-link">
             her
           </Link>
-          <Link to="/ball" className="nav-link">
+          <Link to="/ball" search={{ stay: 1 }} className="nav-link">
             ball
           </Link>
           <a
@@ -665,7 +665,7 @@ export function Player() {
                 <Link to="/her" className="nav-link">
                   her
                 </Link>
-                <Link to="/ball" className="nav-link">
+                <Link to="/ball" search={{ stay: 1 }} className="nav-link">
                   ball
                 </Link>
                 <Link to="/farther" className="nav-link">

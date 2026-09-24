@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 
 const SCENES = [
   { id: "pink", title: "her, in pink.", note: "freckles. blue eyes.", src: "/portrait/pink.jpg", motion: "/motion/pink-tall.mp4", audio: "/audio/scenes/anna.mp3" },
@@ -13,10 +13,15 @@ const SCENES = [
 ];
 
 export const Route = createFileRoute("/ball")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    stay: search.stay === 1 || search.stay === "1" ? 1 : undefined,
+  }),
   component: Ball,
 });
 
 export function Ball() {
+  const stay = Route.useSearch().stay === 1;
+  const navigate = useNavigate();
   const root = useRef<HTMLDivElement>(null);
   const [playing, setPlaying] = useState(true);
   const [rate, setRate] = useState(2);
@@ -37,6 +42,10 @@ export function Ball() {
     window.addEventListener("beforeinstallprompt", onPrompt);
     return () => window.removeEventListener("beforeinstallprompt", onPrompt);
   }, []);
+
+  useEffect(() => {
+    if (!stay) navigate({ to: "/" });
+  }, [stay, navigate]);
 
   const install = () => {
     const prompt = installRef.current;
@@ -99,6 +108,8 @@ export function Ball() {
     return () => window.clearInterval(tick);
   }, []);
 
+  if (!stay) return null;
+
   return (
     <div
       className="ball"
@@ -107,9 +118,9 @@ export function Ball() {
       onTouchStart={() => setPlaying(false)}
     >
       <header className="player-chrome">
-        <a className="nav-link" href="/?home=1">
-          back
-        </a>
+        <Link to="/" className="nav-link">
+          leave
+        </Link>
         <p className="brand">peach ball</p>
         <div className="right">
           <button
