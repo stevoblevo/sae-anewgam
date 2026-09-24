@@ -4,5 +4,5 @@ import { Player } from "@/components/player";
 export const Route = createFileRoute("/")({ component: Home });
 
 function Home() {
-  return <Player />;
+  return <Player key="red-raindear" />;
 }

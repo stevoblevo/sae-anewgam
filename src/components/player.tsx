@@ -7,7 +7,7 @@ import { WAYS } from "@/lib/ways";
 const STORY = ["remember", "trace", "notice", "beside", "bambi", "farther"];
 const HEADS = [{ id: "stare", src: "/stare.png", label: "face lock" }];
 const LOCK = ["remember", "stare", "farther"];
-const START = Math.max(0, PLATES.findIndex((p) => p.id === "savannah"));
+const START = Math.max(0, PLATES.findIndex((p) => p.id === "weather"));
 const BEAT_MS = 6000;
 const SHOWN = new Set(["painted-stare", "savannah", "bambi", "anna", "sisters", "stare", "loom", "weather", "kirby"]);
 const RING_STORY = [
@@ -38,7 +38,7 @@ export function Player() {
   const [vidOn, setVidOn] = useState(false);
   const [story, setStory] = useState(false);
   const [peach, setPeach] = useState(0);
-  const [cast, setCast] = useState<Cast>("porch");
+  const [cast, setCast] = useState<Cast>(PLATES[START]?.cast ?? "rain");
   const [phone, setPhone] = useState(false);
   const [leaving, setLeaving] = useState<{ src: string; motion?: string } | null>(null);
   const [pop, setPop] = useState<{ n: number; top: number; left: number } | null>(null);
