@@ -2,6 +2,7 @@ import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-r
 import { createServerFn } from "@tanstack/react-start";
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
+import { Installable } from "@/components/installable";
 import appCss from "../styles.css?url";
 
 const APP_NAME = "Sae · .anewgam";
@@ -86,6 +87,7 @@ export const Route = createRootRoute({
       </head>
       <body>
         <PreviewHostBridge />
+        <Installable />
         <AuthProvider>
           <Outlet />
         </AuthProvider>

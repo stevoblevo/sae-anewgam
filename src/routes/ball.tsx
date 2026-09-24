@@ -21,9 +21,29 @@ export function Ball() {
   const [playing, setPlaying] = useState(true);
   const [rate, setRate] = useState(2);
   const rateRef = useRef(2);
+  const installRef = useRef<any>(null);
   const [at, setAt] = useState(0);
   const atRef = useRef(0);
   const [head, setHead] = useState<{ n: number; src: string; top: number; left: number } | null>(null);
+
+  useEffect(() => {
+    const onPrompt = (e: Event) => {
+      e.preventDefault();
+      installRef.current = e;
+    };
+    window.addEventListener("beforeinstallprompt", onPrompt);
+    return () => window.removeEventListener("beforeinstallprompt", onPrompt);
+  }, []);
+
+  const install = () => {
+    const prompt = installRef.current;
+    if (prompt?.prompt) {
+      prompt.prompt();
+      installRef.current = null;
+      return;
+    }
+    window.location.assign("/?install=1&platform=ios");
+  };
 
   const go = (n: number) => {
     const next = (n + SCENES.length) % SCENES.length;
@@ -75,6 +95,12 @@ export function Ball() {
           </button>
           <button type="button" className="nav-link" onClick={() => setPlaying((p) => !p)}>
             {playing ? "pause" : "play"}
+          </button>
+          <button type="button" className="nav-link" onClick={() => go(Math.floor(Math.random() * SCENES.length))}>
+            spin
+          </button>
+          <button type="button" className="nav-link" onClick={install}>
+            install
           </button>
           <Link to="/her" className="nav-link">
             her
