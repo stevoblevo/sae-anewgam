@@ -1286,3 +1286,63 @@
     opacity: 1;
   }
 }
+
+.tableau {
+  position: relative;
+  height: 100dvh;
+  overflow: hidden;
+  background: #140e10;
+  color: #fff8f2;
+  font-family: var(--font-serif);
+}
+
+.tableau img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tableau .player-chrome {
+  position: relative;
+  z-index: 2;
+  padding: 14px 18px;
+}
+
+.tableau-line {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 12%;
+  z-index: 2;
+  max-width: 36rem;
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.35;
+  text-shadow: 0 2px 14px rgb(0 0 0 / 0.75);
+}
+
+.tableau-dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4%;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.tableau-dots button {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 248 242 / 0.45);
+}
+
+.tableau-dots button.on {
+  background: #fff8f2;
+}
