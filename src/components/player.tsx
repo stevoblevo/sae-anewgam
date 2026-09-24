@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { ArrowRight, Home, Pause, Play } from "lucide-react";
+import { ArrowLeft, ArrowRight, Download, Home, Pause, Play } from "lucide-react";
 import { PLATES } from "@/lib/plates";
 
 const STORY = ["remember", "trace", "notice", "beside", "bambi", "farther"];
@@ -16,12 +16,19 @@ const BEAT_MS = 6000;
 const MOTION = LEAD_AT;
 const SHOW = LEAD_AT;
 
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+};
+
 export function Player() {
   const [i, setI] = useState(START);
   const [playing, setPlaying] = useState(false);
   const [gallery, setGallery] = useState(false);
   const [whisper, setWhisper] = useState(false);
   const [marks, setMarks] = useState(0);
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [installed, setInstalled] = useState(false);
   const iRef = useRef(START);
   const traceRef = useRef<string[]>([]);
   const wheelAt = useRef(0);
@@ -101,6 +108,38 @@ export function Player() {
     return () => window.removeEventListener("wheel", onWheel);
   }, [gallery, stepShow]);
 
+  useEffect(() => {
+    const displayMode = window.matchMedia?.("(display-mode: standalone)").matches;
+    const iosStandalone = (navigator as Navigator & { standalone?: boolean }).standalone;
+    setInstalled(Boolean(displayMode || iosStandalone));
+
+    const capturePrompt = (event: Event) => {
+      event.preventDefault();
+      setInstallPrompt(event as BeforeInstallPromptEvent);
+    };
+    const confirmInstalled = () => {
+      setInstallPrompt(null);
+      setInstalled(true);
+    };
+    window.addEventListener("beforeinstallprompt", capturePrompt);
+    window.addEventListener("appinstalled", confirmInstalled);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", capturePrompt);
+      window.removeEventListener("appinstalled", confirmInstalled);
+    };
+  }, []);
+
+  const install = useCallback(async () => {
+    if (!installPrompt) {
+      window.location.assign("/?install=1");
+      return;
+    }
+    await installPrompt.prompt();
+    const choice = await installPrompt.userChoice;
+    if (choice.outcome === "accepted") setInstalled(true);
+    setInstallPrompt(null);
+  }, [installPrompt]);
+
   return (
     <div
       className="player-shell"
@@ -131,6 +170,14 @@ export function Player() {
           Sae · .anewgam
         </button>
         <div className="right">
+          <button
+            type="button"
+            className="nav-link"
+            aria-label={installed ? "Sae is installed" : "Install Sae"}
+            onClick={() => void install()}
+          >
+            <Download size={14} aria-hidden /> {installed ? "installed" : "install"}
+          </button>
           {Math.max(0, LEAD_AT.indexOf(i)) + 1} / {LEAD_AT.length}
         </div>
       </header>
@@ -157,7 +204,13 @@ export function Player() {
 
         <section className="room">
           <p className="line">{plate.title}</p>
-          <p className="tag">{whisper ? "remember · the face · farther" : `${plate.note} · scroll`}</p>
+          <p className="tag" aria-live="polite">
+            {whisper
+              ? "remember · the face · farther"
+              : playing
+                ? `${plate.note} · autoplay moves gently through the rooms`
+                : `${plate.note} · scroll or swipe to choose the next room`}
+          </p>
           <div className="heads">
             {HEADS.map((h) => (
               <button key={h.id} type="button" className="face-lock" onClick={() => touch(h.id)}>
@@ -187,12 +240,16 @@ export function Player() {
           </div>
           <div className="controls">
             <div className="bar">
-              <button type="button" aria-label="next" onClick={step}>
+              <button type="button" aria-label="previous room" onClick={() => stepShow(-1)}>
+                <ArrowLeft size={18} strokeWidth={1.6} />
+              </button>
+              <button type="button" aria-label="next room" onClick={() => stepShow(1)}>
                 <ArrowRight size={18} strokeWidth={1.6} />
               </button>
               <button
                 type="button"
                 aria-label={playing ? "pause" : "play"}
+                title={playing ? "Pause autoplay" : "Autoplay each room"}
                 onClick={() => setPlaying((p) => !p)}
               >
                 {playing ? <Pause size={18} strokeWidth={1.6} /> : <Play size={18} strokeWidth={1.6} />}
