@@ -206,6 +206,46 @@
   outline-offset: 2px;
 }
 
+.story {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 48px;
+  z-index: 8;
+  max-width: 420px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgb(28 16 18 / 0.78);
+  color: #fff8f2;
+}
+
+.story p {
+  margin: 0 0 8px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.story button {
+  margin-right: 10px;
+  border: 0;
+  background: transparent;
+  color: #fff8f2;
+  letter-spacing: 0.08em;
+}
+
+.story-mark {
+  position: absolute;
+  left: 18px;
+  bottom: 52px;
+  z-index: 8;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid #fff8f2;
+  background: #8d3a3a;
+}
+
 .player-shell.way-white .player-chrome,
 .player-shell.way-white .skein-rail,
 .player-shell.way-white .heads,

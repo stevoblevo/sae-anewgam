@@ -10,6 +10,12 @@ const LOCK = ["remember", "stare", "farther"];
 const START = Math.max(0, PLATES.findIndex((p) => p.id === "savannah"));
 const BEAT_MS = 6000;
 const SHOWN = new Set(["painted-stare", "savannah", "bambi", "anna", "sisters", "stare", "loom", "weather", "kirby"]);
+const RING_STORY = [
+  "She is in the ring. The boards are still dry. Nobody has been put down on them.",
+  "The red is the lantern light, pulled in close. It looks like a loss if you only see the color. Look at her feet. They are under her. Look at her mouth. It is almost a smile.",
+  "This is not the minute after. This is the minute she is getting ready. The other one has not stepped in. The ring is waiting on a second pair of shoes.",
+  "If she loses, the story changes. It has not changed yet.",
+];
 const PEACH = ["hold.", "she smiles.", "again."];
 const CASTS: Cast[] = ["porch", "peach", "rain", "well", "kirby", "white"];
 const CAST_NAME: Record<Cast, string> = {
@@ -30,6 +36,7 @@ export function Player() {
   const [motionChoice, setMotionChoice] = useState<boolean | null>(null);
   const [reduced, setReduced] = useState(false);
   const [vidOn, setVidOn] = useState(false);
+  const [story, setStory] = useState(false);
   const [peach, setPeach] = useState(0);
   const [cast, setCast] = useState<Cast>("porch");
   const [phone, setPhone] = useState(false);
@@ -203,6 +210,14 @@ export function Player() {
   const motionOn = motionChoice ?? !reduced;
 
   useEffect(() => {
+    if (plate.id !== "ring") {
+      setStory(false);
+      return;
+    }
+    setStory(true);
+  }, [plate.id]);
+
+  useEffect(() => {
     setVidOn(false);
   }, [plate.motion]);
 
@@ -315,6 +330,34 @@ export function Player() {
           />
         ))}
       </nav>
+      {plate.id === "ring" && story ? (
+        <aside className="story">
+          {RING_STORY.map((line) => (
+            <p key={line}>{line}</p>
+          ))}
+          <div>
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window.speechSynthesis === "undefined") return;
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(RING_STORY.join(" "));
+                utterance.rate = 0.92;
+                const emily = window.speechSynthesis.getVoices().find((v) => /emily/i.test(v.name));
+                if (emily) utterance.voice = emily;
+                window.speechSynthesis.speak(utterance);
+              }}
+            >
+              read
+            </button>
+            <button type="button" onClick={() => setStory(false)}>
+              close
+            </button>
+          </div>
+        </aside>
+      ) : plate.id === "ring" ? (
+        <button type="button" className="story-mark" aria-label="story" onClick={() => setStory(true)} />
+      ) : null}
       <audio ref={bedRef} preload="auto" />
       <audio ref={nextRef} preload="auto" />
       <img key={shown} className="world arriving" alt="" src={shown} />
