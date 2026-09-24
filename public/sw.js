@@ -1,4 +1,4 @@
-const CACHE = "sae-pwa-5";
+const CACHE = "sae-pwa-6";
 
 self.addEventListener("install", () => {
   self.skipWaiting();
@@ -18,15 +18,8 @@ self.addEventListener("fetch", (event) => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
-  if (
-    url.pathname.startsWith("/@") ||
-    url.pathname.startsWith("/src/") ||
-    url.pathname.startsWith("/node_modules/") ||
-    url.pathname.startsWith("/__vite") ||
-    url.search.includes("t=")
-  ) {
-    return;
-  }
+  if (req.mode === "navigate") return;
+  if (!/\.(png|jpe?g|webp|gif|svg|mp4|mp3|woff2?)$/i.test(url.pathname)) return;
   event.respondWith(cacheFirst(req));
 });
 
@@ -41,5 +34,5 @@ async function cacheFirst(req) {
     .catch(() => null);
   if (hit) return hit;
   const fresh = await refresh;
-  return fresh || new Response("offline", { status: 503, headers: { "content-type": "text/plain" } });
+  return fresh || fetch(req);
 }

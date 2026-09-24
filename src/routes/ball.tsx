@@ -47,6 +47,16 @@ export function Ball() {
     if (!stay) navigate({ to: "/" });
   }, [stay, navigate]);
 
+  useEffect(() => {
+    return () => {
+      root.current?.querySelectorAll("video").forEach((video) => video.pause());
+      const clip = audioRef.current;
+      if (!clip) return;
+      clip.pause();
+      clip.muted = true;
+    };
+  }, []);
+
   const install = () => {
     const prompt = installRef.current;
     if (prompt?.prompt) {

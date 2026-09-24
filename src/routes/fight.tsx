@@ -13,12 +13,16 @@ export function Fight() {
   useEffect(() => {
     const node = canvas.current;
     if (!node) return;
-    return mountStare(node, {
-      ring: "/stare.png",
-      face: "/stare.png",
-      well: "/well-cry.jpg",
-      onLine: setLine,
-    });
+    try {
+      return mountStare(node, {
+        ring: "/stare.png",
+        face: "/stare.png",
+        well: "/well-cry.jpg",
+        onLine: setLine,
+      });
+    } catch {
+      setLine("The stare couldn't start.");
+    }
   }, []);
 
   return (
