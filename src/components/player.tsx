@@ -16,6 +16,11 @@ const RING_STORY = [
   "This is not the minute after. This is the minute she is getting ready. The other one has not stepped in. The ring is waiting on a second pair of shoes.",
   "If she loses, the story changes. It has not changed yet.",
 ];
+const RAIN_STORY = [
+  "Red rain is the same well. Other weather. Not another world.",
+  "The deer is not a mascot. Dear deer, in the arch. Beside, not ahead.",
+  "Under that rain, the way home stays open.",
+];
 const PEACH = ["hold.", "she smiles.", "again."];
 const CASTS: Cast[] = ["porch", "peach", "rain", "well", "kirby", "white"];
 const CAST_NAME: Record<Cast, string> = {
@@ -44,6 +49,7 @@ export function Player() {
   const [pop, setPop] = useState<{ n: number; top: number; left: number } | null>(null);
   const [pink, setPink] = useState(false);
   const [hear, setHear] = useState(true);
+  const hearRef = useRef(true);
   const pinkRef = useRef(false);
   const seenRef = useRef({ deer: false, reign: false });
   const [immersive, setImmersive] = useState(false);
@@ -210,11 +216,7 @@ export function Player() {
   const motionOn = motionChoice ?? !reduced;
 
   useEffect(() => {
-    if (plate.id !== "ring") {
-      setStory(false);
-      return;
-    }
-    setStory(true);
+    setStory(plate.id === "ring" || plate.id === "weather" || plate.id === "raindear");
   }, [plate.id]);
 
   useEffect(() => {
@@ -260,16 +262,24 @@ export function Player() {
     incoming.src = src;
     incoming.loop = true;
     incoming.volume = 0;
-    if (!hear) {
+    if (!hearRef.current) {
+      incoming.muted = true;
+      if (outgoing) outgoing.muted = true;
       incoming.pause();
       outgoing?.pause();
       window.speechSynthesis?.cancel();
       return;
     }
+    incoming.muted = false;
     incoming.play().catch(() => {});
     const start = performance.now();
     let raf = 0;
     const fade = (now: number) => {
+      if (!hearRef.current) {
+        incoming.pause();
+        outgoing?.pause();
+        return;
+      }
       const t = Math.min(1, (now - start) / 700);
       incoming.volume = 0.55 * t;
       if (outgoing) outgoing.volume = 0.55 * (1 - t);
@@ -284,10 +294,13 @@ export function Player() {
     <div
       className={`player-shell${immersive ? " immersive" : ""}${cast === "white" ? " way-white" : ""}`}
       ref={shellRef}
-      onPointerDown={() => {
-        if (!hear) return;
+      onPointerDown={(e) => {
+        if (!hearRef.current) return;
+        if ((e.target as HTMLElement).closest("[data-hear]")) return;
         const live = side.current === 1 ? bedRef.current : nextRef.current;
-        live?.play().catch(() => {});
+        if (!live) return;
+        live.muted = false;
+        live.play().catch(() => {});
       }}
       onTouchStart={(e) => {
         touchY.current = e.changedTouches[0]?.clientY ?? null;
@@ -330,9 +343,9 @@ export function Player() {
           />
         ))}
       </nav>
-      {plate.id === "ring" && story ? (
-        <aside className="story">
-          {RING_STORY.map((line) => (
+      {story && (plate.id === "ring" || plate.id === "weather" || plate.id === "raindear") ? (
+        <aside className="story" onPointerDown={(e) => e.stopPropagation()}>
+          {(plate.id === "ring" ? RING_STORY : RAIN_STORY).map((line) => (
             <p key={line}>{line}</p>
           ))}
           <div>
@@ -341,7 +354,8 @@ export function Player() {
               onClick={() => {
                 if (typeof window.speechSynthesis === "undefined") return;
                 window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(RING_STORY.join(" "));
+                const lines = plate.id === "ring" ? RING_STORY : RAIN_STORY;
+                const utterance = new SpeechSynthesisUtterance(lines.join(" "));
                 utterance.rate = 0.92;
                 const emily = window.speechSynthesis.getVoices().find((v) => /emily/i.test(v.name));
                 if (emily) utterance.voice = emily;
@@ -355,8 +369,8 @@ export function Player() {
             </button>
           </div>
         </aside>
-      ) : plate.id === "ring" ? (
-        <button type="button" className="story-mark" aria-label="story" onClick={() => setStory(true)} />
+      ) : plate.id === "ring" || plate.id === "weather" || plate.id === "raindear" ? (
+        <button type="button" className="story-mark" aria-label="story" onPointerDown={(e) => e.stopPropagation()} onClick={() => setStory(true)} />
       ) : null}
       <audio ref={bedRef} preload="auto" />
       <audio ref={nextRef} preload="auto" />
@@ -417,7 +431,34 @@ export function Player() {
           >
             {motionOn ? "motion on" : "motion"}
           </button>
-          <button type="button" className="nav-link" onClick={() => setHear((h) => !h)}>
+          <button
+            type="button"
+            className="nav-link"
+            data-hear=""
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={() => {
+              const next = !hearRef.current;
+              hearRef.current = next;
+              setHear(next);
+              window.speechSynthesis?.cancel();
+              for (const el of document.querySelectorAll("audio")) {
+                const audio = el as HTMLAudioElement;
+                audio.muted = !next;
+                if (!next) {
+                  audio.volume = 0;
+                  audio.pause();
+                }
+              }
+              if (next) {
+                const live = side.current === 1 ? bedRef.current : nextRef.current;
+                if (live) {
+                  live.muted = false;
+                  live.volume = 0.55;
+                  live.play().catch(() => {});
+                }
+              }
+            }}
+          >
             {hear ? "quiet" : "hear"}
           </button>
           <button type="button" className="nav-link immerse" onClick={immerse}>
