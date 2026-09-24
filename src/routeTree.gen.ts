@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BallRouteImport } from './routes/ball'
 import { Route as FartherRouteImport } from './routes/farther'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BallRoute = BallRouteImport.update({
+  id: '/ball',
+  path: '/ball',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FartherRoute = FartherRouteImport.update({
@@ -25,27 +31,31 @@ const FartherRoute = FartherRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ball': typeof BallRoute
   '/farther': typeof FartherRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ball': typeof BallRoute
   '/farther': typeof FartherRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ball': typeof BallRoute
   '/farther': typeof FartherRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/farther'
+  fullPaths: '/' | '/ball' | '/farther'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/farther'
-  id: '__root__' | '/' | '/farther'
+  to: '/' | '/ball' | '/farther'
+  id: '__root__' | '/' | '/ball' | '/farther'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BallRoute: typeof BallRoute
   FartherRoute: typeof FartherRoute
 }
 
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ball': {
+      id: '/ball'
+      path: '/ball'
+      fullPath: '/ball'
+      preLoaderRoute: typeof BallRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/farther': {
@@ -70,6 +87,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BallRoute: BallRoute,
   FartherRoute: FartherRoute,
 }
 export const routeTree = rootRouteImport

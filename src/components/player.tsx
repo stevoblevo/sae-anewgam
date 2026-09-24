@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Home, Pause, Play } from "lucide-react";
 import { PLATES } from "@/lib/plates";
 
@@ -15,6 +15,7 @@ const START = LEAD_AT[0] ?? 0;
 const BEAT_MS = 6000;
 const MOTION = LEAD_AT;
 const SHOW = LEAD_AT;
+const PEACH = ["hold.", "she smiles.", "again."];
 
 export function Player() {
   const [i, setI] = useState(START);
@@ -22,6 +23,10 @@ export function Player() {
   const [gallery, setGallery] = useState(false);
   const [whisper, setWhisper] = useState(false);
   const [marks, setMarks] = useState(0);
+  const [live, setLive] = useState(true);
+  const [reduced, setReduced] = useState(false);
+  const [vidOn, setVidOn] = useState(false);
+  const [peach, setPeach] = useState(0);
   const iRef = useRef(START);
   const traceRef = useRef<string[]>([]);
   const wheelAt = useRef(0);
@@ -95,11 +100,26 @@ export function Player() {
       const now = performance.now();
       if (now - wheelAt.current < 380) return;
       wheelAt.current = now;
+      setPlaying(false);
       stepShow(e.deltaY > 0 ? 1 : -1);
     };
     window.addEventListener("wheel", onWheel, { passive: false });
     return () => window.removeEventListener("wheel", onWheel);
   }, [gallery, stepShow]);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const apply = () => setReduced(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
+
+  useEffect(() => {
+    setVidOn(false);
+  }, [plate.src, live, reduced]);
+
+  const showVid = live && !reduced && !!plate.motion;
 
   return (
     <div
@@ -117,11 +137,19 @@ export function Player() {
         stepShow(dy > 0 ? 1 : -1);
       }}
     >
-      {plate.motion ? (
-        <video key={plate.motion} className="world" src={plate.motion} poster={plate.src} autoPlay muted loop playsInline />
-      ) : (
-        <img key={plate.src} className="world" alt="" src={plate.src} />
-      )}
+      <img key={plate.src} className="world" alt="" src={plate.src} />
+      {showVid ? (
+        <video
+          key={plate.motion}
+          className={`world film-layer${vidOn ? " on" : ""}`}
+          src={plate.motion}
+          muted
+          loop
+          playsInline
+          autoPlay
+          onCanPlay={() => setVidOn(true)}
+        />
+      ) : null}
 
       <header className="player-chrome">
         <button type="button" className="nav-link" onClick={() => setGallery(true)}>
@@ -131,6 +159,15 @@ export function Player() {
           Sae · .anewgam
         </button>
         <div className="right">
+          <button type="button" className="nav-link" onClick={() => setLive((v) => !v)}>
+            {live && !reduced ? "still" : "motion"}
+          </button>
+          <Link to="/ball" className="nav-link">
+            ball
+          </Link>
+          <a className="nav-link" href="/?install=1">
+            install
+          </a>
           {Math.max(0, LEAD_AT.indexOf(i)) + 1} / {LEAD_AT.length}
         </div>
       </header>
@@ -155,8 +192,16 @@ export function Player() {
           })}
         </aside>
 
-        <section className="room">
+        <section
+          className="room"
+          onClick={(e) => {
+            if (plate.id !== "bambi") return;
+            if ((e.target as HTMLElement).closest("button")) return;
+            setPeach((n) => (n + 1) % PEACH.length);
+          }}
+        >
           <p className="line">{plate.title}</p>
+          {plate.id === "bambi" ? <p className="tag">{PEACH[peach]}</p> : null}
           <p className="tag">{whisper ? "remember · the face · farther" : `${plate.note} · scroll`}</p>
           <div className="heads">
             {HEADS.map((h) => (

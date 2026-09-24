@@ -156,6 +156,17 @@
   animation: plate-in 420ms ease;
 }
 
+.film-layer {
+  z-index: 1;
+  opacity: 0;
+  animation: none;
+  transition: opacity 420ms ease;
+}
+
+.film-layer.on {
+  opacity: 1;
+}
+
 @keyframes plate-in {
   from { opacity: 0.35; }
   to { opacity: 1; }
@@ -798,4 +809,50 @@
     transition: none;
     animation: none;
   }
+}
+
+.ball {
+  height: 100dvh;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  background: #140e10;
+}
+
+.ball-scene {
+  position: relative;
+  height: 100dvh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.ball-scene img,
+.ball-scene video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ball-scene video {
+  z-index: 1;
+}
+
+.ball-cap {
+  position: absolute;
+  left: 6%;
+  bottom: 8%;
+  z-index: 2;
+  color: #fff8f2;
+  text-shadow: 0 2px 16px rgb(0 0 0 / 0.55);
+}
+
+.player-chrome .right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.player-chrome .right .nav-link {
+  text-decoration: none;
 }

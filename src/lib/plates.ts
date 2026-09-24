@@ -20,7 +20,7 @@ export const PLATES: Plate[] = [
   { id: "porch", title: "porch at dusk.", note: "lantern", src: "/porch.jpg", motion: "/motion/porch.mp4" },
   { id: "lift", title: "the lantern finds her.", note: "porch, closer", src: "/porch-lift.jpg" },
   { id: "wait", title: "she waits.", note: "between rooms", src: "/wait.jpg" },
-  { id: "stare", title: "pf stare.", note: "porch fight · face lock", src: "/stare.png", motion: "/motion/stare.mp4" },
+  { id: "stare", title: "pf stare.", note: "porch fight · face lock", src: "/stare.png", motion: "/motion/stare-wink.mp4" },
   { id: "weather", title: "red rain.", note: "same well, other weather", src: "/weather.jpg", motion: "/motion/rain.mp4" },
   { id: "reach", title: "the way home stays open.", note: "sae reach", src: "/sae-reach.jpg" },
   { id: "delve", title: "everdelve.", note: "weee · different stories, same world", src: "/everdelve.jpg", motion: "/motion/delve.mp4", shelf: "later" },
@@ -30,5 +30,6 @@ export const PLATES: Plate[] = [
   { id: "painted-porch", title: "the porch, painted.", note: "same dusk, garden", src: "/garden-porch.jpg" },
   { id: "painted-stare", title: "the stare, painted.", note: "same face, garden", src: "/garden-stare.jpg" },
   { id: "anna", title: "her, in pink.", note: "anna · peach fall", src: "/anna.jpg" },
-  { id: "bambi", title: "peach fall.", note: "bambi · the stare, recast", src: "/bambi.jpg", motion: "/motion/peach.mp4" },
+  { id: "bambi", title: "peach fall.", note: "bambi · the stare, recast", src: "/bambi.jpg", motion: "/motion/wink.mp4" },
+  { id: "sisters", title: "say who. say hi.", note: "peach and red reign", src: "/sisters.jpg" },
 ];
