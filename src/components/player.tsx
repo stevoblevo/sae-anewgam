@@ -19,7 +19,7 @@ const CAST_NAME: Record<Cast, string> = {
 
 export function Player() {
   const [i, setI] = useState(START);
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState(true);
   const [gallery, setGallery] = useState(false);
   const [whisper, setWhisper] = useState(false);
   const [marks, setMarks] = useState(0);
