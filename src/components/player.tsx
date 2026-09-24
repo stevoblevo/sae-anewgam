@@ -20,11 +20,11 @@ const CAST_NAME: Record<Cast, string> = {
 
 export function Player() {
   const [i, setI] = useState(START);
-  const [playing, setPlaying] = useState(true);
+  const [playing, setPlaying] = useState(false);
   const [gallery, setGallery] = useState(false);
   const [whisper, setWhisper] = useState(false);
   const [marks, setMarks] = useState(0);
-  const [live, setLive] = useState(true);
+  const [motionChoice, setMotionChoice] = useState<boolean | null>(null);
   const [reduced, setReduced] = useState(false);
   const [vidOn, setVidOn] = useState(false);
   const [peach, setPeach] = useState(0);
@@ -135,11 +135,11 @@ export function Player() {
     return () => mq.removeEventListener("change", apply);
   }, []);
 
+  const motionOn = motionChoice ?? !reduced;
+
   useEffect(() => {
     setVidOn(false);
-  }, [shown, live, reduced]);
-
-  const showVid = live && !reduced && !!plate.motion;
+  }, [shown, motionOn]);
 
   return (
     <div
@@ -158,16 +158,21 @@ export function Player() {
       }}
     >
       <img key={shown} className="world" alt="" src={shown} />
-      {showVid ? (
+      {plate.motion ? (
         <video
           key={plate.motion}
-          className={`world film-layer${vidOn ? " on" : ""}`}
+          className={`world film-layer${motionOn && vidOn ? " on" : ""}`}
           src={plate.motion}
           muted
           loop
           playsInline
-          autoPlay
-          onCanPlay={() => setVidOn(true)}
+          autoPlay={motionOn}
+          preload="auto"
+          onCanPlay={(e) => {
+            if (!motionOn) return;
+            e.currentTarget.play().catch(() => {});
+            setVidOn(true);
+          }}
         />
       ) : null}
 
@@ -179,8 +184,18 @@ export function Player() {
           Sae · .anewgam
         </button>
         <div className="right">
-          <button type="button" className="nav-link" onClick={() => setLive((v) => !v)}>
-            {live && !reduced ? "still" : "motion"}
+          <button
+            type="button"
+            className="nav-link"
+            onClick={(e) => {
+              const next = !motionOn;
+              setMotionChoice(next);
+              const v = (e.currentTarget.ownerDocument.querySelector("video.world") as HTMLVideoElement | null);
+              if (next) v?.play().catch(() => {});
+              else v?.pause();
+            }}
+          >
+            {motionOn ? "motion on" : "motion"}
           </button>
           <Link to="/ball" className="nav-link">
             ball
