@@ -221,6 +221,16 @@ export function Player() {
           }}
         >
           <p className="line">{plate.title}</p>
+          {plate.id === "loom" ? (
+            <div className="doors">
+              <button type="button" className="nav-link" onClick={() => go(PLATES.findIndex((p) => p.id === "bambi"))}>
+                peach fall
+              </button>
+              <button type="button" className="nav-link" onClick={() => go(PLATES.findIndex((p) => p.id === "weather"))}>
+                red rain
+              </button>
+            </div>
+          ) : null}
           {plate.href ? (
             <a className="nav-link" href={plate.href} target="_blank" rel="noreferrer">
               saelion · anewgam
@@ -298,7 +308,7 @@ export function Player() {
             >
               <img src={p.src} alt="" />
               <span>
-                {p.id === "savannah" ? "savannah" : p.id === "violet" ? "purple" : p.id === "painted-porch" ? "porch" : p.id === "bambi" ? "peach" : p.id === "anna" ? "pink" : p.id === "weather" ? "rain" : p.id === "stare" ? "stare" : p.id === "recognition" ? "gen 2" : p.id === "crossing" ? "gen 4" : p.id === "further" ? "gen 22" : p.cast ?? p.id}
+                {p.id === "savannah" ? "cute" : p.id === "violet" ? "purple" : p.id === "painted-porch" ? "porch" : p.id === "bambi" ? "peach" : p.id === "anna" ? "pink" : p.id === "weather" ? "rain" : p.id === "stare" ? "stare" : p.id === "recognition" ? "gen 2" : p.id === "crossing" ? "gen 4" : p.id === "further" ? "gen 22" : p.id === "loom" ? "loom" : p.cast ?? p.id}
               </span>
             </button>
           );

@@ -34,7 +34,8 @@ export const PLATES: Plate[] = [
   { id: "ring", title: "porch ring.", note: "porch fight · ring", src: "/ring.png", cast: "porch", seq: 7 },
   { id: "blossom", title: "a ring of blossoms.", note: "the ring, in the well’s paint", src: "/garden-ring.jpg", motion: "/motion/garden-ring.mp4", cast: "peach" },
   { id: "painted-porch", title: "she notices you.", note: "painted porch", src: "/garden-porch.jpg", motion: "/motion/porch-face.mp4", cast: "porch", seq: 2 },
-  { id: "savannah", title: "purple savannah.", note: "the stare, in purple", src: "/savannah.jpg", motion: "/motion/savannah.mp4", cast: "porch", seq: 1 },
+  { id: "savannah", title: "purple.", note: "the cute stare", src: "/cute.jpg", motion: "/motion/cute.mp4", cast: "porch", seq: 1 },
+  { id: "savannah-kept", title: "a painted savannah.", note: "kept", src: "/savannah.jpg", motion: "/motion/savannah.mp4", shelf: "later", cast: "porch" },
   { id: "violet", title: "purple, beside.", note: "the other stare", src: "/violet.jpg", srcPhone: "/violet-phone.jpg", motion: "/motion/violet.mp4", cast: "porch", seq: 3 },
   { id: "painted-stare", title: "the stare, painted.", note: "same face, garden", src: "/garden-stare.jpg", cast: "peach" },
   { id: "anna", title: "her, in pink.", note: "anna · peach fall", src: "/anna.jpg", motion: "/motion/anna.mp4", cast: "peach" },
@@ -43,7 +44,8 @@ export const PLATES: Plate[] = [
   { id: "recognition", title: "you came.", note: "gen 2", src: "/gen2.jpg", cast: "peach" },
   { id: "crossing", title: "another path.", note: "gen 4", src: "/gen4.jpg", cast: "peach" },
   { id: "further", title: "together, further.", note: "gen 22", src: "/gen22.jpg", cast: "peach" },
-  { id: "kirby", title: "say kirby.", note: "saelion · anewgam", src: "/kirby.png", cast: "kirby", href: "https://anewgam-liqc.vercel.app" },
+  { id: "kirby", title: "say kirby.", note: "saelion · anewgam", src: "/kirby.png", cast: "kirby", seq: 2, href: "https://anewgam-liqc.vercel.app" },
+  { id: "loom", title: "the loom room.", note: "skins · the guardian · the door", src: "/loom.png", motion: "/motion/loom.mp4", cast: "kirby", seq: 1 },
 ];
 
 export function platesIn(cast: Cast) {
