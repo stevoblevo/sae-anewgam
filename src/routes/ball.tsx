@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 const SCENES = [
+  { id: "pink", title: "her, in pink.", note: "freckles. blue eyes.", src: "/portrait/pink.jpg", motion: "/motion/pink-tall.mp4" },
+  { id: "purple", title: "purple.", note: "blue eyes.", src: "/cute.jpg", motion: "/motion/cute.mp4" },
   { id: "peach", title: "peach fall.", note: "she winks.", src: "/portrait/peach.jpg", motion: "/motion/peach-tall.mp4" },
-  { id: "pink", title: "her, in pink.", note: "anna.", src: "/portrait/pink.jpg", motion: "/motion/pink-tall.mp4" },
   { id: "sisters", title: "say who. say hi.", note: "peach, and her red sister.", src: "/portrait/sisters.jpg", motion: "/motion/sisters-tall.mp4" },
   { id: "painted", title: "the stare, painted.", note: "same face, garden.", src: "/portrait/painted.jpg", motion: "/motion/painted-tall.mp4" },
   { id: "stare", title: "pf stare.", note: "she winks too.", src: "/portrait/stare.jpg", motion: "/motion/stare-tall.mp4" },
@@ -17,6 +18,8 @@ export const Route = createFileRoute("/ball")({
 export function Ball() {
   const root = useRef<HTMLDivElement>(null);
   const [playing, setPlaying] = useState(true);
+  const [rate, setRate] = useState(2);
+  const rateRef = useRef(2);
   const [at, setAt] = useState(0);
   const atRef = useRef(0);
 
@@ -26,6 +29,13 @@ export function Ball() {
     setAt(next);
     root.current?.querySelectorAll(".ball-scene")[next]?.scrollIntoView({ behavior: "smooth" });
   };
+
+  useEffect(() => {
+    rateRef.current = rate;
+    root.current?.querySelectorAll("video").forEach((v) => {
+      v.playbackRate = rate;
+    });
+  }, [rate]);
 
   useEffect(() => {
     if (!playing) return;
@@ -46,6 +56,9 @@ export function Ball() {
         </a>
         <p className="brand">peach ball</p>
         <div className="right">
+          <button type="button" className="nav-link" onClick={() => setRate((r) => (r === 2 ? 1 : 2))}>
+            {rate === 2 ? "2×" : "1×"}
+          </button>
           <button type="button" className="nav-link" onClick={() => setPlaying((p) => !p)}>
             {playing ? "pause" : "play"}
           </button>
@@ -62,7 +75,18 @@ export function Ball() {
       {SCENES.map((s) => (
         <section key={s.id} className="ball-scene" onClick={() => setPlaying((p) => !p)}>
           <img alt="" src={s.src} />
-          {s.motion ? <video src={s.motion} muted loop playsInline autoPlay /> : null}
+          {s.motion ? (
+            <video
+              src={s.motion}
+              muted
+              loop
+              playsInline
+              autoPlay
+              onLoadedData={(e) => {
+                e.currentTarget.playbackRate = rateRef.current;
+              }}
+            />
+          ) : null}
           <div className="ball-cap">
             <p className="line">{s.title}</p>
             <p className="tag">{s.note}</p>
