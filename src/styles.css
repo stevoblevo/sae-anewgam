@@ -868,3 +868,25 @@
 .player-chrome .right .nav-link {
   text-decoration: none;
 }
+
+.player-shell.immersive .film,
+.player-shell.immersive .player-stage,
+.player-shell.immersive .player-chrome > :not(.right) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.player-shell.immersive .player-chrome {
+  background: none;
+  pointer-events: none;
+}
+
+.player-shell.immersive .right > :not(.immerse) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.player-shell.immersive .immerse {
+  opacity: 1;
+  pointer-events: auto;
+}

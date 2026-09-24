@@ -30,7 +30,9 @@ export function Player() {
   const [peach, setPeach] = useState(0);
   const [cast, setCast] = useState<Cast>("porch");
   const [phone, setPhone] = useState(false);
+  const [immersive, setImmersive] = useState(false);
   const installRef = useRef<any>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
   const iRef = useRef(START);
   const traceRef = useRef<string[]>([]);
   const wheelAt = useRef(0);
@@ -151,9 +153,21 @@ export function Player() {
     return () => window.removeEventListener("beforeinstallprompt", onPrompt);
   }, []);
 
+  const immerse = () => {
+    const el = shellRef.current;
+    if (immersive) {
+      setImmersive(false);
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+      return;
+    }
+    setImmersive(true);
+    el?.requestFullscreen?.().catch(() => {});
+  };
+
   return (
     <div
-      className="player-shell"
+      className={`player-shell${immersive ? " immersive" : ""}`}
+      ref={shellRef}
       onTouchStart={(e) => {
         touchY.current = e.changedTouches[0]?.clientY ?? null;
       }}
@@ -207,6 +221,9 @@ export function Player() {
             }}
           >
             {motionOn ? "motion on" : "motion"}
+          </button>
+          <button type="button" className="nav-link immerse" onClick={immerse}>
+            {immersive ? "close" : "immerse"}
           </button>
           <Link to="/ball" className="nav-link">
             ball
