@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, Download, Home, Pause, Play } from "lucide-react";
+import { MotionModeControl } from "@/components/motion-mode-control";
 import { PLATES } from "@/lib/plates";
 
 const STORY = ["remember", "trace", "notice", "beside", "bambi", "farther"];
@@ -21,6 +22,8 @@ type BeforeInstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 };
 
+type InstallStatus = "ready" | "unavailable" | "installing" | "waiting" | "error";
+
 export function Player() {
   const [i, setI] = useState(START);
   const [playing, setPlaying] = useState(false);
@@ -29,10 +32,12 @@ export function Player() {
   const [marks, setMarks] = useState(0);
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
+  const [installStatus, setInstallStatus] = useState<InstallStatus>("ready");
   const iRef = useRef(START);
   const traceRef = useRef<string[]>([]);
   const wheelAt = useRef(0);
   const touchY = useRef<number | null>(null);
+  const installLock = useRef(false);
   const navigate = useNavigate();
 
   const plate = PLATES[i] ?? PLATES[0];
@@ -111,7 +116,9 @@ export function Player() {
   useEffect(() => {
     const displayMode = window.matchMedia?.("(display-mode: standalone)").matches;
     const iosStandalone = (navigator as Navigator & { standalone?: boolean }).standalone;
-    setInstalled(Boolean(displayMode || iosStandalone));
+    const isInstalled = Boolean(displayMode || iosStandalone);
+    setInstalled(isInstalled);
+    if (isInstalled) setInstallStatus("ready");
 
     const capturePrompt = (event: Event) => {
       event.preventDefault();
@@ -120,6 +127,7 @@ export function Player() {
     const confirmInstalled = () => {
       setInstallPrompt(null);
       setInstalled(true);
+      setInstallStatus("ready");
     };
     window.addEventListener("beforeinstallprompt", capturePrompt);
     window.addEventListener("appinstalled", confirmInstalled);
@@ -130,15 +138,34 @@ export function Player() {
   }, []);
 
   const install = useCallback(async () => {
+    if (installed || installLock.current) return;
     if (!installPrompt) {
-      window.location.assign("/?install=1");
+      setInstallStatus("unavailable");
       return;
     }
-    await installPrompt.prompt();
-    const choice = await installPrompt.userChoice;
-    if (choice.outcome === "accepted") setInstalled(true);
+    installLock.current = true;
     setInstallPrompt(null);
-  }, [installPrompt]);
+    setInstallStatus("installing");
+    try {
+      await installPrompt.prompt();
+      const choice = await installPrompt.userChoice;
+      setInstallStatus(choice.outcome === "accepted" ? "waiting" : "ready");
+    } catch {
+      setInstallStatus("error");
+    } finally {
+      installLock.current = false;
+    }
+  }, [installed, installPrompt]);
+
+  const installCopy = installed
+    ? "installed"
+    : installStatus === "unavailable"
+      ? "install unavailable · open the guide"
+      : installStatus === "installing" || installStatus === "waiting"
+        ? "install prompt open"
+        : installStatus === "error"
+          ? "install prompt failed · try again"
+          : "";
 
   return (
     <div
@@ -156,11 +183,7 @@ export function Player() {
         stepShow(dy > 0 ? 1 : -1);
       }}
     >
-      {plate.motion ? (
-        <video key={plate.motion} className="world" src={plate.motion} poster={plate.src} autoPlay muted loop playsInline />
-      ) : (
-        <img key={plate.src} className="world" alt="" src={plate.src} />
-      )}
+      <MotionModeControl posterSrc={plate.src} motionSrc={plate.motion} />
 
       <header className="player-chrome">
         <button type="button" className="nav-link" onClick={() => setGallery(true)}>
@@ -175,9 +198,16 @@ export function Player() {
             className="nav-link"
             aria-label={installed ? "Sae is installed" : "Install Sae"}
             onClick={() => void install()}
+            disabled={installed || installStatus === "installing" || installStatus === "waiting"}
           >
             <Download size={14} aria-hidden /> {installed ? "installed" : "install"}
           </button>
+          {installStatus === "unavailable" ? (
+            <a href="/?install=1" className="nav-link">
+              guide
+            </a>
+          ) : null}
+          {installCopy ? <span aria-live="polite">{installCopy}</span> : null}
           {Math.max(0, LEAD_AT.indexOf(i)) + 1} / {LEAD_AT.length}
         </div>
       </header>
@@ -208,8 +238,8 @@ export function Player() {
             {whisper
               ? "remember · the face · farther"
               : playing
-                ? `${plate.note} · autoplay moves gently through the rooms`
-                : `${plate.note} · scroll or swipe to choose the next room`}
+                ? `${plate.note} · auto · pause to browse`
+                : `${plate.note} · swipe to explore`}
           </p>
           <div className="heads">
             {HEADS.map((h) => (
@@ -226,7 +256,12 @@ export function Player() {
               const p = n == null ? undefined : PLATES[n];
               if (!p || n == null) return null;
               return (
-                <button type="button" className="glass" aria-label="next room" onClick={() => go(n)}>
+                <button
+                  type="button"
+                  className="glass"
+                  aria-label="next room"
+                  onClick={() => go(n)}
+                >
                   <img src={p.src} alt="" />
                   <span>next</span>
                 </button>
@@ -252,7 +287,11 @@ export function Player() {
                 title={playing ? "Pause autoplay" : "Autoplay each room"}
                 onClick={() => setPlaying((p) => !p)}
               >
-                {playing ? <Pause size={18} strokeWidth={1.6} /> : <Play size={18} strokeWidth={1.6} />}
+                {playing ? (
+                  <Pause size={18} strokeWidth={1.6} />
+                ) : (
+                  <Play size={18} strokeWidth={1.6} />
+                )}
               </button>
               <button
                 type="button"
@@ -284,7 +323,17 @@ export function Player() {
             >
               <img src={p.src} alt="" />
               <span>
-                {p.id === "bambi" ? "peach" : p.id === "anna" ? "pink" : p.id === "blossom" ? "ring" : p.id === "painted-porch" ? "porch" : p.id === "weather" ? "rain" : "stare"}
+                {p.id === "bambi"
+                  ? "peach"
+                  : p.id === "anna"
+                    ? "pink"
+                    : p.id === "blossom"
+                      ? "ring"
+                      : p.id === "painted-porch"
+                        ? "porch"
+                        : p.id === "weather"
+                          ? "rain"
+                          : "stare"}
               </span>
             </button>
           );
