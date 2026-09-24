@@ -215,19 +215,31 @@ export function Player() {
   }, [hear]);
 
   useEffect(() => {
-    if (!hear) return;
-    const line = LINES[plate.id];
-    if (!line || typeof window.speechSynthesis === "undefined") return;
+    if (!hear || typeof window.speechSynthesis === "undefined") return;
+    const id = plate.id;
+    const line = LINES[id];
     window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(line);
-    utterance.rate = 0.8;
-    utterance.pitch = 1.02;
-    utterance.volume = 0.65;
-    const soft = window.speechSynthesis
-      .getVoices()
-      .find((v) => /en/i.test(v.lang) && /female|samantha|google/i.test(v.name));
-    if (soft) utterance.voice = soft;
-    window.speechSynthesis.speak(utterance);
+    if (!line) return;
+    let spoken = false;
+    const speak = () => {
+      if (spoken) return;
+      const emily = window.speechSynthesis.getVoices().find((v) => /emily/i.test(v.name));
+      if (!emily) return;
+      spoken = true;
+      const utterance = new SpeechSynthesisUtterance(line);
+      utterance.voice = emily;
+      utterance.rate = 0.92;
+      utterance.pitch = 1;
+      utterance.volume = 0.8;
+      window.speechSynthesis.speak(utterance);
+    };
+    const timer = window.setTimeout(speak, 800);
+    window.speechSynthesis.addEventListener("voiceschanged", speak);
+    return () => {
+      window.clearTimeout(timer);
+      window.speechSynthesis.removeEventListener("voiceschanged", speak);
+      window.speechSynthesis.cancel();
+    };
   }, [hear, plate.id]);
 
   return (
