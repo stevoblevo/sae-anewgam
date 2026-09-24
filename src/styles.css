@@ -184,6 +184,38 @@
   font-size: 0;
 }
 
+.way-marks {
+  position: fixed;
+  left: 16px;
+  bottom: 18px;
+  z-index: 8;
+  display: flex;
+  gap: 8px;
+}
+
+.way-marks button {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgb(255 248 242 / 0.85);
+}
+
+.way-marks button.on {
+  outline: 2px solid #fff8f2;
+  outline-offset: 2px;
+}
+
+.player-shell.way-white .player-chrome,
+.player-shell.way-white .skein-rail,
+.player-shell.way-white .heads,
+.player-shell.way-white .bubbles,
+.player-shell.way-white .room .line,
+.player-shell.way-white .room .tag {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .exit-immerse {
   position: fixed;
   top: 16px;

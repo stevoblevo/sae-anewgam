@@ -11,13 +11,14 @@ const START = Math.max(0, PLATES.findIndex((p) => p.id === "savannah"));
 const BEAT_MS = 6000;
 const SHOWN = new Set(["painted-stare", "savannah", "bambi", "anna", "sisters", "stare", "loom", "weather", "kirby"]);
 const PEACH = ["hold.", "she smiles.", "again."];
-const CASTS: Cast[] = ["porch", "peach", "rain", "well", "kirby"];
+const CASTS: Cast[] = ["porch", "peach", "rain", "well", "kirby", "white"];
 const CAST_NAME: Record<Cast, string> = {
   porch: "porch fight",
   peach: "peach ball",
   rain: "red rain",
   well: "the well",
   kirby: "say kirby",
+  white: "white ring",
 };
 
 export function Player() {
@@ -266,7 +267,7 @@ export function Player() {
 
   return (
     <div
-      className={`player-shell${immersive ? " immersive" : ""}`}
+      className={`player-shell${immersive ? " immersive" : ""}${cast === "white" ? " way-white" : ""}`}
       ref={shellRef}
       onPointerDown={() => {
         if (!hear) return;
@@ -298,6 +299,22 @@ export function Player() {
       >
         ×
       </button>
+      <nav className="way-marks" aria-label="ways">
+        {WAYS.map((w) => (
+          <button
+            key={w.id}
+            type="button"
+            className={cast === w.cast ? "on" : ""}
+            style={{ background: w.color }}
+            aria-label={w.name}
+            onClick={() => {
+              const n = PLATES.findIndex((p) => p.id === w.start);
+              if (n >= 0) go(n, true);
+              setPlaying(true);
+            }}
+          />
+        ))}
+      </nav>
       <audio ref={bedRef} preload="auto" />
       <audio ref={nextRef} preload="auto" />
       <img key={shown} className="world arriving" alt="" src={shown} />
