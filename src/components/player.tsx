@@ -17,9 +17,14 @@ const RING_STORY = [
   "If she loses, the story changes. It has not changed yet.",
 ];
 const RAIN_STORY = [
-  "Red rain is the same well. Other weather. Not another world.",
-  "The deer is not a mascot. Dear deer, in the arch. Beside, not ahead.",
-  "Under that rain, the way home stays open.",
+  "Here is the red rain. She is standing in it.",
+  "The red on her is the weather, not a fall.",
+  "The deer is the next plate. This one is only the rain.",
+];
+const DEER_STORY = [
+  "Here is the dear deer. Beside the child, not ahead.",
+  "Not a mascot. The path goes a little farther.",
+  "The red rain was the plate before this. Same walk, other weather.",
 ];
 const PEACH = ["hold.", "she smiles.", "again."];
 const CASTS: Cast[] = ["porch", "peach", "rain", "well", "kirby", "white"];
@@ -345,7 +350,7 @@ export function Player() {
       </nav>
       {story && (plate.id === "ring" || plate.id === "weather" || plate.id === "raindear") ? (
         <aside className="story" onPointerDown={(e) => e.stopPropagation()}>
-          {(plate.id === "ring" ? RING_STORY : RAIN_STORY).map((line) => (
+          {(plate.id === "ring" ? RING_STORY : plate.id === "raindear" ? DEER_STORY : RAIN_STORY).map((line) => (
             <p key={line}>{line}</p>
           ))}
           <div>
@@ -354,7 +359,7 @@ export function Player() {
               onClick={() => {
                 if (typeof window.speechSynthesis === "undefined") return;
                 window.speechSynthesis.cancel();
-                const lines = plate.id === "ring" ? RING_STORY : RAIN_STORY;
+                const lines = plate.id === "ring" ? RING_STORY : plate.id === "raindear" ? DEER_STORY : RAIN_STORY;
                 const utterance = new SpeechSynthesisUtterance(lines.join(" "));
                 utterance.rate = 0.92;
                 const emily = window.speechSynthesis.getVoices().find((v) => /emily/i.test(v.name));
