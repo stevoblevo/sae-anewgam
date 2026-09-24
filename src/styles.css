@@ -1149,46 +1149,57 @@
 }
 
 .tale {
+  position: relative;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: #f4ece3;
-  color: #4a3330;
+  background: #140e10;
+  color: #fff8f2;
   font-family: var(--font-serif);
 }
 
+.tale-world {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .tale .player-chrome {
+  position: relative;
+  z-index: 2;
   padding: 14px 18px;
 }
 
-.tale .brand,
-.tale .nav-link {
-  color: #6e4a38;
-  text-shadow: none;
-}
-
 .tale-log {
+  position: relative;
+  z-index: 2;
   flex: 1;
   overflow: auto;
-  padding: 8px 8vw 16px;
-  max-width: 40rem;
+  margin-top: auto;
+  max-height: 42vh;
+  padding: 16px 8vw 8px;
+  background: linear-gradient(#140e1000, rgb(20 14 16 / 0.82) 28px);
 }
 
 .tale-log p {
   margin: 0 0 10px;
+  max-width: 40rem;
   font-size: 22px;
   line-height: 1.35;
+  text-shadow: 0 1px 8px rgb(0 0 0 / 0.65);
 }
 
 .tale-you {
-  color: #8a6a62;
+  color: #f3ddd0;
 }
 
 .tale-bar {
-  position: sticky;
-  bottom: 0;
+  position: relative;
+  z-index: 2;
   padding: 10px 8vw 18px;
-  background: linear-gradient(#f4ece300, #f4ece3 18px);
+  background: rgb(20 14 16 / 0.82);
 }
 
 .tale-ways {
@@ -1200,9 +1211,9 @@
 
 .tale-ways button,
 .tale-bar input {
-  border: 1px solid rgb(139 90 74 / 0.35);
-  background: #fffaf5;
-  color: #4a3330;
+  border: 1px solid rgb(255 248 242 / 0.35);
+  background: rgb(28 16 18 / 0.55);
+  color: #fff8f2;
   border-radius: 999px;
   font-family: var(--font-serif);
   font-size: 18px;

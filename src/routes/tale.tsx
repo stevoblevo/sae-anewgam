@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { act, exits, look, START, type TaleState } from "@/lib/tale";
+import { act, exits, look, roomArt, START, type TaleState } from "@/lib/tale";
 
 export const Route = createFileRoute("/tale")({
   component: Tale,
@@ -27,6 +27,7 @@ export function Tale() {
 
   return (
     <div className="tale">
+      <img className="tale-world" alt="" src={roomArt(state)} />
       <header className="player-chrome">
         <Link to="/walk" className="nav-link">
           porch

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Tale } from "@/routes/tale";
+import { Player } from "@/components/player";
 
 export const Route = createFileRoute("/")({
-  component: Tale,
+  component: () => <Player key="porch" />,
 });
