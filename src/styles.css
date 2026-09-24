@@ -104,9 +104,14 @@
 
 .bubbles {
   position: absolute;
-  right: 28px;
-  top: 22%;
+  right: 18px;
+  top: 16%;
   z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 72vh;
+  overflow: auto;
 }
 
 .bubbles button.glass {
@@ -122,9 +127,16 @@
   position: relative;
 }
 
-.bubbles button.on {
-  outline: 2px solid #f3e6d4;
-  outline-offset: 2px;
+.bubbles button.pip {
+  width: 120px;
+  height: 120px;
+}
+
+.bubbles video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .bubbles img {

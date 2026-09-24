@@ -30,6 +30,7 @@ export function Player() {
   const [peach, setPeach] = useState(0);
   const [cast, setCast] = useState<Cast>("porch");
   const [phone, setPhone] = useState(false);
+  const installRef = useRef<any>(null);
   const iRef = useRef(START);
   const traceRef = useRef<string[]>([]);
   const wheelAt = useRef(0);
@@ -139,7 +140,16 @@ export function Player() {
 
   useEffect(() => {
     setVidOn(false);
-  }, [shown, motionOn]);
+  }, [plate.motion]);
+
+  useEffect(() => {
+    const onPrompt = (e: Event) => {
+      e.preventDefault();
+      installRef.current = e;
+    };
+    window.addEventListener("beforeinstallprompt", onPrompt);
+    return () => window.removeEventListener("beforeinstallprompt", onPrompt);
+  }, []);
 
   return (
     <div
@@ -161,7 +171,7 @@ export function Player() {
       {plate.motion ? (
         <video
           key={plate.motion}
-          className={`world film-layer${motionOn && vidOn ? " on" : ""}`}
+          className={`world film-layer${motionOn ? " on" : ""}`}
           src={plate.motion}
           muted
           loop
@@ -187,10 +197,11 @@ export function Player() {
           <button
             type="button"
             className="nav-link"
-            onClick={(e) => {
+            onClick={() => {
               const next = !motionOn;
               setMotionChoice(next);
-              const v = (e.currentTarget.ownerDocument.querySelector("video.world") as HTMLVideoElement | null);
+              setVidOn(next);
+              const v = document.querySelector("video.world") as HTMLVideoElement | null;
               if (next) v?.play().catch(() => {});
               else v?.pause();
             }}
@@ -200,7 +211,20 @@ export function Player() {
           <Link to="/ball" className="nav-link">
             ball
           </Link>
-          <a className="nav-link" href="/?install=1">
+          <a
+            className="nav-link"
+            href="/?install=1&platform=ios"
+            onClick={(e) => {
+              e.preventDefault();
+              const prompt = installRef.current;
+              if (prompt?.prompt) {
+                prompt.prompt();
+                installRef.current = null;
+                return;
+              }
+              window.location.assign("/?install=1&platform=ios");
+            }}
+          >
             install
           </a>
           {Math.max(0, path.indexOf(i)) + 1} / {Math.max(path.length, 1)}
@@ -262,19 +286,28 @@ export function Player() {
             ))}
           </div>
           <div className="bubbles">
-            {(() => {
-              const list = path.length ? path : [i];
-              const at = list.indexOf(i);
-              const n = list[(at < 0 ? 0 : at + 1) % list.length] ?? list[0];
-              const p = n == null ? undefined : PLATES[n];
-              if (!p || n == null) return null;
+            {["painted-stare", "savannah", "bambi", "anna", "sisters", "stare", "loom", "weather", "kirby"].map((id) => {
+              const n = PLATES.findIndex((p) => p.id === id);
+              const p = PLATES[n];
+              if (!p || n < 0) return null;
+              const pip = id === "painted-stare";
               return (
-                <button type="button" className="glass" aria-label="next room" onClick={() => go(n)}>
-                  <img src={p.src} alt="" />
-                  <span>next</span>
+                <button
+                  key={id}
+                  type="button"
+                  className={pip ? "glass pip" : "glass"}
+                  aria-label={p.note}
+                  onClick={() => go(n)}
+                >
+                  {pip && p.motion ? (
+                    <video src={p.motion} muted loop playsInline autoPlay />
+                  ) : (
+                    <img src={p.src} alt="" />
+                  )}
+                  <span>{pip ? "garden" : p.id === "savannah" ? "cute" : p.id === "bambi" ? "peach" : p.id === "anna" ? "pink" : p.id === "sisters" ? "hi" : p.id === "stare" ? "stare" : p.id === "loom" ? "loom" : p.id === "weather" ? "rain" : "kirby"}</span>
                 </button>
               );
-            })()}
+            })}
           </div>
           <div className="traces" aria-hidden>
             {LOCK.map((_, n) => (
