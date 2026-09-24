@@ -193,6 +193,16 @@ export function Player() {
     return () => window.removeEventListener("beforeinstallprompt", onPrompt);
   }, []);
 
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setImmersive(false);
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   const immerse = () => {
     const el = shellRef.current;
     if (immersive) {
@@ -512,12 +522,15 @@ export function Player() {
                 close
               </button>
             </header>
-            {CASTS.map((c) => (
-              <section key={c}>
-                <p className="shelf-label">{CAST_NAME[c]}</p>
-                <div className="gallery-grid">
-                  {PLATES.map((p, n) =>
-                    p.cast === c && p.shelf !== "study" && p.shelf !== "later" ? (
+            {CASTS.map((c) => {
+              const items = PLATES.flatMap((p, n) => (p.cast === c && p.shelf !== "study" && p.shelf !== "later" ? [{ p, n }] : []));
+              return (
+                <details key={c} open={c === cast}>
+                  <summary>
+                    {CAST_NAME[c]} · {items.length}
+                  </summary>
+                  <div className="gallery-grid">
+                    {items.map(({ p, n }) => (
                       <button
                         key={p.id}
                         type="button"
@@ -529,12 +542,13 @@ export function Player() {
                         <img src={p.src} alt="" />
                         <span>{p.note}</span>
                       </button>
-                    ) : null,
-                  )}
-                </div>
-              </section>
-            ))}
-            <p className="shelf-label">kept</p>
+                    ))}
+                  </div>
+                </details>
+              );
+            })}
+            <details>
+              <summary>kept · {PLATES.filter((p) => p.shelf === "study" || p.shelf === "later").length}</summary>
             <div className="gallery-grid studies">
               {PLATES.map((p, n) =>
                 p.shelf === "study" || p.shelf === "later" ? (
@@ -552,6 +566,7 @@ export function Player() {
                 ) : null,
               )}
             </div>
+            </details>
           </div>
         </div>
       ) : null}

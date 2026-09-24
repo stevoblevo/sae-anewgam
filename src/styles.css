@@ -887,13 +887,21 @@
   gap: 8px;
 }
 
-.player-chrome .right .nav-link {
-  text-decoration: none;
+.gallery-sheet details {
+  margin: 0 0 16px;
 }
 
-.player-shell.immersive .film,
-.player-shell.immersive .player-stage,
-.player-shell.immersive .player-chrome > :not(.right) {
+.gallery-sheet summary {
+  cursor: pointer;
+  margin-bottom: 8px;
+  letter-spacing: 0.12em;
+  text-transform: lowercase;
+}
+
+.player-shell.immersive .player-chrome > :not(.right),
+.player-shell.immersive .room .line,
+.player-shell.immersive .room .tag,
+.player-shell.immersive .skein-rail {
   opacity: 0;
   pointer-events: none;
 }
@@ -909,8 +917,13 @@
 }
 
 .player-shell.immersive .immerse {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 80;
   opacity: 1;
   pointer-events: auto;
+  background: rgb(20 10 16 / 0.55);
 }
 
 .pop {
