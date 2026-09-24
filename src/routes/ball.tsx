@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 const SCENES = [
+  { id: "savannah", title: "purple savannah.", note: "she winks.", src: "/savannah.jpg", motion: "/motion/savannah.mp4" },
   { id: "peach", title: "peach fall.", note: "she winks.", src: "/bambi.jpg", motion: "/motion/wink.mp4" },
-  { id: "pink", title: "her, in pink.", note: "anna.", src: "/anna.jpg" },
-  { id: "sisters", title: "say who. say hi.", note: "peach, and her red sister.", src: "/sisters.jpg" },
+  { id: "pink", title: "her, in pink.", note: "anna.", src: "/anna.jpg", motion: "/motion/anna.mp4" },
+  { id: "sisters", title: "say who. say hi.", note: "peach, and her red sister.", src: "/sisters.jpg", motion: "/motion/sisters.mp4" },
   { id: "stare", title: "pf stare.", note: "she winks too.", src: "/stare.png", motion: "/motion/stare-wink.mp4" },
   { id: "reign", title: "red reign.", note: "same place. another feeling.", src: "/weather.jpg", motion: "/motion/rain.mp4" },
 ];

@@ -6,7 +6,7 @@ import { PLATES, platesIn, type Cast } from "@/lib/plates";
 const STORY = ["remember", "trace", "notice", "beside", "bambi", "farther"];
 const HEADS = [{ id: "stare", src: "/stare.png", label: "face lock" }];
 const LOCK = ["remember", "stare", "farther"];
-const START = Math.max(0, PLATES.findIndex((p) => p.id === "painted-porch"));
+const START = Math.max(0, PLATES.findIndex((p) => p.id === "savannah"));
 const BEAT_MS = 6000;
 const PEACH = ["hold.", "she smiles.", "again."];
 const CASTS: Cast[] = ["porch", "peach", "rain", "well"];
@@ -292,7 +292,7 @@ export function Player() {
             >
               <img src={p.src} alt="" />
               <span>
-                {p.id === "violet" ? "purple" : p.id === "painted-porch" ? "porch" : p.id === "bambi" ? "peach" : p.id === "anna" ? "pink" : p.id === "weather" ? "rain" : p.id === "stare" ? "stare" : p.id === "recognition" ? "gen 2" : p.id === "crossing" ? "gen 4" : p.id === "further" ? "gen 22" : p.cast ?? p.id}
+                {p.id === "savannah" ? "savannah" : p.id === "violet" ? "purple" : p.id === "painted-porch" ? "porch" : p.id === "bambi" ? "peach" : p.id === "anna" ? "pink" : p.id === "weather" ? "rain" : p.id === "stare" ? "stare" : p.id === "recognition" ? "gen 2" : p.id === "crossing" ? "gen 4" : p.id === "further" ? "gen 22" : p.cast ?? p.id}
               </span>
             </button>
           );
