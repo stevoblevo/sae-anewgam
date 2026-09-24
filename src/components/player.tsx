@@ -31,6 +31,7 @@ export function Player() {
   const [peach, setPeach] = useState(0);
   const [cast, setCast] = useState<Cast>("porch");
   const [phone, setPhone] = useState(false);
+  const [leaving, setLeaving] = useState<{ src: string; motion?: string } | null>(null);
   const [pop, setPop] = useState<{ n: number; top: number; left: number } | null>(null);
   const [immersive, setImmersive] = useState(false);
   const installRef = useRef<any>(null);
@@ -39,6 +40,8 @@ export function Player() {
   const traceRef = useRef<string[]>([]);
   const wheelAt = useRef(0);
   const touchY = useRef<number | null>(null);
+  const popRef = useRef<number | null>(null);
+  const leaveTimer = useRef(0);
   const navigate = useNavigate();
 
   const plate = PLATES[i] ?? PLATES[0];
@@ -49,6 +52,12 @@ export function Player() {
 
   const go = useCallback((n: number, keepPlay = false) => {
     const next = ((n % PLATES.length) + PLATES.length) % PLATES.length;
+    const cur = PLATES[iRef.current];
+    if (cur && next !== iRef.current) {
+      setLeaving({ src: cur.src, motion: cur.motion });
+      window.clearTimeout(leaveTimer.current);
+      leaveTimer.current = window.setTimeout(() => setLeaving(null), 900);
+    }
     const nextCast = PLATES[next]?.cast;
     if (nextCast) setCast(nextCast);
     iRef.current = next;
@@ -101,12 +110,15 @@ export function Player() {
       acc += dt;
       if (acc >= BEAT_MS) {
         acc = 0;
-        step();
+        const target = popRef.current;
+        if (target != null && target !== iRef.current) go(target, true);
+        else step();
         const hidden = PLATES.flatMap((p, n) =>
-          n !== iRef.current && !SHOWN.has(p.id) ? [n] : [],
+          n !== iRef.current && p.shelf !== "study" ? [n] : [],
         );
         if (hidden.length) {
           const n = hidden[Math.floor(Math.random() * hidden.length)] ?? hidden[0];
+          popRef.current = n;
           setPop({ n, top: 16 + Math.random() * 46, left: 6 + Math.random() * 48 });
         }
       }
@@ -114,10 +126,13 @@ export function Player() {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [playing, gallery, step]);
+  }, [playing, gallery, step, go]);
 
   useEffect(() => {
-    if (!playing) setPop(null);
+    if (!playing) {
+      setPop(null);
+      popRef.current = null;
+    }
   }, [playing]);
 
   useEffect(() => {
@@ -194,11 +209,15 @@ export function Player() {
         stepShow(dy > 0 ? 1 : -1);
       }}
     >
-      <img key={shown} className="world" alt="" src={shown} />
+      <img key={shown} className="world arriving" alt="" src={shown} />
+      {leaving ? <img className="world leaving" alt="" src={leaving.src} /> : null}
+      {leaving?.motion && motionOn ? (
+        <video className="world film-layer on leaving" src={leaving.motion} muted loop playsInline autoPlay />
+      ) : null}
       {plate.motion ? (
         <video
           key={plate.motion}
-          className={`world film-layer${motionOn ? " on" : ""}`}
+          className={`world film-layer arriving${motionOn ? " on" : ""}`}
           src={plate.motion}
           muted
           loop
