@@ -1147,3 +1147,73 @@
     opacity: 1;
   }
 }
+
+.tale {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: #f4ece3;
+  color: #4a3330;
+  font-family: var(--font-serif);
+}
+
+.tale .player-chrome {
+  padding: 14px 18px;
+}
+
+.tale .brand,
+.tale .nav-link {
+  color: #6e4a38;
+  text-shadow: none;
+}
+
+.tale-log {
+  flex: 1;
+  overflow: auto;
+  padding: 8px 8vw 16px;
+  max-width: 40rem;
+}
+
+.tale-log p {
+  margin: 0 0 10px;
+  font-size: 22px;
+  line-height: 1.35;
+}
+
+.tale-you {
+  color: #8a6a62;
+}
+
+.tale-bar {
+  position: sticky;
+  bottom: 0;
+  padding: 10px 8vw 18px;
+  background: linear-gradient(#f4ece300, #f4ece3 18px);
+}
+
+.tale-ways {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.tale-ways button,
+.tale-bar input {
+  border: 1px solid rgb(139 90 74 / 0.35);
+  background: #fffaf5;
+  color: #4a3330;
+  border-radius: 999px;
+  font-family: var(--font-serif);
+  font-size: 18px;
+}
+
+.tale-ways button {
+  padding: 6px 12px;
+}
+
+.tale-bar input {
+  width: min(100%, 36rem);
+  padding: 10px 16px;
+  border-radius: 14px;
+}

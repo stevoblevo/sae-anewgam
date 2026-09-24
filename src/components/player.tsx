@@ -472,6 +472,9 @@ export function Player() {
           <Link to="/her" className="nav-link">
             her
           </Link>
+          <Link to="/" className="nav-link">
+            words
+          </Link>
           <Link to="/ball" search={{ stay: 1 }} className="nav-link">
             ball
           </Link>
