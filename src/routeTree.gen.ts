@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BallRouteImport } from './routes/ball'
+import { Route as CiRouteImport } from './routes/ci'
 import { Route as FallenRouteImport } from './routes/fallen'
 import { Route as FartherRouteImport } from './routes/farther'
 import { Route as FightRouteImport } from './routes/fight'
@@ -29,6 +30,11 @@ const IndexRoute = IndexRouteImport.update({
 const BallRoute = BallRouteImport.update({
   id: '/ball',
   path: '/ball',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CiRoute = CiRouteImport.update({
+  id: '/ci',
+  path: '/ci',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FallenRoute = FallenRouteImport.update({
@@ -80,6 +86,7 @@ const WalkRoute = WalkRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ball': typeof BallRoute
+  '/ci': typeof CiRoute
   '/fallen': typeof FallenRoute
   '/farther': typeof FartherRoute
   '/fight': typeof FightRoute
@@ -93,6 +100,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ball': typeof BallRoute
+  '/ci': typeof CiRoute
   '/fallen': typeof FallenRoute
   '/farther': typeof FartherRoute
   '/fight': typeof FightRoute
@@ -107,6 +115,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/ball': typeof BallRoute
+  '/ci': typeof CiRoute
   '/fallen': typeof FallenRoute
   '/farther': typeof FartherRoute
   '/fight': typeof FightRoute
@@ -122,6 +131,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/ball'
+    | '/ci'
     | '/fallen'
     | '/farther'
     | '/fight'
@@ -135,6 +145,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/ball'
+    | '/ci'
     | '/fallen'
     | '/farther'
     | '/fight'
@@ -148,6 +159,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/ball'
+    | '/ci'
     | '/fallen'
     | '/farther'
     | '/fight'
@@ -162,6 +174,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BallRoute: typeof BallRoute
+  CiRoute: typeof CiRoute
   FallenRoute: typeof FallenRoute
   FartherRoute: typeof FartherRoute
   FightRoute: typeof FightRoute
@@ -187,6 +200,13 @@ declare module '@tanstack/react-router' {
       path: '/ball'
       fullPath: '/ball'
       preLoaderRoute: typeof BallRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ci': {
+      id: '/ci'
+      path: '/ci'
+      fullPath: '/ci'
+      preLoaderRoute: typeof CiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fallen': {
@@ -258,6 +278,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BallRoute: BallRoute,
+  CiRoute: CiRoute,
   FallenRoute: FallenRoute,
   FartherRoute: FartherRoute,
   FightRoute: FightRoute,
