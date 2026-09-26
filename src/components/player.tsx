@@ -3,6 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Home, Pause, Play } from "lucide-react";
 import { useAskInstall } from "@/components/install-sheet";
 import { PLATES, platesIn, type Cast } from "@/lib/plates";
+import { PICTURES } from "@/lib/pictures";
 import { WAYS } from "@/lib/ways";
 
 const STORY = ["remember", "trace", "notice", "beside", "bambi", "farther", "peachfall", "dear", "meet"];
@@ -661,11 +662,36 @@ export function Player() {
         <div className="gallery" onClick={(e) => e.target === e.currentTarget && setGallery(false)}>
           <div className="gallery-sheet">
             <header>
-              <b>gallery · {PLATES.length}</b>
+              <b>gallery · {PICTURES.length}</b>
               <button type="button" onClick={() => setGallery(false)}>
                 close
               </button>
             </header>
+            <details open>
+              <summary>every picture · {PICTURES.length}</summary>
+              <div className="gallery-grid studies">
+                {PICTURES.map((src) => {
+                  const n = PLATES.findIndex((p) => p.src === src);
+                  return (
+                    <button
+                      key={src}
+                      type="button"
+                      onClick={() => {
+                        if (n >= 0) {
+                          go(n);
+                          setGallery(false);
+                          return;
+                        }
+                        navigate({ to: "/layers", search: { img: src } });
+                      }}
+                    >
+                      <img src={src} alt="" />
+                      <span>{src.split("/").pop()}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </details>
             <details open>
               <summary>ways</summary>
               <div className="gallery-grid">
@@ -690,6 +716,9 @@ export function Player() {
                   );
                 })}
                 <Link to="/fallen">the picture</Link>
+                <Link to="/layers" search={{ img: "/peachfall-walk.jpg" }}>
+                  layers
+                </Link>
                 <Link to="/ball" search={{ stay: 1 }} className="nav-link">
                   ball
                 </Link>

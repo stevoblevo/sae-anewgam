@@ -15,6 +15,7 @@ import { Route as FallenRouteImport } from './routes/fallen'
 import { Route as FartherRouteImport } from './routes/farther'
 import { Route as FightRouteImport } from './routes/fight'
 import { Route as HerRouteImport } from './routes/her'
+import { Route as LayersRouteImport } from './routes/layers'
 import { Route as LeafRouteImport } from './routes/leaf'
 import { Route as MarksRouteImport } from './routes/marks'
 import { Route as TaleRouteImport } from './routes/tale'
@@ -50,6 +51,11 @@ const HerRoute = HerRouteImport.update({
   path: '/her',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LayersRoute = LayersRouteImport.update({
+  id: '/layers',
+  path: '/layers',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LeafRoute = LeafRouteImport.update({
   id: '/leaf',
   path: '/leaf',
@@ -78,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/farther': typeof FartherRoute
   '/fight': typeof FightRoute
   '/her': typeof HerRoute
+  '/layers': typeof LayersRoute
   '/leaf': typeof LeafRoute
   '/marks': typeof MarksRoute
   '/tale': typeof TaleRoute
@@ -90,6 +97,7 @@ export interface FileRoutesByTo {
   '/farther': typeof FartherRoute
   '/fight': typeof FightRoute
   '/her': typeof HerRoute
+  '/layers': typeof LayersRoute
   '/leaf': typeof LeafRoute
   '/marks': typeof MarksRoute
   '/tale': typeof TaleRoute
@@ -103,6 +111,7 @@ export interface FileRoutesById {
   '/farther': typeof FartherRoute
   '/fight': typeof FightRoute
   '/her': typeof HerRoute
+  '/layers': typeof LayersRoute
   '/leaf': typeof LeafRoute
   '/marks': typeof MarksRoute
   '/tale': typeof TaleRoute
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/farther'
     | '/fight'
     | '/her'
+    | '/layers'
     | '/leaf'
     | '/marks'
     | '/tale'
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/farther'
     | '/fight'
     | '/her'
+    | '/layers'
     | '/leaf'
     | '/marks'
     | '/tale'
@@ -141,6 +152,7 @@ export interface FileRouteTypes {
     | '/farther'
     | '/fight'
     | '/her'
+    | '/layers'
     | '/leaf'
     | '/marks'
     | '/tale'
@@ -154,6 +166,7 @@ export interface RootRouteChildren {
   FartherRoute: typeof FartherRoute
   FightRoute: typeof FightRoute
   HerRoute: typeof HerRoute
+  LayersRoute: typeof LayersRoute
   LeafRoute: typeof LeafRoute
   MarksRoute: typeof MarksRoute
   TaleRoute: typeof TaleRoute
@@ -204,6 +217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/layers': {
+      id: '/layers'
+      path: '/layers'
+      fullPath: '/layers'
+      preLoaderRoute: typeof LayersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/leaf': {
       id: '/leaf'
       path: '/leaf'
@@ -242,6 +262,7 @@ const rootRouteChildren: RootRouteChildren = {
   FartherRoute: FartherRoute,
   FightRoute: FightRoute,
   HerRoute: HerRoute,
+  LayersRoute: LayersRoute,
   LeafRoute: LeafRoute,
   MarksRoute: MarksRoute,
   TaleRoute: TaleRoute,
