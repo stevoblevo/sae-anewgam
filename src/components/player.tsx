@@ -5,7 +5,8 @@ import { useAskInstall } from "@/components/install-sheet";
 import { PLATES, platesIn, type Cast } from "@/lib/plates";
 import { WAYS } from "@/lib/ways";
 
-const STORY = ["remember", "trace", "notice", "beside", "bambi", "farther"];
+const STORY = ["remember", "trace", "notice", "beside", "bambi", "farther", "peachfall", "dear", "meet"];
+const RING = ["remember", "trace", "notice", "beside", "bambi", "farther", "peachfall", "peachfall-on", "dear", "meet", "leaf-again", "corridor", "stare", "blossom", "sisters", "anna", "savannah"];
 const HEADS = [{ id: "stare", src: "/stare.png", label: "face lock" }];
 const LOCK = ["remember", "stare", "farther"];
 const START = Math.max(0, PLATES.findIndex((p) => p.id === "painted-porch"));
@@ -80,6 +81,12 @@ export function Player() {
   const path = platesIn(cast, pink);
   const pathRef = useRef(path);
   pathRef.current = path;
+  const ring = RING.flatMap((id) => {
+    const n = PLATES.findIndex((p) => p.id === id);
+    return n >= 0 ? [n] : [];
+  });
+  const ringRef = useRef(ring);
+  ringRef.current = ring;
 
   const go = useCallback((n: number, keepPlay = false) => {
     const next = ((n % PLATES.length) + PLATES.length) % PLATES.length;
@@ -112,7 +119,7 @@ export function Player() {
 
   const stepShow = useCallback(
     (dir: number) => {
-      const list = pathRef.current;
+      const list = ringRef.current.includes(iRef.current) ? ringRef.current : pathRef.current;
       if (!list.length) return;
       const at = list.indexOf(iRef.current);
       const from = at < 0 ? 0 : at;
@@ -123,7 +130,7 @@ export function Player() {
   );
 
   const step = useCallback(() => {
-    const list = pathRef.current;
+    const list = ringRef.current.includes(iRef.current) ? ringRef.current : pathRef.current;
     if (!list.length) return;
     const at = list.indexOf(iRef.current);
     const next = list[(at + 1) % list.length] ?? list[0] ?? 0;
@@ -487,8 +494,8 @@ export function Player() {
           <button type="button" className="nav-link immerse" onClick={immerse}>
             {immersive ? "close" : "immerse"}
           </button>
-          <Link to="/leaf" className="nav-link">
-            leaf
+          <Link to="/fallen" className="nav-link">
+            picture
           </Link>
           <Link to="/her" className="nav-link">
             her
@@ -562,6 +569,12 @@ export function Player() {
                 <span>{h.label}</span>
               </button>
             ))}
+            <button type="button" className="face-lock" aria-label="next" onClick={() => step()}>
+              <span className="next-face">
+                <ArrowRight size={28} strokeWidth={1.4} />
+              </span>
+              <span>next</span>
+            </button>
           </div>
           <div className="bubbles">
             {(pink ? ["pink-forest", "remember", "painted-stare", "savannah", "bambi", "anna", "sisters", "stare", "loom", "weather", "kirby"] : ["remember", "painted-stare", "savannah", "bambi", "anna", "sisters", "stare", "loom", "weather", "kirby"]).map((id) => {
@@ -623,7 +636,7 @@ export function Player() {
       </div>
 
       <div className="film" role="list">
-        {path.map((n) => {
+        {ring.map((n) => {
           const p = PLATES[n];
           if (!p) return null;
           return (
@@ -676,9 +689,7 @@ export function Player() {
                     </button>
                   );
                 })}
-                <Link to="/her" className="nav-link">
-                  her
-                </Link>
+                <Link to="/fallen">the picture</Link>
                 <Link to="/ball" search={{ stay: 1 }} className="nav-link">
                   ball
                 </Link>

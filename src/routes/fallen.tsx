@@ -249,21 +249,21 @@ export function Fallen() {
   const spoken =
     side < 0
       ? fall
-        ? "Pink walks beside her."
-        : "The left of the picture opens."
+        ? "Pink walks beside her. She has not gone ahead."
+        : beat.line
       : side > 0
         ? fall
-          ? "Purple walks beside her."
-          : "The right of the picture opens."
+          ? "Purple stays at her other side. The path is still gold."
+          : beat.line
         : !lineOn && depth === 0
           ? ""
           : depth < 0
             ? fall
-              ? "The blossoms are the weather."
+              ? "The blossoms are only weather, and they let her through."
               : beat.over
             : depth > 0
               ? fall
-                ? "The path is gold under their feet."
+                ? "Gold under their feet. The leaf is still beside the path."
                 : beat.under
               : at === BEATS.length - 1 && both
                 ? "You rose and you delved. Weee. The story fits."
@@ -306,7 +306,12 @@ export function Fallen() {
   };
 
   const dive = (dir: -1 | 1) => {
-    if (depth !== 0 && depth === dir) return;
+    if (depth === dir) {
+      setDepth(0);
+      setLineOn(false);
+      go(at + dir);
+      return;
+    }
     if (depth === -dir) {
       setDepth(0);
       setLineOn(false);
@@ -778,7 +783,7 @@ export function Fallen() {
           </button>
           <Link to="/leaf">the leaf</Link>
           <Link to="/marks">the marks</Link>
-          <Link to="/walk">porch walk · every scene</Link>
+          <Link to="/walk">thumbnails</Link>
           <Link to="/ball" search={{ stay: 1 }}>
             peach ball
           </Link>
