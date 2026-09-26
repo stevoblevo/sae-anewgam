@@ -1,8 +1,41 @@
 import { useEffect, useRef, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link, useNavigate, createFileRoute } from "@tanstack/react-router";
 import { PLATES } from "@/lib/plates";
+import { decodeHeat, markSeen, readFaves, readSeen, shareHeat, toggleFave } from "@/lib/seen";
 
 const BEATS = [
+  {
+    act: "Z",
+    src: "/scroll-doors.jpg",
+    title: "The corridor",
+    line: "Each doorway is a chapter. Down the hall is the scroll. Sideways still walks.",
+    over: "Rise and the doors are only light.",
+    under: "Delve and the floor remembers every step.",
+  },
+  {
+    act: "Z",
+    src: "/scroll-dear.jpg",
+    title: "Dear",
+    line: "She is at the well. The deer stands beside her, not ahead.",
+    over: "Rise and the sky is only dusk.",
+    under: "Delve and the well keeps what it was given.",
+  },
+  {
+    act: "Z",
+    src: "/scroll-meet.jpg",
+    title: "Orange, and red",
+    line: "The door is light. The circle takes the weather and stays whole.",
+    over: "Rise and neither covers the other.",
+    under: "Delve and the water holds both.",
+  },
+  {
+    act: "Z",
+    src: "/scroll-leaf.jpg",
+    title: "The leaf, again",
+    line: "One leaf, where the orange path meets the rain. It is not a trophy.",
+    over: "Rise and the leaf is still beside you.",
+    under: "Delve and the path does not ask you to take it.",
+  },
   {
     act: "Z",
     src: "/porch-face.jpg",
@@ -170,6 +203,16 @@ export function Fallen() {
   const [playing, setPlaying] = useState(true);
   const [motion, setMotion] = useState(true);
   const [lineOn, setLineOn] = useState(false);
+  const [bubbles, setBubbles] = useState(true);
+  const [folded, setFolded] = useState(true);
+  const [scroll, setScroll] = useState(false);
+  const [heat, setHeat] = useState(false);
+  const [counts, setCounts] = useState<Record<string, number>>({});
+  const [faves, setFaves] = useState<string[]>([]);
+  const [shared, setShared] = useState<Record<string, number> | null>(null);
+  const scrollRef = useRef(false);
+  scrollRef.current = scroll;
+  const navigate = useNavigate();
   const rose = useRef(false);
   const sank = useRef(false);
   const knownRef = useRef(known);
@@ -201,7 +244,8 @@ export function Fallen() {
     if (next === at) return;
     setDepth(0);
     setLineOn(false);
-    el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
+    if (scrollRef.current) el.scrollTo({ top: next * el.clientHeight, behavior: "smooth" });
+    else el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
     learn("walk");
   };
 
@@ -218,8 +262,41 @@ export function Fallen() {
     if (rose.current && sank.current) setBoth(true);
   };
 
-  const api = useRef({ go, dive, at });
-  api.current = { go, dive, at };
+  const api = useRef({ go, dive, at, scroll });
+  api.current = { go, dive, at, scroll };
+
+  useEffect(() => {
+    setCounts(readSeen());
+    setFaves(readFaves());
+    const params = new URLSearchParams(window.location.search);
+    const heatQ = params.get("heat");
+    if (heatQ) {
+      setShared(decodeHeat(heatQ));
+      setHeat(true);
+      return;
+    }
+    try {
+      if (sessionStorage.getItem("sae-door")) return;
+      sessionStorage.setItem("sae-door", "1");
+    } catch {
+      return;
+    }
+    const doors = ["stay", "bubbles", "scroll", "line", "leaf", "marks", "walk", "ball", "fight", "tale", "her", "farther"] as const;
+    const door = doors[Math.floor(Math.random() * doors.length)];
+    if (door === "bubbles") setFolded(false);
+    else if (door === "scroll") setScroll(true);
+    else if (door === "line") setLineOn(true);
+    else if (door === "stay") {
+      const n = Math.floor(Math.random() * ALL.length);
+      window.setTimeout(() => api.current.go(n), 400);
+    } else if (door === "ball") navigate({ to: "/ball", search: { stay: 1 } });
+    else navigate({ to: `/${door}` });
+  }, [navigate]);
+
+  useEffect(() => {
+    if (!beat?.src) return;
+    setCounts(markSeen(beat.src));
+  }, [beat.src]);
 
   useEffect(() => {
     if (!playing || found) return;
@@ -252,12 +329,16 @@ export function Fallen() {
     let locked = false;
     const onWheel = (event: WheelEvent) => {
       const t = event.target as HTMLElement | null;
-      if (t?.closest(".z-find")) return;
+      if (t?.closest(".z-find, .heat")) return;
       const ax = Math.abs(event.deltaX);
       const ay = Math.abs(event.deltaY);
       if (ax < 1 && ay < 1) return;
       event.preventDefault();
       setPlaying(false);
+      if (api.current.scroll && !(event.shiftKey || ax > ay)) {
+        rail.current?.scrollBy({ top: event.deltaY });
+        return;
+      }
       if (locked) return;
       locked = true;
       window.setTimeout(() => {
@@ -330,8 +411,16 @@ export function Fallen() {
     };
   }, []);
 
+  const seeds = ["/scroll-doors.jpg", "/scroll-dear.jpg", "/scroll-meet.jpg", "/scroll-leaf.jpg", "/porch-face.jpg"];
+  const seenOrder = Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([src]) => src);
+  const bubbleSrcs = (faves.length ? faves : seenOrder.length ? seenOrder : seeds).slice(0, 6);
+  const heatCounts = shared ?? counts;
+  const kept = faves.includes(beat.src);
+
   return (
-    <div className="tableau" ref={root}>
+    <div className={`tableau${scroll ? " scroll" : ""}`} ref={root}>
       <div className="z-rail" ref={rail}>
         {ALL.map((item, n) => (
           <section className="z-beat" data-i={n} key={`${n}-${item.src}`}>
@@ -352,6 +441,70 @@ export function Fallen() {
         <button type="button" className={motion ? "on" : ""} aria-label={motion ? "still" : "motion"} onClick={() => setMotion((v) => !v)} />
         <button type="button" aria-label={found ? "close" : "map"} onClick={() => setFound((v) => !v)} />
       </div>
+      {bubbles && bubbleSrcs.length ? (
+        <div className={folded ? "bubbles folded" : "bubbles"}>
+          {bubbleSrcs.map((src) => (
+            <button
+              key={src}
+              type="button"
+              aria-label="return"
+              style={{ backgroundImage: `url(${src})` }}
+              onClick={() => {
+                if (folded) {
+                  setFolded(false);
+                  return;
+                }
+                const n = ALL.findIndex((item) => item.src === src);
+                if (n >= 0) {
+                  setPlaying(false);
+                  go(n);
+                }
+              }}
+            />
+          ))}
+          {folded ? null : (
+            <button type="button" className="fold" aria-label="fold" onClick={() => setFolded(true)}>
+              fold
+            </button>
+          )}
+        </div>
+      ) : null}
+      {heat ? (
+        <div className="heat">
+          <p>{shared ? "A shared heat." : "On this machine."}</p>
+          <div>
+            {ALL.map((item, n) => {
+              const nSeen = heatCounts[item.src] || 0;
+              return (
+                <button
+                  key={`${n}-${item.src}`}
+                  type="button"
+                  title={item.title}
+                  style={{ opacity: nSeen ? 0.35 + Math.min(0.65, nSeen / 6) : 0.18 }}
+                  onClick={() => {
+                    setPlaying(false);
+                    setHeat(false);
+                    go(n);
+                  }}
+                >
+                  <img src={item.src} alt="" />
+                </button>
+              );
+            })}
+          </div>
+          <button type="button" onClick={() => shareHeat(counts)}>
+            share with @stevoblevo
+          </button>
+          {shared ? (
+            <button type="button" onClick={() => setShared(null)}>
+              mine
+            </button>
+          ) : null}
+          <button type="button" onClick={() => setHeat(false)}>
+            close
+          </button>
+        </div>
+      ) : null}
       {spoken ? <p className="tableau-line">{spoken}</p> : null}
       <div className="tableau-dots" style={{ transform: `scaleX(${(at + 1) / ALL.length})` }} />
       {found ? (
@@ -361,6 +514,26 @@ export function Fallen() {
           </button>
           <button type="button" onClick={() => setMotion((v) => !v)}>
             {motion ? "still" : "motion"}
+          </button>
+          <button type="button" onClick={() => setBubbles((v) => !v)}>
+            {bubbles ? "hide bubbles" : "bubbles"}
+          </button>
+          <button type="button" onClick={() => setScroll((v) => !v)}>
+            {scroll ? "walk" : "scroll"}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setFaves(toggleFave(beat.src));
+            }}
+          >
+            {kept ? "kept" : "keep"}
+          </button>
+          <button type="button" onClick={() => setHeat(true)}>
+            heat
+          </button>
+          <button type="button" onClick={() => shareHeat(counts)}>
+            share with @stevoblevo
           </button>
           <p className="z-find-title">places</p>
           {ALL.map((item, n) => (
