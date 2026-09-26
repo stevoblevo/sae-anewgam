@@ -5,7 +5,10 @@
   --color-ink: #4a3330;
   --color-muted: #8a6a62;
   --color-gold: #c4a07a;
-  --color-wine: #8a3d44;
+  --color-peach: #f3b183;
+  --color-charcoal: #2a2422;
+  --color-mint: #9ecfb8;
+  --color-red: #e25b4a;
   --color-line: rgb(139 90 74 / 0.28);
   --color-blush: #f3ddd0;
   --color-peach-wash: #ead3c8;
@@ -243,7 +246,7 @@
   padding: 0;
   border-radius: 50%;
   border: 1px solid #fff8f2;
-  background: #8d3a3a;
+  background: #e25b4a;
 }
 
 .player-shell.way-white .room .line,
@@ -325,7 +328,7 @@
 .nav-link {
   justify-self: start;
   border: 0;
-  background: rgb(255 248 242 / 0.16);
+  background: rgb(243 177 131 / 0.34);
   color: #f6efe8;
   font-family: var(--font-serif);
   font-size: 15px;
@@ -639,7 +642,7 @@
   width: min(980px, 100%);
   max-height: min(86dvh, 820px);
   overflow: auto;
-  background: #1c1416;
+  background: #2a2422;
   border-radius: 18px;
   padding: 14px;
 }
@@ -674,7 +677,6 @@
 
 .gallery-grid.studies {
   grid-template-columns: repeat(auto-fill, minmax(96px, 120px));
-  opacity: 0.85;
 }
 
 .gallery-grid button {
@@ -685,6 +687,8 @@
   border-radius: 12px;
   overflow: hidden;
   text-align: left;
+  content-visibility: auto;
+  contain-intrinsic-size: 120px 96px;
 }
 
 .gallery-grid img {
@@ -698,6 +702,42 @@
   display: block;
   padding: 6px 8px 8px;
   font-size: 13px;
+}
+
+.gallery-find {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.gallery-find input {
+  flex: 1;
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: #f3b183;
+  color: #2a2422;
+  font: inherit;
+}
+
+.gallery-find button {
+  border: 0;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: #2a2422;
+  color: #f6efe8;
+  font: inherit;
+}
+
+.gallery-find button.on {
+  background: #9ecfb8;
+  color: #2a2422;
+}
+
+.gallery-grid.bubbles button,
+.gallery-grid.bubbles img {
+  border-radius: 50%;
+  aspect-ratio: 1;
 }
 
 .player-chrome {
@@ -1966,6 +2006,26 @@
   display: grid;
   gap: 8px;
   transform: translateY(-50%);
+}
+
+.follow {
+  position: fixed;
+  z-index: 12;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 0 0 1.5px rgb(243 177 131 / 0.9);
+}
+
+.follow img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.follow.awake {
+  animation: float-y 1.6s ease-in-out 1;
 }
 
 .glue-face {

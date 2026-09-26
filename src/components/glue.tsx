@@ -24,14 +24,31 @@ export function useAxis(onSide: (dir: number) => void, onRise: (dir: number) => 
   }, []);
 }
 
+const FOLLOW = [
+  { id: "anna", src: "/portrait/pink.jpg" },
+  { id: "lock", src: "/face-lock.jpg" },
+  { id: "sister", src: "/blink-sister.jpg" },
+  { id: "hearth", src: "/anna-hearth.jpg" },
+];
+
 export function Glue() {
-  const [faces, setFaces] = useState(true);
+  const [faces, setFaces] = useState(false);
   const [note, setNote] = useState("");
   const [flash, setFlash] = useState(0);
+  const [awake, setAwake] = useState(0);
   const last = useRef(0);
 
   useEffect(() => {
-    if (localStorage.getItem("sae-faces") === "0") setFaces(false);
+    if (localStorage.getItem("sae-faces") === "1") setFaces(true);
+  }, []);
+
+  useEffect(() => {
+    const tick = () => {
+      setAwake(Math.floor(Math.random() * FOLLOW.length));
+      window.setTimeout(() => setAwake(-1), 1600);
+    };
+    const id = window.setInterval(tick, 7000);
+    return () => window.clearInterval(id);
   }, []);
 
   useEffect(() => {
@@ -70,6 +87,20 @@ export function Glue() {
       <p key={`n${flash}`} className={note ? "glue-note on" : "glue-note"}>
         {note}
       </p>
+      <div className="follow-group">
+        {FOLLOW.map((item, n) => (
+          <Link
+            key={item.id}
+            to="/layers"
+            search={{ img: item.src }}
+            className={awake === n ? "follow awake" : "follow"}
+            style={{ top: `${18 + (n % 2) * 11}%`, right: `${12 + Math.floor(n / 2) * 7}%` }}
+            aria-label={item.id}
+          >
+            <img src={item.src} alt="" decoding="async" />
+          </Link>
+        ))}
+      </div>
       <div className="glue-faces">
         {faces
           ? FACES.map((face) =>

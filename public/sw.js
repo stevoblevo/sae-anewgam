@@ -1,5 +1,5 @@
-const SHELL = "sae-shell-7";
-const MEDIA = "sae-media-7";
+const SHELL = "sae-shell-8";
+const MEDIA = "sae-media-8";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

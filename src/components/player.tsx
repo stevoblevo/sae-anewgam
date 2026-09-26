@@ -4,14 +4,16 @@ import { ArrowRight, Home, Pause, Play } from "lucide-react";
 import { useAskInstall } from "@/components/install-sheet";
 import { PLATES, platesIn, type Cast } from "@/lib/plates";
 import { PICTURES } from "@/lib/pictures";
+import { matchPicture } from "@/lib/find";
 import { markGamma } from "@/lib/seen";
 import { WAYS } from "@/lib/ways";
 
-const STORY = ["remember", "trace", "notice", "beside", "bambi", "farther", "porchfight-gal", "peachfall-all", "red-horizon", "reign-well"];
-const RING = ["remember", "trace", "trace-tall", "notice", "beside", "bambi", "farther", "porchfight-gal", "peachfall", "peachfall-all", "red-horizon", "reign-well", "dear", "meet", "leaf-again", "corridor", "stare", "blossom", "sisters", "sisters-well", "anna", "pink-notice", "porchlight", "savannah"];
+const PLAY = ["bambi", "farther", "peachfall", "peachfall-all", "red-horizon", "reign-well", "trace", "remember"];
+const STORY = [...PLAY, "notice", "beside", "porchfight-gal"];
+const RING = [...PLAY, "trace-tall", "notice", "beside", "porchfight-gal", "dear", "meet", "leaf-again", "corridor", "stare", "blossom", "sisters", "sisters-well", "anna", "anna-hearth", "face-lock", "blink-sister", "pink-notice", "porchlight", "savannah"];
 const HEADS = [{ id: "stare", src: "/stare.png", label: "face lock" }];
 const LOCK = ["remember", "stare", "farther"];
-const START = Math.max(0, PLATES.findIndex((p) => p.id === "painted-porch"));
+const START = Math.max(0, PLATES.findIndex((p) => p.id === "anna"));
 const BEAT_MS = 6000;
 const SHOWN = new Set(["painted-stare", "savannah", "bambi", "anna", "sisters", "stare", "loom", "weather", "kirby"]);
 const RING_STORY = [
@@ -45,6 +47,8 @@ export function Player() {
   const [i, setI] = useState(START);
   const [playing, setPlaying] = useState(false);
   const [gallery, setGallery] = useState(false);
+  const [q, setQ] = useState("");
+  const [mode, setMode] = useState<"tile" | "bubble" | "scene">("tile");
   const [whisper, setWhisper] = useState(false);
   const [marks, setMarks] = useState(0);
   const [motionChoice, setMotionChoice] = useState<boolean | null>(null);
@@ -421,25 +425,22 @@ export function Player() {
       ) : plate.id === "ring" || plate.id === "weather" || plate.id === "raindear" ? (
         <button type="button" className="story-mark" aria-label="story" onPointerDown={(e) => e.stopPropagation()} onClick={() => setStory(true)} />
       ) : null}
-      <audio ref={bedRef} preload="auto" />
-      <audio ref={nextRef} preload="auto" />
-      <img key={shown} className="world arriving" alt="" src={shown} />
-      {leaving ? <img className="world leaving" alt="" src={leaving.src} /> : null}
-      {leaving?.motion && motionOn ? (
-        <video className="world film-layer on leaving" src={leaving.motion} muted loop playsInline autoPlay />
-      ) : null}
-      {plate.motion ? (
+      <audio ref={bedRef} preload="none" />
+      <audio ref={nextRef} preload="none" />
+      <img key={shown} className="world arriving" alt="" src={shown} decoding="async" fetchPriority="high" />
+      {leaving ? <img className="world leaving" alt="" src={leaving.src} decoding="async" /> : null}
+      {plate.motion && motionOn ? (
         <video
           key={plate.motion}
-          className={`world film-layer arriving${motionOn ? " on" : ""}`}
+          className="world film-layer arriving on"
           src={plate.motion}
+          poster={shown}
           muted
           loop
           playsInline
-          autoPlay={motionOn}
-          preload="auto"
+          autoPlay
+          preload="none"
           onCanPlay={(e) => {
-            if (!motionOn) return;
             e.currentTarget.play().catch(() => {});
             setVidOn(true);
           }}
@@ -614,11 +615,7 @@ export function Player() {
                     if (id === "remember") setPlaying(true);
                   }}
                 >
-                  {pip && p.motion ? (
-                    <video src={p.motion} muted loop playsInline autoPlay />
-                  ) : (
-                    <img src={p.src} alt="" />
-                  )}
+                  <img src={p.src} alt="" decoding="async" />
                   <span>{id === "remember" || id === "pink-forest" ? "" : pip ? "garden" : p.id === "savannah" ? "cute" : p.id === "bambi" ? "peach" : p.id === "anna" ? "pink" : p.id === "sisters" ? "hi" : p.id === "stare" ? "stare" : p.id === "loom" ? "loom" : p.id === "weather" ? "rain" : "kirby"}</span>
                 </button>
               );
@@ -669,7 +666,7 @@ export function Player() {
               aria-label={p.note}
               onClick={() => go(n)}
             >
-              <img src={p.src} alt="" />
+              <img src={p.src} alt="" loading="lazy" decoding="async" />
               <span>
                 {p.id === "savannah" ? "cute" : p.id === "violet" ? "purple" : p.id === "painted-porch" ? "porch" : p.id === "bambi" ? "peach" : p.id === "anna" ? "pink" : p.id === "weather" ? "rain" : p.id === "stare" ? "stare" : p.id === "recognition" ? "gen 2" : p.id === "crossing" ? "gen 4" : p.id === "further" ? "gen 22" : p.id === "loom" ? "loom" : p.cast ?? p.id}
               </span>
@@ -687,15 +684,55 @@ export function Player() {
                 close
               </button>
             </header>
+            <form
+              className="gallery-find"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (mode !== "scene") return;
+                const hit = PICTURES.find((src) => matchPicture(src, q));
+                if (!hit) return;
+                const n = PLATES.findIndex((p) => p.src === hit);
+                if (n >= 0) go(n);
+                else navigate({ to: "/layers", search: { img: hit } });
+                setGallery(false);
+              }}
+            >
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="peach, well, anna" aria-label="find a picture" />
+              {(["tile", "bubble", "scene"] as const).map((item) => (
+                <button key={item} type="button" className={item === mode ? "on" : ""} onClick={() => setMode(item)}>
+                  {item}
+                </button>
+              ))}
+            </form>
             <details open>
-              <summary>every picture · {PICTURES.length}</summary>
-              <div className="gallery-grid studies">
-                {PICTURES.map((src) => {
+              <summary>hearth</summary>
+              <div className="gallery-grid bubbles">
+                {["/anna-hearth.jpg", "/face-lock.jpg", "/blink-sister.jpg", "/leaf-deer.jpg"].map((src) => (
+                  <button
+                    key={src}
+                    type="button"
+                    onClick={() => {
+                      const n = PLATES.findIndex((p) => p.src === src);
+                      if (n >= 0) go(n);
+                      else navigate({ to: "/layers", search: { img: src } });
+                      setGallery(false);
+                    }}
+                  >
+                    <img src={src} alt="" loading="lazy" decoding="async" />
+                  </button>
+                ))}
+              </div>
+            </details>
+            <details open>
+              <summary>every picture · {PICTURES.filter((src) => matchPicture(src, q)).length}</summary>
+              <div className={`gallery-grid studies${mode === "bubble" ? " bubbles" : ""}`}>
+                {PICTURES.filter((src) => matchPicture(src, q)).map((src) => {
                   const n = PLATES.findIndex((p) => p.src === src);
                   return (
                     <button
                       key={src}
                       type="button"
+                      aria-label={src}
                       onClick={() => {
                         if (n >= 0) {
                           go(n);
@@ -705,8 +742,7 @@ export function Player() {
                         navigate({ to: "/layers", search: { img: src } });
                       }}
                     >
-                      <img src={src} alt="" />
-                      <span>{src.split("/").pop()}</span>
+                      <img src={src} alt="" loading="lazy" decoding="async" />
                     </button>
                   );
                 })}
