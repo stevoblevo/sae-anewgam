@@ -4,17 +4,34 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 const BEATS = [
   {
     act: "Z",
+    src: "/porch-face.jpg",
+    motion: "/motion/porch-face.mp4",
+    title: "The picture",
+    line: "The picture is the screen. The dark only shows where it ends.",
+    over: "Look up. The lantern is close enough to warm her face.",
+    under: "Look down. It is still the porch.",
+  },
+  {
+    act: "Z",
+    src: "/small-one.jpg",
+    title: "The words",
+    line: "Peach and red, on the same step. The sentence sits on them and does not hide them.",
+    over: "Rise and the light is behind them.",
+    under: "Delve and the step is what they share.",
+  },
+  {
+    act: "Z",
     src: "/garden-porch.jpg",
     motion: "/motion/porch-face.mp4",
     title: "Ever fallen",
-    line: "Version Z. The side wheel walks. She notices you. The lantern is already lit.",
+    line: "She notices you. The lantern is already lit.",
     over: "Look up. The lantern is the whole sky.",
     under: "Look down. The boards are warm, and they remember shoes.",
   },
   {
     act: "Z",
     src: "/stare.png",
-    motion: "/motion/stare-wink.mp4",
+    motion: "/motion/stare.mp4",
     title: "The minute before",
     line: "She holds your eyes. The fight has not started.",
     over: "Above her, nothing is swinging. No bell. No prize.",
@@ -81,6 +98,15 @@ const BEATS = [
     line: "She went down into the weather and came up still herself.",
     over: "Rise. Pink is only rest.",
     under: "Delve. The path is gold at the edges and quiet in the middle.",
+  },
+  {
+    act: "Z",
+    src: "/loom.png",
+    motion: "/motion/loom.mp4",
+    title: "The door",
+    line: "This is the only layer that can cover the picture. The other plays are through it.",
+    over: "Above them the room opens.",
+    under: "Under the loom, the floor is the way out.",
   },
   {
     act: "Z",
@@ -319,14 +345,6 @@ export function Fallen() {
         </div>
       </header>
       {note ? <p className="z-hint">{note}</p> : null}
-      {known.length > 0 ? (
-        <p className="z-map">
-          {map
-            .filter((row) => row[2])
-            .map((row) => `${row[0]} → ${row[1]}`)
-            .join("   ")}
-        </p>
-      ) : null}
       <p className="tableau-line">{spoken}</p>
       <div className="tableau-dots" style={{ transform: `scaleX(${(at + 1) / BEATS.length})` }} />
       {found ? (
