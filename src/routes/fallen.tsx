@@ -213,6 +213,7 @@ export function Fallen() {
   const rail = useRef<HTMLDivElement>(null);
   const [at, setAt] = useState(0);
   const [depth, setDepth] = useState<-1 | 0 | 1>(0);
+  const [side, setSide] = useState<-1 | 0 | 1>(0);
   const [both, setBoth] = useState(false);
   const [known, setKnown] = useState<Array<"walk" | "rise" | "delve">>([]);
   const [found, setFound] = useState(false);
@@ -234,18 +235,40 @@ export function Fallen() {
   const knownRef = useRef(known);
   knownRef.current = known;
   const beat = ALL[at] ?? ALL[0];
-  const frame = (depth < 0 ? DEPTH[beat.src]?.high : depth > 0 ? DEPTH[beat.src]?.low : beat.src) ?? beat.src;
-  const look = depth < 0 ? "center 20%" : depth > 0 ? "center 80%" : "center 46%";
+  const fall = beat.src.startsWith("/peachfall");
+  const frame = fall ? beat.src : ((depth < 0 ? DEPTH[beat.src]?.high : depth > 0 ? DEPTH[beat.src]?.low : beat.src) ?? beat.src);
+  const look =
+    side < 0
+      ? { width: "190%", height: "190%", left: "2%", top: "-42%", right: "auto", bottom: "auto" }
+      : side > 0
+        ? { width: "190%", height: "190%", left: "-92%", top: "-42%", right: "auto", bottom: "auto" }
+        : depth < 0
+          ? { width: "170%", height: "170%", left: "-35%", top: "0%", right: "auto", bottom: "auto" }
+          : depth > 0
+            ? { width: "170%", height: "170%", left: "-35%", top: "-70%", right: "auto", bottom: "auto" }
+            : { width: "100%", height: "100%", left: "0%", top: "0%", right: "auto", bottom: "auto" };
   const spoken =
-    !lineOn && depth === 0
-      ? ""
-      : depth < 0
-        ? beat.over
-        : depth > 0
-          ? beat.under
-          : at === BEATS.length - 1 && both
-            ? "You rose and you delved. Weee. The story fits."
-            : beat.line;
+    side < 0
+      ? fall
+        ? "Pink walks beside her."
+        : "The left of the picture opens."
+      : side > 0
+        ? fall
+          ? "Purple walks beside her."
+          : "The right of the picture opens."
+        : !lineOn && depth === 0
+          ? ""
+          : depth < 0
+            ? fall
+              ? "The blossoms are the weather."
+              : beat.over
+            : depth > 0
+              ? fall
+                ? "The path is gold under their feet."
+                : beat.under
+              : at === BEATS.length - 1 && both
+                ? "You rose and you delved. Weee. The story fits."
+                : beat.line;
 
   const learn = (axis: "walk" | "rise" | "delve") => {
     if (knownRef.current.includes(axis)) return;
@@ -259,13 +282,38 @@ export function Fallen() {
     const next = Math.max(0, Math.min(ALL.length - 1, n));
     if (next === at) return;
     setDepth(0);
+    setSide(0);
     setLineOn(false);
     if (scrollRef.current) el.scrollTo({ top: next * el.clientHeight, behavior: "smooth" });
     else el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
     learn("walk");
   };
 
+  const along = (dir: -1 | 1) => {
+    if (side === 0) {
+      setDepth(0);
+      setSide(dir);
+      setLineOn(true);
+      learn("walk");
+      return;
+    }
+    if (side === -dir) {
+      setSide(0);
+      setLineOn(false);
+      return;
+    }
+    setSide(0);
+    go(at + dir);
+  };
+
   const dive = (dir: -1 | 1) => {
+    if (depth !== 0 && depth === dir) return;
+    if (depth === -dir) {
+      setDepth(0);
+      setLineOn(false);
+      return;
+    }
+    setSide(0);
     setDepth(dir);
     setLineOn(true);
     if (dir > 0) {
@@ -278,8 +326,8 @@ export function Fallen() {
     if (rose.current && sank.current) setBoth(true);
   };
 
-  const api = useRef({ go, dive, at, scroll });
-  api.current = { go, dive, at, scroll };
+  const api = useRef({ go, along, dive, at, scroll });
+  api.current = { go, along, dive, at, scroll };
 
   useEffect(() => {
     setCounts(readSeen());
@@ -317,6 +365,7 @@ export function Fallen() {
   useEffect(() => {
     if (!playing || found) return;
     const id = window.setInterval(() => {
+      if (api.current.at < 2) return;
       const next = api.current.at + 1;
       api.current.go(next >= ALL.length ? 0 : next);
     }, 8000);
@@ -363,7 +412,7 @@ export function Fallen() {
       const horizontal = event.shiftKey || ax > ay;
       if (horizontal) {
         const dir = (event.deltaX || event.deltaY) > 0 ? 1 : -1;
-        api.current.go(api.current.at + dir);
+        api.current.along(dir);
       } else {
         api.current.dive(event.deltaY > 0 ? 1 : -1);
       }
@@ -374,8 +423,8 @@ export function Fallen() {
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "ArrowRight") api.current.go(api.current.at + 1);
-      if (event.key === "ArrowLeft") api.current.go(api.current.at - 1);
+      if (event.key === "ArrowRight") api.current.along(1);
+      if (event.key === "ArrowLeft") api.current.along(-1);
       if (event.key === "ArrowUp") api.current.dive(-1);
       if (event.key === "ArrowDown") api.current.dive(1);
       if (event.key === "Escape") setFound(false);
@@ -413,7 +462,7 @@ export function Fallen() {
         setLineOn((v) => !v);
         return;
       }
-      if (Math.abs(dx) > Math.abs(dy)) api.current.go(api.current.at + (dx < 0 ? 1 : -1));
+      if (Math.abs(dx) > Math.abs(dy)) api.current.along(dx < 0 ? 1 : -1);
       else api.current.dive(dy > 0 ? 1 : -1);
     };
     el.addEventListener("pointerdown", start);
@@ -440,9 +489,9 @@ export function Fallen() {
       <div className="z-rail" ref={rail}>
         {ALL.map((item, n) => (
           <section className="z-beat" data-i={n} key={`${n}-${item.src}`}>
-            <img key={frame} src={frame} alt="" style={{ objectPosition: look }} />
-            {motion && item.motion && n === at && depth === 0 ? (
-              <video src={item.motion} poster={item.src} muted loop playsInline autoPlay style={{ objectPosition: look }} />
+            <img key={frame} src={frame} alt="" style={look} />
+            {motion && item.motion && n === at && depth === 0 && side === 0 ? (
+              <video src={item.motion} poster={item.src} muted loop playsInline autoPlay />
             ) : null}
           </section>
         ))}
@@ -450,8 +499,8 @@ export function Fallen() {
       <div className="z-compass">
         <button type="button" className="z-edge z-up" aria-label="rise" onClick={() => { setPlaying(false); dive(-1); }} />
         <button type="button" className="z-edge z-down" aria-label="delve" onClick={() => { setPlaying(false); dive(1); }} />
-        <button type="button" className="z-edge z-left" aria-label="back" onClick={() => { setPlaying(false); go(at - 1); }} />
-        <button type="button" className="z-edge z-right" aria-label="on" onClick={() => { setPlaying(false); go(at + 1); }} />
+        <button type="button" className="z-edge z-left" aria-label="back" onClick={() => { setPlaying(false); along(-1); }} />
+        <button type="button" className="z-edge z-right" aria-label="on" onClick={() => { setPlaying(false); along(1); }} />
       </div>
       <div className="z-dots">
         <button type="button" className={motion ? "on" : ""} aria-label={motion ? "still" : "motion"} onClick={() => setMotion((v) => !v)} />

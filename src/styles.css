@@ -1545,6 +1545,7 @@
   position: relative;
   flex: 0 0 100%;
   height: 100%;
+  overflow: hidden;
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }
@@ -1554,7 +1555,13 @@
   inset: 0;
   width: 100%;
   height: 100%;
+  max-width: none;
   object-fit: cover;
+  transition:
+    left 0.7s ease,
+    top 0.7s ease,
+    width 0.7s ease,
+    height 0.7s ease;
 }
 
 .z-beat video {
