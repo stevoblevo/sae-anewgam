@@ -2350,15 +2350,14 @@ html[data-eye="in"] .follow {
 
 .eye-sheet {
   position: fixed;
-  left: 50%;
-  bottom: 18px;
   z-index: 40;
-  width: min(440px, calc(100% - 28px));
-  transform: translateX(-50%);
+  width: min(320px, calc(100% - 28px));
   padding: 12px;
   border-radius: 18px;
   background: rgb(42 36 34 / 0.92);
   color: #fff8f2;
+  cursor: grab;
+  touch-action: none;
 }
 
 .eye-sheet img {
@@ -2385,4 +2384,40 @@ html[data-eye="in"] .follow {
   background: #f3b183;
   color: #2a2422;
   font: inherit;
+  cursor: pointer;
+}
+
+.you-circle {
+  position: fixed;
+  z-index: 42;
+  width: 86px;
+  height: 86px;
+  padding: 0;
+  border: 3px solid #9ecfb8;
+  border-radius: 50%;
+  overflow: hidden;
+  touch-action: none;
+  cursor: grab;
+  background: #2a2422;
+}
+
+.you-circle.with {
+  box-shadow: 0 0 0 7px rgb(243 177 131 / 0.85);
+}
+
+.you-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.you-scene {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
 }

@@ -36,6 +36,14 @@ export function Glue() {
   const [note, setNote] = useState("");
   const [flash, setFlash] = useState(0);
   const [awake, setAwake] = useState(0);
+  const [places, setPlaces] = useState<Record<string, { x: number; y: number }>>(() => {
+    try {
+      const raw = JSON.parse(localStorage.getItem("sae-follow-spots") || "{}");
+      return raw && typeof raw === "object" ? raw : {};
+    } catch {
+      return {};
+    }
+  });
   const [threads, setThreads] = useState<Thread[]>([]);
   const last = useRef(0);
 
@@ -75,7 +83,7 @@ export function Glue() {
       setNote(side ? "she looks aside." : "she blinks.");
       setFlash((n) => n + 1);
       window.dispatchEvent(new CustomEvent("sae-wink"));
-      const picture = document.querySelector(".rite img, .player-stage img, .ball-scene img, .leaf img, .layers-ground, .ci img, .tale-world, .fight img, .cinema video, .world");
+      const picture = document.querySelector(".you-scene, .rite img, .player-stage img, .ball-scene img, .leaf img, .layers-ground, .ci img, .tale-world, .fight img, .cinema video, .world");
       picture?.classList.remove("sae-she");
       void (picture as HTMLElement | null)?.offsetWidth;
       picture?.classList.add("sae-she");
@@ -101,18 +109,52 @@ export function Glue() {
           <i key={thread.id} className={thread.axis} />
         ))}
       </div>
-        {FOLLOW.map((item, n) => (
-          <Link
-            key={item.id}
-            to="/layers"
-            search={{ img: item.src }}
-            className={awake === n ? "follow awake" : "follow"}
-            style={{ top: `${18 + (n % 2) * 11}%`, right: `${12 + Math.floor(n / 2) * 7}%` }}
-            aria-label={item.id}
-          >
-            <img src={item.src} alt="" decoding="async" />
-          </Link>
-        ))}
+        {FOLLOW.map((item, n) => {
+          const place = places[item.id] ?? {
+            x: (typeof window === "undefined" ? 900 : window.innerWidth) - 120 - Math.floor(n / 2) * 80,
+            y: 80 + (n % 2) * 90,
+          };
+          return (
+            <Link
+              key={item.id}
+              to="/layers"
+              search={{ img: item.src }}
+              className={awake === n ? "follow awake" : "follow"}
+              style={{ left: place.x, top: place.y, right: "auto" }}
+              aria-label={item.id}
+              onPointerDown={(event) => {
+                event.preventDefault();
+                const startX = event.clientX;
+                const startY = event.clientY;
+                const origin = place;
+                let moved = false;
+                const move = (ev: PointerEvent) => {
+                  if (Math.hypot(ev.clientX - startX, ev.clientY - startY) > 6) moved = true;
+                  const next = { x: origin.x + ev.clientX - startX, y: origin.y + ev.clientY - startY };
+                  setPlaces((all) => ({ ...all, [item.id]: next }));
+                };
+                const up = (ev: PointerEvent) => {
+                  window.removeEventListener("pointermove", move);
+                  window.removeEventListener("pointerup", up);
+                  const next = { x: origin.x + ev.clientX - startX, y: origin.y + ev.clientY - startY };
+                  setPlaces((all) => {
+                    const saved = { ...all, [item.id]: next };
+                    localStorage.setItem("sae-follow-spots", JSON.stringify(saved));
+                    return saved;
+                  });
+                  if (!moved) {
+                    window.location.href = `/layers?img=${encodeURIComponent(item.src)}`;
+                  }
+                };
+                window.addEventListener("pointermove", move);
+                window.addEventListener("pointerup", up);
+              }}
+              onClick={(event) => event.preventDefault()}
+            >
+              <img src={item.src} alt="" decoding="async" draggable={false} />
+            </Link>
+          );
+        })}
       <div className="glue-faces">
         {faces
           ? FACES.map((face) =>
