@@ -58,6 +58,7 @@ export function Player() {
   const [pink, setPink] = useState(false);
   const [hear, setHear] = useState(true);
   const hearRef = useRef(true);
+  const hearTouched = useRef(false);
   const pinkRef = useRef(false);
   const seenRef = useRef({ deer: false, reign: false });
   const [immersive, setImmersive] = useState(false);
@@ -307,6 +308,22 @@ export function Player() {
     return () => cancelAnimationFrame(raf);
   }, [hear, plate.id]);
 
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      if (hearTouched.current || !hearRef.current) return;
+      hearRef.current = false;
+      setHear(false);
+      window.speechSynthesis?.cancel();
+      for (const el of document.querySelectorAll("audio")) {
+        const audio = el as HTMLAudioElement;
+        audio.muted = true;
+        audio.volume = 0;
+        audio.pause();
+      }
+    }, 4000);
+    return () => window.clearTimeout(id);
+  }, []);
+
   return (
     <div
       className={`player-shell${immersive ? " immersive" : ""}${cast === "white" ? " way-white" : ""}`}
@@ -468,6 +485,7 @@ export function Player() {
             data-hear=""
             onPointerDown={(e) => e.stopPropagation()}
             onClick={() => {
+              hearTouched.current = true;
               const next = !hearRef.current;
               hearRef.current = next;
               setHear(next);
