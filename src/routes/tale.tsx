@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { act, exits, look, roomArt, START, type TaleState } from "@/lib/tale";
+import { useAxis } from "@/components/glue";
 
 export const Route = createFileRoute("/tale")({
   component: Tale,
@@ -24,6 +25,17 @@ export function Tale() {
     setDraft("");
     box.current?.focus();
   };
+
+  useAxis(
+    (dir) => {
+      const ways = exits(state);
+      say(dir > 0 ? (ways.includes("east") ? "east" : "look") : ways.includes("west") ? "west" : "look");
+    },
+    (dir) => {
+      const ways = exits(state);
+      say(dir > 0 ? (ways.includes("north") ? "north" : "talk") : ways.includes("south") ? "south" : "talk");
+    },
+  );
 
   return (
     <div className="tale">

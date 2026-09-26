@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useAxis } from "@/components/glue";
 
 const MARKS = [
   {
@@ -56,6 +57,10 @@ export const Route = createFileRoute("/marks")({
 function Marks() {
   const [at, setAt] = useState(0);
   const mark = MARKS[at] ?? MARKS[0];
+  useAxis(
+    (dir) => setAt((n) => (n + dir + MARKS.length) % MARKS.length),
+    (dir) => setAt((n) => Math.min(MARKS.length - 1, Math.max(0, n + (dir > 0 ? 1 : -1)))),
+  );
 
   return (
     <div className="leaf">

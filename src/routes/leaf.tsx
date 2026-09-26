@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useAxis } from "@/components/glue";
 
 const STEPS = [
   {
@@ -49,6 +50,13 @@ function Leaf() {
   const [note, setNote] = useState("");
   const step = STEPS[at] ?? STEPS[0];
   const last = at === STEPS.length - 1;
+  useAxis(
+    (dir) => {
+      setNote("");
+      setAt((n) => Math.min(STEPS.length - 1, Math.max(0, n + (dir > 0 ? 1 : -1))));
+    },
+    () => setNote((line) => (line ? "" : "She stays. The picture does not.")),
+  );
 
   const choose = (ok: boolean | undefined, line: string | undefined) => {
     if (ok) {

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { mountStare } from "@/lib/stare";
+import { useAxis } from "@/components/glue";
 
 export const Route = createFileRoute("/fight")({
   component: Fight,
@@ -10,6 +11,11 @@ export function Fight() {
   const canvas = useRef<HTMLCanvasElement>(null);
   const router = useRouter();
   const [line, setLine] = useState("Hold her eyes.");
+  const [held, setHeld] = useState(true);
+  useAxis(
+    (dir) => setLine(dir > 0 ? "She does not look away." : "The ring is still empty."),
+    () => setHeld((v) => !v),
+  );
 
   useEffect(() => {
     const node = canvas.current;
@@ -28,7 +34,7 @@ export function Fight() {
 
   return (
     <div className="fight">
-      <img src="/stare.png" alt="" />
+      <img className={held ? "" : "fight-aside"} src="/stare.png" alt="" />
       <canvas ref={canvas} />
       <header className="player-chrome">
         <button type="button" className="nav-link" onClick={() => router.history.back()}>

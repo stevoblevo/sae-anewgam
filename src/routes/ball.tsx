@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useAskInstall } from "@/components/install-sheet";
+import { useAxis } from "@/components/glue";
 
 const SCENES = [
   { id: "pink", title: "her, in pink.", note: "freckles. blue eyes.", src: "/portrait/pink.jpg", motion: "/motion/pink-tall.mp4", audio: "/audio/scenes/anna.mp3" },
@@ -57,6 +58,17 @@ export function Ball() {
     root.current?.querySelectorAll(".ball-scene")[next]?.scrollIntoView({ behavior: "smooth" });
   };
 
+  useAxis(
+    (dir) => {
+      setPlaying(false);
+      go(atRef.current + dir);
+    },
+    () => {
+      setPlaying(false);
+      setRate((r) => (r === 1 ? 2 : 1));
+    },
+  );
+
   useEffect(() => {
     const clip = audioRef.current;
     if (!clip) return;
@@ -107,7 +119,6 @@ export function Ball() {
     <div
       className="ball"
       ref={root}
-      onWheel={() => setPlaying(false)}
       onTouchStart={() => setPlaying(false)}
     >
       {installSheet}

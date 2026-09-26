@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PLATES } from "@/lib/plates";
+import { useAxis } from "@/components/glue";
 
 const FILMS = PLATES.filter((p) => p.motion);
 const HOLD = 6000;
@@ -12,6 +13,10 @@ export const Route = createFileRoute("/farther")({
 function Farther() {
   const [i, setI] = useState(0);
   const film = FILMS[i] ?? FILMS[0];
+  useAxis(
+    (dir) => setI((n) => (n + dir + FILMS.length) % FILMS.length),
+    (dir) => setI((n) => (n - dir + FILMS.length) % FILMS.length),
+  );
 
   useEffect(() => {
     let raf = 0;

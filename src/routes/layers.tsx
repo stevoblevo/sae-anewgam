@@ -1,6 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { PICTURES } from "@/lib/pictures";
+import { useAxis } from "@/components/glue";
 
 const ORDER = [
   { z: 0, name: "picture", note: "The painting, and the motion on it. It fills the screen and never takes a tap." },
@@ -24,6 +25,15 @@ function Layers() {
   const [words, setWords] = useState(true);
   const [face, setFace] = useState(true);
   const [sheet, setSheet] = useState(true);
+  const navigate = useNavigate();
+  const at = Math.max(0, (PICTURES as readonly string[]).indexOf(ground));
+  useAxis(
+    (dir) => {
+      const next = PICTURES[(at + dir + PICTURES.length) % PICTURES.length];
+      navigate({ to: "/layers", search: { img: next } });
+    },
+    () => setWords((v) => !v),
+  );
 
   return (
     <div className="layers">
