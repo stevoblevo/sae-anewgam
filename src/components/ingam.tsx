@@ -17,6 +17,13 @@ export function InGam({ onWalk, onRite }: { onWalk: () => void; onRite: () => vo
   const frame = IN[at] ?? IN[0];
 
   useEffect(() => {
+    document.documentElement.dataset.eye = "in";
+    return () => {
+      delete document.documentElement.dataset.eye;
+    };
+  }, []);
+
+  useEffect(() => {
     if (!playing) return;
     const id = window.setInterval(() => setAt((n) => (n + 1) % IN.length), 4200);
     return () => window.clearInterval(id);

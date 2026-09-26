@@ -74,7 +74,8 @@ export function Glue() {
       const dir = ((side ? event.deltaX : event.deltaY) || event.deltaY || event.deltaX) > 0 ? 1 : -1;
       setNote(side ? "she looks aside." : "she blinks.");
       setFlash((n) => n + 1);
-      const picture = document.querySelector(".player-stage img, .ball-scene img, .leaf img, .layers-ground, .ci img, .tale-world, .fight img, .cinema video");
+      window.dispatchEvent(new CustomEvent("sae-wink"));
+      const picture = document.querySelector(".rite img, .player-stage img, .ball-scene img, .leaf img, .layers-ground, .ci img, .tale-world, .fight img, .cinema video, .world");
       picture?.classList.remove("sae-she");
       void (picture as HTMLElement | null)?.offsetWidth;
       picture?.classList.add("sae-she");

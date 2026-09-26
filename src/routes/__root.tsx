@@ -4,6 +4,7 @@ import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { Installable } from "@/components/installable";
 import { Glue } from "@/components/glue";
+import { Eye } from "@/components/eye";
 import appCss from "../styles.css?url";
 
 const APP_NAME = "Sae · .anewgam";
@@ -92,6 +93,7 @@ export const Route = createRootRoute({
         <AuthProvider>
           <Outlet />
           <Glue />
+          <Eye />
         </AuthProvider>
         <Scripts />
       </body>
