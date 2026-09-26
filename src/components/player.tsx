@@ -45,7 +45,7 @@ const CAST_NAME: Record<Cast, string> = {
 
 export function Player() {
   const [i, setI] = useState(START);
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState(true);
   const [gallery, setGallery] = useState(false);
   const [q, setQ] = useState("");
   const [mode, setMode] = useState<"tile" | "bubble" | "scene">("tile");
@@ -130,7 +130,8 @@ export function Player() {
       if (!list.length) return;
       const at = list.indexOf(iRef.current);
       const from = at < 0 ? 0 : at;
-      const next = list[(from + dir + list.length) % list.length] ?? list[0] ?? 0;
+      let next = list[(from + dir + list.length) % list.length] ?? list[0] ?? 0;
+      if (PLATES[next]?.id === "bambi") next = list[(list.indexOf(next) + 1) % list.length] ?? next;
       go(next);
     },
     [go],
@@ -140,7 +141,8 @@ export function Player() {
     const list = ringRef.current.includes(iRef.current) ? ringRef.current : pathRef.current;
     if (!list.length) return;
     const at = list.indexOf(iRef.current);
-    const next = list[(at + 1) % list.length] ?? list[0] ?? 0;
+    let next = list[(at + 1) % list.length] ?? list[0] ?? 0;
+    if (PLATES[next]?.id === "bambi") next = list[(list.indexOf(next) + 1) % list.length] ?? next;
     go(next, true);
   }, [go]);
 

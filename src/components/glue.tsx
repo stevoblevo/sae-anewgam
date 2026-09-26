@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { pushSign, rollFlow } from "@/lib/flow";
+import { pushSign, rollFlow, colonize, readFlow, type Thread } from "@/lib/flow";
 
 const FACES = [
   { src: "/stare.png", label: "porch", to: "/" as const },
@@ -36,6 +36,7 @@ export function Glue() {
   const [note, setNote] = useState("");
   const [flash, setFlash] = useState(0);
   const [awake, setAwake] = useState(0);
+  const [threads, setThreads] = useState<Thread[]>([]);
   const last = useRef(0);
 
   useEffect(() => {
@@ -49,6 +50,13 @@ export function Glue() {
     };
     const id = window.setInterval(tick, 7000);
     return () => window.clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    const grow = () => setThreads(colonize(readFlow()).slice(-6));
+    grow();
+    window.addEventListener("sae-flow", grow);
+    return () => window.removeEventListener("sae-flow", grow);
   }, []);
 
   useEffect(() => {
@@ -87,7 +95,11 @@ export function Glue() {
       <p key={`n${flash}`} className={note ? "glue-note on" : "glue-note"}>
         {note}
       </p>
-      <div className="follow-group">
+      <div className="fungi" aria-hidden="true">
+        {threads.map((thread) => (
+          <i key={thread.id} className={thread.axis} />
+        ))}
+      </div>
         {FOLLOW.map((item, n) => (
           <Link
             key={item.id}
@@ -100,7 +112,6 @@ export function Glue() {
             <img src={item.src} alt="" decoding="async" />
           </Link>
         ))}
-      </div>
       <div className="glue-faces">
         {faces
           ? FACES.map((face) =>

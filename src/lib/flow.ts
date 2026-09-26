@@ -37,9 +37,8 @@ export function rollFlow(): Sign[] {
   return next;
 }
 
-// Implemented above: a short line of signs, rolled back one mark at a time.
-// Not this stage. A colonization map would grow a thread from each sign
-// instead of keeping a line. That is a different investigation.
-// function colonize(signs: Sign[]) {
-//   return signs.map((sign, i) => ({ id: i, from: Math.max(0, i - 1), axis: sign.axis }));
-// }
+export type Thread = { id: number; from: number; axis: Sign["axis"] };
+
+export function colonize(signs: Sign[]): Thread[] {
+  return signs.map((sign, i) => ({ id: i, from: Math.max(0, i - 1), axis: sign.axis }));
+}

@@ -2008,6 +2008,34 @@
   transform: translateY(-50%);
 }
 
+.fungi {
+  position: fixed;
+  left: 16px;
+  bottom: 18px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  pointer-events: none;
+}
+
+.fungi i {
+  display: block;
+  background: #f3b183;
+  opacity: 0.85;
+}
+
+.fungi i.side {
+  width: 18px;
+  height: 2px;
+}
+
+.fungi i.rise {
+  width: 2px;
+  height: 14px;
+  margin: 0 4px;
+}
+
 .follow {
   position: fixed;
   z-index: 12;
