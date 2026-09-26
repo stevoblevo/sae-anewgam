@@ -1523,8 +1523,7 @@
 .z-edge.known,
 .z-edge:hover,
 .z-edge:focus-visible {
-  opacity: 0.9;
-  background: rgb(20 14 16 / 0.28);
+  background: rgb(20 14 16 / 0.18);
 }
 
 .z-up {
@@ -1563,7 +1562,7 @@
   z-index: 4;
   overflow: auto;
   padding: 72px 12% 8%;
-  background: rgb(20 14 16 / 0.9);
+  background: rgb(20 14 16 / 0.72);
 }
 
 .z-find-title,
@@ -1611,6 +1610,28 @@
   font-size: 15px;
 }
 
+.z-dots {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 6;
+  display: flex;
+  gap: 10px;
+}
+
+.z-dots button {
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgb(255 248 242 / 0.55);
+  background: transparent;
+}
+
+.z-dots button.on {
+  background: rgb(255 248 242 / 0.85);
+}
+
 .tableau-dots {
   position: absolute;
   left: 8%;
@@ -1619,7 +1640,7 @@
   width: 28%;
   height: 2px;
   transform-origin: left center;
-  background: rgb(255 248 242 / 0.85);
+  background: rgb(255 248 242 / 0.28);
 }
 
 .tableau-line {

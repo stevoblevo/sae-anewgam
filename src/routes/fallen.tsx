@@ -166,9 +166,10 @@ export function Fallen() {
   const [depth, setDepth] = useState<-1 | 0 | 1>(0);
   const [both, setBoth] = useState(false);
   const [known, setKnown] = useState<Array<"walk" | "rise" | "delve">>([]);
-  const [note, setNote] = useState("");
   const [found, setFound] = useState(false);
   const [playing, setPlaying] = useState(true);
+  const [motion, setMotion] = useState(true);
+  const [lineOn, setLineOn] = useState(false);
   const rose = useRef(false);
   const sank = useRef(false);
   const knownRef = useRef(known);
@@ -177,16 +178,20 @@ export function Fallen() {
   const frame = (depth < 0 ? DEPTH[beat.src]?.high : depth > 0 ? DEPTH[beat.src]?.low : beat.src) ?? beat.src;
   const look = depth < 0 ? "center 20%" : depth > 0 ? "center 80%" : "center 46%";
   const spoken =
-    depth < 0 ? beat.over : depth > 0 ? beat.under : at === BEATS.length - 1 && both ? "You rose and you delved. Weee. The story fits." : beat.line;
-  const walked = known.includes("walk");
-  const roseKnown = known.includes("rise");
-  const sankKnown = known.includes("delve");
+    !lineOn && depth === 0
+      ? ""
+      : depth < 0
+        ? beat.over
+        : depth > 0
+          ? beat.under
+          : at === BEATS.length - 1 && both
+            ? "You rose and you delved. Weee. The story fits."
+            : beat.line;
 
-  const learn = (axis: "walk" | "rise" | "delve", phrase: string) => {
+  const learn = (axis: "walk" | "rise" | "delve") => {
     if (knownRef.current.includes(axis)) return;
     knownRef.current = [...knownRef.current, axis];
     setKnown(knownRef.current);
-    setNote(phrase);
   };
 
   const go = (n: number) => {
@@ -195,18 +200,20 @@ export function Fallen() {
     const next = Math.max(0, Math.min(ALL.length - 1, n));
     if (next === at) return;
     setDepth(0);
+    setLineOn(false);
     el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
-    learn("walk", "sideways → walk");
+    learn("walk");
   };
 
   const dive = (dir: -1 | 1) => {
     setDepth(dir);
+    setLineOn(true);
     if (dir > 0) {
       sank.current = true;
-      learn("delve", "down → delve");
+      learn("delve");
     } else {
       rose.current = true;
-      learn("rise", "up → rise");
+      learn("rise");
     }
     if (rose.current && sank.current) setBoth(true);
   };
@@ -222,12 +229,6 @@ export function Fallen() {
     }, 8000);
     return () => window.clearInterval(id);
   }, [playing, found]);
-
-  useEffect(() => {
-    if (!note) return;
-    const id = window.setTimeout(() => setNote(""), 1700);
-    return () => window.clearTimeout(id);
-  }, [note]);
 
   useEffect(() => {
     const el = rail.current;
@@ -303,7 +304,6 @@ export function Fallen() {
       held = window.setTimeout(() => {
         armed = false;
         setFound(true);
-        setNote("hold → the list");
       }, 520);
     };
     const end = (event: PointerEvent) => {
@@ -313,11 +313,7 @@ export function Fallen() {
       const dx = event.clientX - x;
       const dy = event.clientY - y;
       if (Math.hypot(dx, dy) < 18) {
-        setNote((cur) => {
-          if (!known.includes("walk")) return "sideways walks";
-          if (!known.includes("rise") && !known.includes("delve")) return "up rises · down delves";
-          return cur;
-        });
+        setLineOn((v) => !v);
         return;
       }
       if (Math.abs(dx) > Math.abs(dy)) api.current.go(api.current.at + (dx < 0 ? 1 : -1));
@@ -332,14 +328,7 @@ export function Fallen() {
       el.removeEventListener("pointerup", end);
       el.removeEventListener("pointercancel", end);
     };
-  }, [known]);
-
-  const map = [
-    ["sideways", "walk", walked],
-    ["up", "rise", roseKnown],
-    ["down", "delve", sankKnown],
-    ["hold", "the list", found],
-  ] as const;
+  }, []);
 
   return (
     <div className="tableau" ref={root}>
@@ -347,61 +336,33 @@ export function Fallen() {
         {ALL.map((item, n) => (
           <section className="z-beat" data-i={n} key={`${n}-${item.src}`}>
             <img key={frame} src={frame} alt="" style={{ objectPosition: look }} />
-            {item.motion && n === at && depth === 0 ? (
+            {motion && item.motion && n === at && depth === 0 ? (
               <video src={item.motion} poster={item.src} muted loop playsInline autoPlay style={{ objectPosition: look }} />
             ) : null}
           </section>
         ))}
       </div>
       <div className="z-compass">
-        <button type="button" className={roseKnown ? "z-edge z-up known" : "z-edge z-up"} onClick={() => dive(-1)}>
-          rise
-        </button>
-        <button type="button" className={sankKnown ? "z-edge z-down known" : "z-edge z-down"} onClick={() => dive(1)}>
-          delve
-        </button>
-        <button type="button" className={walked ? "z-edge z-left known" : "z-edge z-left"} onClick={() => go(at - 1)}>
-          back
-        </button>
-        <button
-          type="button"
-          className={walked ? "z-edge z-right known" : "z-edge z-right"}
-          onClick={() => (at === ALL.length - 1 ? setFound(true) : go(at + 1))}
-        >
-          {at === ALL.length - 1 ? "more" : "on"}
-        </button>
+        <button type="button" className="z-edge z-up" aria-label="rise" onClick={() => { setPlaying(false); dive(-1); }} />
+        <button type="button" className="z-edge z-down" aria-label="delve" onClick={() => { setPlaying(false); dive(1); }} />
+        <button type="button" className="z-edge z-left" aria-label="back" onClick={() => { setPlaying(false); go(at - 1); }} />
+        <button type="button" className="z-edge z-right" aria-label="on" onClick={() => { setPlaying(false); go(at + 1); }} />
       </div>
-      <header className="player-chrome">
-        <p className="brand">
-          {depth < 0 ? "rise" : depth > 0 ? "delve" : "walk"} · {beat.title}
-        </p>
-        <div className="right">
-          <Link to="/marks" className="nav-link">
-            marks
-          </Link>
-          <Link to="/leaf" className="nav-link">
-            leaf
-          </Link>
-          <button type="button" className="nav-link" onClick={() => setPlaying((v) => !v)}>
-            {playing ? "pause" : "play"}
-          </button>
-          <button type="button" className="nav-link" onClick={() => setFound((v) => !v)}>
-            more
-          </button>
-        </div>
-      </header>
-      {note ? <p className="z-hint">{note}</p> : null}
-      <p className="tableau-line">{spoken}</p>
+      <div className="z-dots">
+        <button type="button" className={motion ? "on" : ""} aria-label={motion ? "still" : "motion"} onClick={() => setMotion((v) => !v)} />
+        <button type="button" aria-label={found ? "close" : "map"} onClick={() => setFound((v) => !v)} />
+      </div>
+      {spoken ? <p className="tableau-line">{spoken}</p> : null}
       <div className="tableau-dots" style={{ transform: `scaleX(${(at + 1) / ALL.length})` }} />
       {found ? (
         <div className="z-find">
-          <p className="z-find-title">gesture map</p>
-          {map.map(([from, to, seen]) => (
-            <p key={from} className={seen ? "on" : ""}>
-              {from} → {seen ? to : "not yet"}
-            </p>
-          ))}
-          <p className="z-find-title">pictures</p>
+          <button type="button" onClick={() => setPlaying((v) => !v)}>
+            {playing ? "pause" : "play"}
+          </button>
+          <button type="button" onClick={() => setMotion((v) => !v)}>
+            {motion ? "still" : "motion"}
+          </button>
+          <p className="z-find-title">places</p>
           {ALL.map((item, n) => (
             <button
               key={item.title}
