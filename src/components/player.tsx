@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Home, Pause, Play } from "lucide-react";
+import { useAskInstall } from "@/components/install-sheet";
 import { PLATES, platesIn, type Cast } from "@/lib/plates";
 import { WAYS } from "@/lib/ways";
 
@@ -61,7 +62,7 @@ export function Player() {
   const bedRef = useRef<HTMLAudioElement>(null);
   const nextRef = useRef<HTMLAudioElement>(null);
   const side = useRef(0);
-  const installRef = useRef<any>(null);
+  const { ask: askInstall, sheet: installSheet } = useAskInstall();
   const shellRef = useRef<HTMLDivElement>(null);
   const iRef = useRef(START);
   const castRef = useRef(cast);
@@ -241,15 +242,6 @@ export function Player() {
   }, [plate.motion]);
 
   useEffect(() => {
-    const onPrompt = (e: Event) => {
-      e.preventDefault();
-      installRef.current = e;
-    };
-    window.addEventListener("beforeinstallprompt", onPrompt);
-    return () => window.removeEventListener("beforeinstallprompt", onPrompt);
-  }, []);
-
-  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       setImmersive(false);
@@ -345,6 +337,7 @@ export function Player() {
         stepShow(dy > 0 ? 1 : -1);
       }}
     >
+      {installSheet}
       <button
         type="button"
         className="exit-immerse"
@@ -509,22 +502,9 @@ export function Player() {
           <Link to="/ball" search={{ stay: 1 }} className="nav-link">
             ball
           </Link>
-          <a
-            className="nav-link"
-            href="/?install=1&platform=ios"
-            onClick={(e) => {
-              e.preventDefault();
-              const prompt = installRef.current;
-              if (prompt?.prompt) {
-                prompt.prompt();
-                installRef.current = null;
-                return;
-              }
-              window.location.assign("/?install=1&platform=ios");
-            }}
-          >
+          <button type="button" className="nav-link" onClick={askInstall}>
             install
-          </a>
+          </button>
           {Math.max(0, path.indexOf(i)) + 1} / {Math.max(path.length, 1)}
         </div>
       </header>

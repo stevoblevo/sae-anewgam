@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
+import { useAskInstall } from "@/components/install-sheet";
 
 const SCENES = [
   { id: "pink", title: "her, in pink.", note: "freckles. blue eyes.", src: "/portrait/pink.jpg", motion: "/motion/pink-tall.mp4", audio: "/audio/scenes/anna.mp3" },
@@ -28,20 +29,10 @@ export function Ball() {
   const [hear, setHear] = useState(false);
   const hearRef = useRef(false);
   const rateRef = useRef(2);
-  const installRef = useRef<any>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [at, setAt] = useState(0);
   const atRef = useRef(0);
   const [head, setHead] = useState<{ n: number; src: string; top: number; left: number } | null>(null);
-
-  useEffect(() => {
-    const onPrompt = (e: Event) => {
-      e.preventDefault();
-      installRef.current = e;
-    };
-    window.addEventListener("beforeinstallprompt", onPrompt);
-    return () => window.removeEventListener("beforeinstallprompt", onPrompt);
-  }, []);
 
   useEffect(() => {
     if (!stay) navigate({ to: "/" });
@@ -57,15 +48,7 @@ export function Ball() {
     };
   }, []);
 
-  const install = () => {
-    const prompt = installRef.current;
-    if (prompt?.prompt) {
-      prompt.prompt();
-      installRef.current = null;
-      return;
-    }
-    window.location.assign("/?install=1&platform=ios");
-  };
+  const { ask: askInstall, sheet: installSheet } = useAskInstall();
 
   const go = (n: number) => {
     const next = (n + SCENES.length) % SCENES.length;
@@ -127,6 +110,7 @@ export function Ball() {
       onWheel={() => setPlaying(false)}
       onTouchStart={() => setPlaying(false)}
     >
+      {installSheet}
       <header className="player-chrome">
         <Link to="/" className="nav-link">
           back
@@ -160,7 +144,7 @@ export function Ball() {
           <button type="button" className="nav-link" onClick={() => go(Math.floor(Math.random() * SCENES.length))}>
             spin
           </button>
-          <button type="button" className="nav-link" onClick={install}>
+          <button type="button" className="nav-link" onClick={askInstall}>
             install
           </button>
           <Link to="/her" className="nav-link">

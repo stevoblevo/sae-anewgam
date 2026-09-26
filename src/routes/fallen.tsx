@@ -349,6 +349,9 @@ export function Fallen() {
           {depth < 0 ? "rise" : depth > 0 ? "delve" : "walk"} · {beat.title}
         </p>
         <div className="right">
+          <Link to="/marks" className="nav-link">
+            marks
+          </Link>
           <Link to="/leaf" className="nav-link">
             leaf
           </Link>
@@ -387,6 +390,7 @@ export function Fallen() {
             version Z · this
           </button>
           <Link to="/leaf">the leaf</Link>
+          <Link to="/marks">the marks</Link>
           <Link to="/walk">porch walk · every scene</Link>
           <Link to="/ball" search={{ stay: 1 }}>
             peach ball
