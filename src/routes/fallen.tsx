@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { PLATES } from "@/lib/plates";
 
 const BEATS = [
   {
@@ -135,6 +136,25 @@ const DEPTH: Record<string, { high: string; low: string }> = {
   "/everdelve.jpg": { high: "/pink-forest.jpg", low: "/loom.png" },
 };
 
+const ALL = [
+  ...BEATS,
+  ...PLATES.flatMap((p) =>
+    p.shelf === "study" || BEATS.some((b) => b.src === p.src)
+      ? []
+      : [
+          {
+            act: "Z",
+            src: p.src,
+            motion: p.motion,
+            title: p.title,
+            line: p.note,
+            over: p.note,
+            under: p.note,
+          },
+        ],
+  ),
+];
+
 export const Route = createFileRoute("/fallen")({
   component: Fallen,
 });
@@ -148,11 +168,12 @@ export function Fallen() {
   const [known, setKnown] = useState<Array<"walk" | "rise" | "delve">>([]);
   const [note, setNote] = useState("");
   const [found, setFound] = useState(false);
+  const [playing, setPlaying] = useState(true);
   const rose = useRef(false);
   const sank = useRef(false);
   const knownRef = useRef(known);
   knownRef.current = known;
-  const beat = BEATS[at] ?? BEATS[0];
+  const beat = ALL[at] ?? ALL[0];
   const frame = (depth < 0 ? DEPTH[beat.src]?.high : depth > 0 ? DEPTH[beat.src]?.low : beat.src) ?? beat.src;
   const look = depth < 0 ? "center 20%" : depth > 0 ? "center 80%" : "center 46%";
   const spoken =
@@ -171,8 +192,9 @@ export function Fallen() {
   const go = (n: number) => {
     const el = rail.current;
     if (!el) return;
-    const next = Math.max(0, Math.min(BEATS.length - 1, n));
+    const next = Math.max(0, Math.min(ALL.length - 1, n));
     if (next === at) return;
+    setDepth(0);
     el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
     learn("walk", "sideways → walk");
   };
@@ -193,9 +215,13 @@ export function Fallen() {
   api.current = { go, dive, at };
 
   useEffect(() => {
-    const id = window.setTimeout(() => setNote((cur) => cur || "sideways walks"), 2200);
-    return () => window.clearTimeout(id);
-  }, []);
+    if (!playing || found) return;
+    const id = window.setInterval(() => {
+      const next = api.current.at + 1;
+      api.current.go(next >= ALL.length ? 0 : next);
+    }, 8000);
+    return () => window.clearInterval(id);
+  }, [playing, found]);
 
   useEffect(() => {
     if (!note) return;
@@ -230,6 +256,7 @@ export function Fallen() {
       const ay = Math.abs(event.deltaY);
       if (ax < 1 && ay < 1) return;
       event.preventDefault();
+      setPlaying(false);
       if (locked) return;
       locked = true;
       window.setTimeout(() => {
@@ -317,8 +344,8 @@ export function Fallen() {
   return (
     <div className="tableau" ref={root}>
       <div className="z-rail" ref={rail}>
-        {BEATS.map((item, n) => (
-          <section className="z-beat" data-i={n} key={item.src + item.title}>
+        {ALL.map((item, n) => (
+          <section className="z-beat" data-i={n} key={`${n}-${item.src}`}>
             <img key={frame} src={frame} alt="" style={{ objectPosition: look }} />
             {item.motion && n === at && depth === 0 ? (
               <video src={item.motion} poster={item.src} muted loop playsInline autoPlay style={{ objectPosition: look }} />
@@ -339,9 +366,9 @@ export function Fallen() {
         <button
           type="button"
           className={walked ? "z-edge z-right known" : "z-edge z-right"}
-          onClick={() => (at === BEATS.length - 1 ? setFound(true) : go(at + 1))}
+          onClick={() => (at === ALL.length - 1 ? setFound(true) : go(at + 1))}
         >
-          {at === BEATS.length - 1 ? "more" : "on"}
+          {at === ALL.length - 1 ? "more" : "on"}
         </button>
       </div>
       <header className="player-chrome">
@@ -355,6 +382,9 @@ export function Fallen() {
           <Link to="/leaf" className="nav-link">
             leaf
           </Link>
+          <button type="button" className="nav-link" onClick={() => setPlaying((v) => !v)}>
+            {playing ? "pause" : "play"}
+          </button>
           <button type="button" className="nav-link" onClick={() => setFound((v) => !v)}>
             more
           </button>
@@ -362,7 +392,7 @@ export function Fallen() {
       </header>
       {note ? <p className="z-hint">{note}</p> : null}
       <p className="tableau-line">{spoken}</p>
-      <div className="tableau-dots" style={{ transform: `scaleX(${(at + 1) / BEATS.length})` }} />
+      <div className="tableau-dots" style={{ transform: `scaleX(${(at + 1) / ALL.length})` }} />
       {found ? (
         <div className="z-find">
           <p className="z-find-title">gesture map</p>
@@ -372,7 +402,7 @@ export function Fallen() {
             </p>
           ))}
           <p className="z-find-title">pictures</p>
-          {BEATS.map((item, n) => (
+          {ALL.map((item, n) => (
             <button
               key={item.title}
               type="button"
