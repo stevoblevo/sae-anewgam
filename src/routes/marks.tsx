@@ -3,6 +3,26 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 const MARKS = [
   {
+    src: "/mark-orange.jpg",
+    title: "Orange",
+    line: "The leaf mark has walked. It stays beside the path.",
+  },
+  {
+    src: "/mark-red.jpg",
+    title: "Red",
+    line: "More weather. The circle of the well is still whole.",
+  },
+  {
+    src: "/mark-meet.jpg",
+    title: "They meet",
+    line: "Orange is the door. Red is the rain. Neither covers the other.",
+  },
+  {
+    src: "/mark-under.jpg",
+    title: "Under it",
+    line: "They stand the same height. The red stays in the sky.",
+  },
+  {
     src: "/mark-leaf.jpg",
     title: "The leaf",
     line: "One mark, beside the path. Not ahead. Not taken.",
