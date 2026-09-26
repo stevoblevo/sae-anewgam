@@ -20,4 +20,12 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/stevoblevo/sae-anewgam:latest
+          tags: |
+            ghcr.io/stevoblevo/sae-anewgam:latest
+            ghcr.io/stevoblevo/sae-anewgam:${{ github.sha }}
+      - name: make the package public
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api --method PATCH "/user/packages/container/sae-anewgam" -f visibility=public \
+            || gh api --method PATCH "/users/stevoblevo/packages/container/sae-anewgam" -f visibility=public
