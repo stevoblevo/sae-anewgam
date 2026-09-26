@@ -64,9 +64,12 @@ export function Player() {
   const installRef = useRef<any>(null);
   const shellRef = useRef<HTMLDivElement>(null);
   const iRef = useRef(START);
+  const castRef = useRef(cast);
+  castRef.current = cast;
   const traceRef = useRef<string[]>([]);
   const wheelAt = useRef(0);
   const touchY = useRef<number | null>(null);
+  const touchX = useRef<number | null>(null);
   const popRef = useRef<number | null>(null);
   const leaveTimer = useRef(0);
   const navigate = useNavigate();
@@ -186,11 +189,20 @@ export function Player() {
       if (now - wheelAt.current < 380) return;
       wheelAt.current = now;
       setPlaying(false);
+      const horizontal = e.shiftKey || Math.abs(e.deltaX) > Math.abs(e.deltaY);
+      if (horizontal) {
+        const here = WAYS.findIndex((w) => w.cast === castRef.current);
+        const dir = (e.deltaX || e.deltaY) > 0 ? 1 : -1;
+        const next = WAYS[(here + dir + WAYS.length) % WAYS.length];
+        const n = PLATES.findIndex((p) => p.id === next?.start);
+        if (n >= 0) go(n);
+        return;
+      }
       stepShow(e.deltaY > 0 ? 1 : -1);
     };
     window.addEventListener("wheel", onWheel, { passive: false });
     return () => window.removeEventListener("wheel", onWheel);
-  }, [gallery, stepShow]);
+  }, [gallery, stepShow, go]);
 
   useEffect(() => {
     const apply = () => setPhone(window.innerWidth / Math.max(window.innerHeight, 1) < 0.9);
@@ -309,14 +321,27 @@ export function Player() {
       }}
       onTouchStart={(e) => {
         touchY.current = e.changedTouches[0]?.clientY ?? null;
+        touchX.current = e.changedTouches[0]?.clientX ?? null;
       }}
       onTouchEnd={(e) => {
-        const start = touchY.current;
-        const end = e.changedTouches[0]?.clientY;
+        const y0 = touchY.current;
+        const x0 = touchX.current;
+        const y1 = e.changedTouches[0]?.clientY;
+        const x1 = e.changedTouches[0]?.clientX;
         touchY.current = null;
-        if (start == null || end == null) return;
-        const dy = start - end;
-        if (Math.abs(dy) < 48) return;
+        touchX.current = null;
+        if (y0 == null || x0 == null || y1 == null || x1 == null) return;
+        const dx = x1 - x0;
+        const dy = y0 - y1;
+        if (Math.abs(dx) < 48 && Math.abs(dy) < 48) return;
+        setPlaying(false);
+        if (Math.abs(dx) > Math.abs(dy)) {
+          const here = WAYS.findIndex((w) => w.cast === cast);
+          const next = WAYS[(here + (dx < 0 ? 1 : -1) + WAYS.length) % WAYS.length];
+          const n = PLATES.findIndex((p) => p.id === next?.start);
+          if (n >= 0) go(n);
+          return;
+        }
         stepShow(dy > 0 ? 1 : -1);
       }}
     >
@@ -546,7 +571,7 @@ export function Player() {
             </a>
           ) : null}
           {plate.id === "bambi" ? <p className="tag">{PEACH[peach]}</p> : null}
-          <p key={`${plate.id}-note`} className="tag">{whisper ? "remember · the face · farther" : `${plate.note} · scroll`}</p>
+          <p key={`${plate.id}-note`} className="tag">{whisper ? "remember · the face · farther" : plate.note}</p>
           <div className="heads">
             {HEADS.map((h) => (
               <button key={h.id} type="button" className="face-lock" onClick={() => touch(h.id)}>

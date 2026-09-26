@@ -119,6 +119,22 @@ const BEATS = [
   },
 ];
 
+const DEPTH: Record<string, { high: string; low: string }> = {
+  "/porch-face.jpg": { high: "/porch-lift.jpg", low: "/garden-porch.jpg" },
+  "/small-one.jpg": { high: "/sisters.jpg", low: "/anna.jpg" },
+  "/garden-porch.jpg": { high: "/stare.png", low: "/ring.png" },
+  "/stare.png": { high: "/weather.jpg", low: "/well-cry.jpg" },
+  "/ring.png": { high: "/garden-ring.jpg", low: "/well-cry.jpg" },
+  "/weather.jpg": { high: "/farther-well.jpg", low: "/beat01.jpg" },
+  "/farther-well.jpg": { high: "/beat05.jpg", low: "/well-cry.jpg" },
+  "/beat05.jpg": { high: "/pink-forest.jpg", low: "/beat01.jpg" },
+  "/well-cry.jpg": { high: "/stare.png", low: "/beat01.jpg" },
+  "/beat01.jpg": { high: "/weather.jpg", low: "/pink-forest.jpg" },
+  "/pink-forest.jpg": { high: "/sisters.jpg", low: "/everdelve.jpg" },
+  "/loom.png": { high: "/kirby.png", low: "/porch.jpg" },
+  "/everdelve.jpg": { high: "/pink-forest.jpg", low: "/loom.png" },
+};
+
 export const Route = createFileRoute("/fallen")({
   component: Fallen,
 });
@@ -137,7 +153,8 @@ export function Fallen() {
   const knownRef = useRef(known);
   knownRef.current = known;
   const beat = BEATS[at] ?? BEATS[0];
-  const look = depth < 0 ? "center 16%" : depth > 0 ? "center 84%" : "center 46%";
+  const frame = (depth < 0 ? DEPTH[beat.src]?.high : depth > 0 ? DEPTH[beat.src]?.low : beat.src) ?? beat.src;
+  const look = depth < 0 ? "center 20%" : depth > 0 ? "center 80%" : "center 46%";
   const spoken =
     depth < 0 ? beat.over : depth > 0 ? beat.under : at === BEATS.length - 1 && both ? "You rose and you delved. Weee. The story fits." : beat.line;
   const walked = known.includes("walk");
@@ -205,38 +222,29 @@ export function Fallen() {
   }, []);
 
   useEffect(() => {
-    const el = rail.current;
-    if (!el) return;
-    let accX = 0;
-    let accY = 0;
     let locked = false;
     const onWheel = (event: WheelEvent) => {
+      const t = event.target as HTMLElement | null;
+      if (t?.closest(".z-find")) return;
       const ax = Math.abs(event.deltaX);
       const ay = Math.abs(event.deltaY);
       if (ax < 1 && ay < 1) return;
       event.preventDefault();
       if (locked) return;
-      if (ax > ay) {
-        accX += event.deltaX;
-        if (Math.abs(accX) < 28) return;
-        const dir = accX > 0 ? 1 : -1;
-        accX = 0;
-        locked = true;
-        api.current.go(api.current.at + dir);
-      } else {
-        accY += event.deltaY;
-        if (Math.abs(accY) < 28) return;
-        const down = accY > 0;
-        accY = 0;
-        locked = true;
-        api.current.dive(down ? 1 : -1);
-      }
+      locked = true;
       window.setTimeout(() => {
         locked = false;
       }, 420);
+      const horizontal = event.shiftKey || ax > ay;
+      if (horizontal) {
+        const dir = (event.deltaX || event.deltaY) > 0 ? 1 : -1;
+        api.current.go(api.current.at + dir);
+      } else {
+        api.current.dive(event.deltaY > 0 ? 1 : -1);
+      }
     };
-    el.addEventListener("wheel", onWheel, { passive: false });
-    return () => el.removeEventListener("wheel", onWheel);
+    window.addEventListener("wheel", onWheel, { capture: true, passive: false });
+    return () => window.removeEventListener("wheel", onWheel, { capture: true });
   }, []);
 
   useEffect(() => {
@@ -311,8 +319,8 @@ export function Fallen() {
       <div className="z-rail" ref={rail}>
         {BEATS.map((item, n) => (
           <section className="z-beat" data-i={n} key={item.src + item.title}>
-            <img src={item.src} alt="" style={{ objectPosition: look }} />
-            {item.motion && n === at ? (
+            <img key={frame} src={frame} alt="" style={{ objectPosition: look }} />
+            {item.motion && n === at && depth === 0 ? (
               <video src={item.motion} poster={item.src} muted loop playsInline autoPlay style={{ objectPosition: look }} />
             ) : null}
           </section>
@@ -337,7 +345,9 @@ export function Fallen() {
         </button>
       </div>
       <header className="player-chrome">
-        <p className="brand">{beat.title}</p>
+        <p className="brand">
+          {depth < 0 ? "rise" : depth > 0 ? "delve" : "walk"} · {beat.title}
+        </p>
         <div className="right">
           <button type="button" className="nav-link" onClick={() => setFound((v) => !v)}>
             more
