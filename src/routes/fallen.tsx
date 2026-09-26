@@ -349,6 +349,9 @@ export function Fallen() {
           {depth < 0 ? "rise" : depth > 0 ? "delve" : "walk"} · {beat.title}
         </p>
         <div className="right">
+          <Link to="/leaf" className="nav-link">
+            leaf
+          </Link>
           <button type="button" className="nav-link" onClick={() => setFound((v) => !v)}>
             more
           </button>
@@ -383,6 +386,7 @@ export function Fallen() {
           <button type="button" onClick={() => setFound(false)}>
             version Z · this
           </button>
+          <Link to="/leaf">the leaf</Link>
           <Link to="/walk">porch walk · every scene</Link>
           <Link to="/ball" search={{ stay: 1 }}>
             peach ball

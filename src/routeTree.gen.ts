@@ -15,6 +15,7 @@ import { Route as FallenRouteImport } from './routes/fallen'
 import { Route as FartherRouteImport } from './routes/farther'
 import { Route as FightRouteImport } from './routes/fight'
 import { Route as HerRouteImport } from './routes/her'
+import { Route as LeafRouteImport } from './routes/leaf'
 import { Route as TaleRouteImport } from './routes/tale'
 import { Route as WalkRouteImport } from './routes/walk'
 
@@ -48,6 +49,11 @@ const HerRoute = HerRouteImport.update({
   path: '/her',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LeafRoute = LeafRouteImport.update({
+  id: '/leaf',
+  path: '/leaf',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TaleRoute = TaleRouteImport.update({
   id: '/tale',
   path: '/tale',
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/farther': typeof FartherRoute
   '/fight': typeof FightRoute
   '/her': typeof HerRoute
+  '/leaf': typeof LeafRoute
   '/tale': typeof TaleRoute
   '/walk': typeof WalkRoute
 }
@@ -76,6 +83,7 @@ export interface FileRoutesByTo {
   '/farther': typeof FartherRoute
   '/fight': typeof FightRoute
   '/her': typeof HerRoute
+  '/leaf': typeof LeafRoute
   '/tale': typeof TaleRoute
   '/walk': typeof WalkRoute
 }
@@ -87,6 +95,7 @@ export interface FileRoutesById {
   '/farther': typeof FartherRoute
   '/fight': typeof FightRoute
   '/her': typeof HerRoute
+  '/leaf': typeof LeafRoute
   '/tale': typeof TaleRoute
   '/walk': typeof WalkRoute
 }
@@ -99,6 +108,7 @@ export interface FileRouteTypes {
     | '/farther'
     | '/fight'
     | '/her'
+    | '/leaf'
     | '/tale'
     | '/walk'
   fileRoutesByTo: FileRoutesByTo
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/farther'
     | '/fight'
     | '/her'
+    | '/leaf'
     | '/tale'
     | '/walk'
   id:
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/farther'
     | '/fight'
     | '/her'
+    | '/leaf'
     | '/tale'
     | '/walk'
   fileRoutesById: FileRoutesById
@@ -130,6 +142,7 @@ export interface RootRouteChildren {
   FartherRoute: typeof FartherRoute
   FightRoute: typeof FightRoute
   HerRoute: typeof HerRoute
+  LeafRoute: typeof LeafRoute
   TaleRoute: typeof TaleRoute
   WalkRoute: typeof WalkRoute
 }
@@ -178,6 +191,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/leaf': {
+      id: '/leaf'
+      path: '/leaf'
+      fullPath: '/leaf'
+      preLoaderRoute: typeof LeafRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tale': {
       id: '/tale'
       path: '/tale'
@@ -202,6 +222,7 @@ const rootRouteChildren: RootRouteChildren = {
   FartherRoute: FartherRoute,
   FightRoute: FightRoute,
   HerRoute: HerRoute,
+  LeafRoute: LeafRoute,
   TaleRoute: TaleRoute,
   WalkRoute: WalkRoute,
 }
