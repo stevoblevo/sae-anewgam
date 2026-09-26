@@ -364,10 +364,9 @@ export function Fallen() {
   useEffect(() => {
     if (!playing || found) return;
     const id = window.setInterval(() => {
-      if (api.current.at < 2) return;
       const next = api.current.at + 1;
       api.current.go(next >= ALL.length ? 0 : next);
-    }, 8000);
+    }, 4500);
     return () => window.clearInterval(id);
   }, [playing, found]);
 
@@ -479,10 +478,14 @@ export function Fallen() {
   const seenOrder = Object.entries(counts)
     .sort((a, b) => b[1] - a[1])
     .map(([src]) => src);
-  const bubbleSrcs = (faves.length ? faves : seenOrder.length ? seenOrder : seeds).slice(0, 6);
-  const spotsRef = useRef<Record<string, { x: number; y: number; g: string; placed: boolean }>>({});
+  const bubbleSrcs = Array.from(new Set([...seeds, ...seenOrder, beat.src])).filter((src) =>
+    ALL.some((item) => item.src === src),
+  );
+  const spotsRef = useRef<Record<string, { x: number; y: number; g: string; placed: boolean; pop?: boolean; land?: boolean }>>({});
   const tapRef = useRef({ src: "", t: 0, timer: 0 });
   const [spots, setSpots] = useState(spotsRef.current);
+  const [dragG, setDragG] = useState<string | null>(null);
+  const [magnet, setMagnet] = useState<string | null>(null);
   spotsRef.current = spots;
 
   const bubbleKey = bubbleSrcs.join("|");
@@ -502,13 +505,29 @@ export function Fallen() {
       const next = { ...saved };
       srcs.forEach((src, i) => {
         if (!next[src]) {
-          next[src] = { x: 8 + (i % 3) * 11, y: 70 + Math.floor(i / 3) * 14, g: src, placed: false };
+          next[src] = { x: 2 + (i % 4) * 2.1, y: 3, g: "pile", placed: false };
           changed = true;
         }
       });
       return changed ? next : prev;
     });
   }, [bubbleKey]);
+
+  useEffect(() => {
+    const src = beat?.src;
+    if (!src) return;
+    setSpots((prev) => {
+      const cur = prev[src];
+      if (cur?.placed) return prev;
+      const mates = Object.entries(prev).filter(([key, spot]) => key !== src && spot.g === "pile");
+      const anchor = mates.find(([, spot]) => spot.placed)?.[1] ?? mates[0]?.[1] ?? { x: 2, y: 3 };
+      const i = mates.length;
+      const x = Math.min(94, anchor.x + (i % 4) * 2.1);
+      const y = Math.min(90, anchor.y + Math.floor(i / 4) * 2.2);
+      if (cur && Math.abs(cur.x - x) < 0.4 && Math.abs(cur.y - y) < 0.4 && cur.g === "pile") return prev;
+      return { ...prev, [src]: { x, y, g: "pile", placed: false, pop: !cur } };
+    });
+  }, [beat.src]);
 
   const grab = (src: string, event: React.PointerEvent) => {
     event.stopPropagation();
@@ -521,10 +540,20 @@ export function Fallen() {
     const g = before[src]?.g ?? src;
     const mates = bubbleSrcs.filter((item) => (before[item]?.g ?? item) === g);
     let moved = false;
+    setDragG(g);
     const move = (ev: PointerEvent) => {
       const dx = ((ev.clientX - startX) / rect.width) * 100;
       const dy = ((ev.clientY - startY) / rect.height) * 100;
       if (Math.hypot(ev.clientX - startX, ev.clientY - startY) > 6) moved = true;
+      const leadX = Math.min(94, Math.max(0, (before[src]?.x ?? 0) + dx));
+      const leadY = Math.min(90, Math.max(0, (before[src]?.y ?? 0) + dy));
+      let host: string | null = null;
+      for (const other of bubbleSrcs) {
+        if (mates.includes(other)) continue;
+        const spot = before[other];
+        if (spot && Math.hypot(spot.x - leadX, spot.y - leadY) < 10) host = spot.g;
+      }
+      setMagnet(host);
       setSpots((prev) => {
         const next = { ...prev };
         for (const item of mates) {
@@ -532,8 +561,8 @@ export function Fallen() {
           if (!origin) continue;
           next[item] = {
             ...origin,
-            x: Math.min(92, Math.max(2, origin.x + dx)),
-            y: Math.min(88, Math.max(4, origin.y + dy)),
+            x: Math.min(94, Math.max(0, origin.x + dx)),
+            y: Math.min(90, Math.max(0, origin.y + dy)),
             placed: true,
           };
         }
@@ -543,6 +572,8 @@ export function Fallen() {
     const up = () => {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", up);
+      setDragG(null);
+      setMagnet(null);
       if (!moved) {
         const now = Date.now();
         window.clearTimeout(tapRef.current.timer);
@@ -575,13 +606,34 @@ export function Fallen() {
         for (const other of bubbleSrcs) {
           if (mates.includes(other)) continue;
           const spot = prev[other];
-          if (spot && Math.hypot(spot.x - me.x, spot.y - me.y) < 9) host = spot.g;
+          if (spot && Math.hypot(spot.x - me.x, spot.y - me.y) < 10) host = spot.g;
         }
         const next = { ...prev };
-        if (host) {
-          for (const item of mates) next[item] = { ...next[item], g: host, placed: true };
-        }
+        const pile = host ? bubbleSrcs.filter((item) => mates.includes(item) || next[item]?.g === host) : mates;
+        pile.forEach((item, i) => {
+          const spot = next[item];
+          if (!spot) return;
+          next[item] = host
+            ? {
+                x: Math.min(94, Math.max(0, me.x + (i % 4) * 2.1)),
+                y: Math.min(90, Math.max(0, me.y + Math.floor(i / 4) * 2.2)),
+                g: host,
+                placed: true,
+                land: true,
+              }
+            : { ...spot, placed: true, land: true };
+        });
         localStorage.setItem("sae-bubble-spots", JSON.stringify(next));
+        window.setTimeout(() => {
+          setSpots((cur) => {
+            if (!Object.values(cur).some((spot) => spot.land || spot.pop)) return cur;
+            const cleared = { ...cur };
+            for (const key of Object.keys(cleared)) {
+              if (cleared[key].land || cleared[key].pop) cleared[key] = { ...cleared[key], land: false, pop: false };
+            }
+            return cleared;
+          });
+        }, 520);
         return next;
       });
     };
@@ -616,15 +668,24 @@ export function Fallen() {
       {bubbles && bubbleSrcs.length ? (
         <div className="bubbles">
           {bubbleSrcs.map((src, i) => {
-            const spot = spots[src] ?? { x: 8 + i * 11, y: 74, g: src, placed: false };
+            const spot = spots[src] ?? { x: 2 + (i % 4) * 2.1, y: 3, g: "pile", placed: false };
             const grouped = bubbleSrcs.some((item) => item !== src && spots[item]?.g === spot.g);
+            const cls = [
+              dragG === spot.g ? "held" : "",
+              magnet && (spot.g === magnet || spot.g === dragG) ? "near" : "",
+              grouped ? "with" : "",
+              spot.pop ? "pop" : "",
+              spot.land ? "land" : "",
+            ]
+              .filter(Boolean)
+              .join(" ");
             return (
               <button
                 key={src}
                 type="button"
                 aria-label="return"
-                className={grouped ? (spot.placed ? "with" : "with slip") : spot.placed ? "" : "slip"}
-                style={{ backgroundImage: `url(${src})`, left: `${spot.x}%`, top: `${spot.y}%`, zIndex: 6 + i, animationDelay: `${i * 0.6}s` }}
+                className={cls}
+                style={{ backgroundImage: `url(${src})`, left: `${spot.x}%`, top: `${spot.y}%`, zIndex: dragG === spot.g ? 40 : 6 + i }}
                 onPointerDown={(event) => grab(src, event)}
               />
             );

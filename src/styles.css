@@ -1464,23 +1464,55 @@
   pointer-events: auto;
   touch-action: none;
   cursor: grab;
+  transition:
+    left 0.35s ease,
+    top 0.35s ease,
+    transform 0.35s ease,
+    box-shadow 0.25s ease;
 }
 
 .tableau .bubbles button.with {
-  box-shadow: 0 0 0 2px rgb(255 236 210 / 0.9);
+  box-shadow: 0 0 0 2px rgb(255 228 190 / 0.95);
 }
 
-.tableau .bubbles button.slip {
-  animation: bubble-slip 7s ease-in-out infinite;
+.tableau .bubbles button.near {
+  box-shadow:
+    0 0 0 4px rgb(255 214 160 / 1),
+    0 0 18px rgb(255 170 90 / 0.9);
 }
 
-@keyframes bubble-slip {
-  0%,
-  100% {
-    translate: 0 0;
+.tableau .bubbles button.held {
+  transition: none;
+  transform: scale(1.12);
+  cursor: grabbing;
+  z-index: 40;
+}
+
+.tableau .bubbles button.pop {
+  animation: bubble-pop 0.55s ease;
+}
+
+.tableau .bubbles button.land {
+  animation: bubble-land 0.45s ease;
+}
+
+@keyframes bubble-pop {
+  from {
+    transform: scale(0.35);
+    opacity: 0;
   }
-  50% {
-    translate: 10px 16px;
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes bubble-land {
+  0% {
+    transform: scale(1.16);
+  }
+  100% {
+    transform: scale(1);
   }
 }
 
