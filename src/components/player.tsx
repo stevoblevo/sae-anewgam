@@ -6,8 +6,8 @@ import { PLATES, platesIn, type Cast } from "@/lib/plates";
 import { PICTURES } from "@/lib/pictures";
 import { WAYS } from "@/lib/ways";
 
-const STORY = ["remember", "trace", "notice", "beside", "bambi", "farther", "peachfall", "dear", "meet"];
-const RING = ["remember", "trace", "notice", "beside", "bambi", "farther", "peachfall", "peachfall-on", "dear", "meet", "leaf-again", "corridor", "stare", "blossom", "sisters", "anna", "savannah"];
+const STORY = ["remember", "trace", "notice", "beside", "bambi", "farther", "porchfight-gal", "peachfall-all", "red-horizon", "reign-well"];
+const RING = ["remember", "trace", "notice", "beside", "bambi", "farther", "porchfight-gal", "peachfall", "peachfall-all", "red-horizon", "reign-well", "dear", "meet", "leaf-again", "corridor", "stare", "blossom", "sisters", "anna", "savannah"];
 const HEADS = [{ id: "stare", src: "/stare.png", label: "face lock" }];
 const LOCK = ["remember", "stare", "farther"];
 const START = Math.max(0, PLATES.findIndex((p) => p.id === "painted-porch"));
