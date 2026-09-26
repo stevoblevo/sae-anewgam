@@ -1,3 +1,5 @@
+import { bsGamma } from "@/lib/blackscholes";
+
 const SEEN = "sae-seen";
 const FAVES = "sae-faves";
 
@@ -38,7 +40,7 @@ export function markGamma(src: string): Record<string, number> {
   all[src] = (all[src] || 0) + 1;
   try {
     localStorage.setItem(GAMMA, JSON.stringify(all));
-    if (all[src] >= SAY_DO_AT) {
+    if (all[src] >= SAY_DO_AT && bsGamma(all[src], SAY_DO_AT, 30 / 365, 0.01, 0.45) > 0) {
       const decided = readDecided();
       if (!decided.includes(src)) localStorage.setItem(DECIDED, JSON.stringify([src, ...decided]));
     }

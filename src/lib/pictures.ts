@@ -1,6 +1,7 @@
 /** Every still on the site. The gallery and the layers view both read this. */
 export const PICTURES = [
   "/anna.jpg",
+  "/anna-hearth.jpg",
   "/approach.jpg",
   "/bambi.jpg",
   "/beat01.jpg",
@@ -9,6 +10,7 @@ export const PICTURES = [
   "/beat04.jpg",
   "/beat05.jpg",
   "/beat06.jpg",
+  "/blink-sister.jpg",
   "/blossom-mark.jpg",
   "/blossom-real.jpg",
   "/blossom-white.jpg",
@@ -18,6 +20,7 @@ export const PICTURES = [
   "/depth-grotto.jpg",
   "/depth-thea.jpg",
   "/everdelve.jpg",
+  "/face-lock.jpg",
   "/farther-well.jpg",
   "/garden-porch.jpg",
   "/garden-ring.jpg",
