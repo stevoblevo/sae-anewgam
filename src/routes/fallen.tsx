@@ -6,6 +6,22 @@ import { decodeHeat, markSeen, readFaves, readSeen, shareHeat, toggleFave } from
 const BEATS = [
   {
     act: "Z",
+    src: "/peachfall-walk.jpg",
+    title: "Peach fall",
+    line: "The red-haired one looks down. Pink and purple walk beside her, on the golden path.",
+    over: "Rise and the blossoms are the weather.",
+    under: "Delve and the path is gold under their feet.",
+  },
+  {
+    act: "Z",
+    src: "/peachfall-on.jpg",
+    title: "A little farther",
+    line: "They have not left her. The path stays gold.",
+    over: "Rise. She is still sad, and still walking.",
+    under: "Delve. Nobody is ahead of her.",
+  },
+  {
+    act: "Z",
     src: "/scroll-doors.jpg",
     title: "The corridor",
     line: "Each doorway is a chapter. Down the hall is the scroll. Sideways still walks.",
@@ -411,7 +427,7 @@ export function Fallen() {
     };
   }, []);
 
-  const seeds = ["/scroll-doors.jpg", "/scroll-dear.jpg", "/scroll-meet.jpg", "/scroll-leaf.jpg", "/porch-face.jpg"];
+  const seeds = ["/peachfall-walk.jpg", "/scroll-doors.jpg", "/scroll-dear.jpg", "/porch-face.jpg"];
   const seenOrder = Object.entries(counts)
     .sort((a, b) => b[1] - a[1])
     .map(([src]) => src);
