@@ -221,7 +221,6 @@ export function Fallen() {
   const [motion, setMotion] = useState(true);
   const [lineOn, setLineOn] = useState(false);
   const [bubbles, setBubbles] = useState(true);
-  const [folded, setFolded] = useState(true);
   const [scroll, setScroll] = useState(false);
   const [heat, setHeat] = useState(false);
   const [counts, setCounts] = useState<Record<string, number>>({});
@@ -347,7 +346,7 @@ export function Fallen() {
     }
     const doors = ["stay", "bubbles", "scroll", "line", "leaf", "marks", "walk", "ball", "fight", "tale", "her", "farther"] as const;
     const door = doors[Math.floor(Math.random() * doors.length)];
-    if (door === "bubbles") setFolded(false);
+    if (door === "bubbles") setBubbles(true);
     else if (door === "scroll") setScroll(true);
     else if (door === "line") setLineOn(true);
     else if (door === "stay") {
@@ -481,6 +480,114 @@ export function Fallen() {
     .sort((a, b) => b[1] - a[1])
     .map(([src]) => src);
   const bubbleSrcs = (faves.length ? faves : seenOrder.length ? seenOrder : seeds).slice(0, 6);
+  const spotsRef = useRef<Record<string, { x: number; y: number; g: string; placed: boolean }>>({});
+  const tapRef = useRef({ src: "", t: 0, timer: 0 });
+  const [spots, setSpots] = useState(spotsRef.current);
+  spotsRef.current = spots;
+
+  const bubbleKey = bubbleSrcs.join("|");
+
+  useEffect(() => {
+    const srcs = bubbleKey.split("|").filter(Boolean);
+    setSpots((prev) => {
+      let saved = prev;
+      if (!Object.keys(prev).length) {
+        try {
+          saved = JSON.parse(localStorage.getItem("sae-bubble-spots") || "{}");
+        } catch {
+          saved = {};
+        }
+      }
+      let changed = saved !== prev;
+      const next = { ...saved };
+      srcs.forEach((src, i) => {
+        if (!next[src]) {
+          next[src] = { x: 8 + (i % 3) * 11, y: 70 + Math.floor(i / 3) * 14, g: src, placed: false };
+          changed = true;
+        }
+      });
+      return changed ? next : prev;
+    });
+  }, [bubbleKey]);
+
+  const grab = (src: string, event: React.PointerEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+    const rect = root.current?.getBoundingClientRect();
+    if (!rect) return;
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const before = spotsRef.current;
+    const g = before[src]?.g ?? src;
+    const mates = bubbleSrcs.filter((item) => (before[item]?.g ?? item) === g);
+    let moved = false;
+    const move = (ev: PointerEvent) => {
+      const dx = ((ev.clientX - startX) / rect.width) * 100;
+      const dy = ((ev.clientY - startY) / rect.height) * 100;
+      if (Math.hypot(ev.clientX - startX, ev.clientY - startY) > 6) moved = true;
+      setSpots((prev) => {
+        const next = { ...prev };
+        for (const item of mates) {
+          const origin = before[item];
+          if (!origin) continue;
+          next[item] = {
+            ...origin,
+            x: Math.min(92, Math.max(2, origin.x + dx)),
+            y: Math.min(88, Math.max(4, origin.y + dy)),
+            placed: true,
+          };
+        }
+        return next;
+      });
+    };
+    const up = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      if (!moved) {
+        const now = Date.now();
+        window.clearTimeout(tapRef.current.timer);
+        if (tapRef.current.src === src && now - tapRef.current.t < 320) {
+          tapRef.current = { src: "", t: 0, timer: 0 };
+          setSpots((prev) => {
+            const next = { ...prev, [src]: { ...prev[src], g: src, placed: true } };
+            localStorage.setItem("sae-bubble-spots", JSON.stringify(next));
+            return next;
+          });
+          return;
+        }
+        tapRef.current = {
+          src,
+          t: now,
+          timer: window.setTimeout(() => {
+            const n = ALL.findIndex((item) => item.src === src);
+            if (n >= 0) {
+              setPlaying(false);
+              go(n);
+            }
+          }, 280),
+        };
+        return;
+      }
+      setSpots((prev) => {
+        const me = prev[src];
+        if (!me) return prev;
+        let host: string | null = null;
+        for (const other of bubbleSrcs) {
+          if (mates.includes(other)) continue;
+          const spot = prev[other];
+          if (spot && Math.hypot(spot.x - me.x, spot.y - me.y) < 9) host = spot.g;
+        }
+        const next = { ...prev };
+        if (host) {
+          for (const item of mates) next[item] = { ...next[item], g: host, placed: true };
+        }
+        localStorage.setItem("sae-bubble-spots", JSON.stringify(next));
+        return next;
+      });
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+  };
   const heatCounts = shared ?? counts;
   const kept = faves.includes(beat.src);
 
@@ -507,31 +614,21 @@ export function Fallen() {
         <button type="button" aria-label={found ? "close" : "map"} onClick={() => setFound((v) => !v)} />
       </div>
       {bubbles && bubbleSrcs.length ? (
-        <div className={folded ? "bubbles folded" : "bubbles"}>
-          {bubbleSrcs.map((src) => (
-            <button
-              key={src}
-              type="button"
-              aria-label="return"
-              style={{ backgroundImage: `url(${src})` }}
-              onClick={() => {
-                if (folded) {
-                  setFolded(false);
-                  return;
-                }
-                const n = ALL.findIndex((item) => item.src === src);
-                if (n >= 0) {
-                  setPlaying(false);
-                  go(n);
-                }
-              }}
-            />
-          ))}
-          {folded ? null : (
-            <button type="button" className="fold" aria-label="fold" onClick={() => setFolded(true)}>
-              fold
-            </button>
-          )}
+        <div className="bubbles">
+          {bubbleSrcs.map((src, i) => {
+            const spot = spots[src] ?? { x: 8 + i * 11, y: 74, g: src, placed: false };
+            const grouped = bubbleSrcs.some((item) => item !== src && spots[item]?.g === spot.g);
+            return (
+              <button
+                key={src}
+                type="button"
+                aria-label="return"
+                className={grouped ? (spot.placed ? "with" : "with slip") : spot.placed ? "" : "slip"}
+                style={{ backgroundImage: `url(${src})`, left: `${spot.x}%`, top: `${spot.y}%`, zIndex: 6 + i, animationDelay: `${i * 0.6}s` }}
+                onPointerDown={(event) => grab(src, event)}
+              />
+            );
+          })}
         </div>
       ) : null}
       {heat ? (
