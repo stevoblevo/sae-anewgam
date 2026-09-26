@@ -2166,6 +2166,32 @@
   object-fit: cover;
 }
 
+.delve.deep .float-mark {
+  animation-name: float-fluid;
+  border-radius: 99px;
+}
+
+.fall-stack {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  transition: transform 1.1s ease;
+}
+
+.fall-stack img,
+.fall-stack video {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@keyframes float-fluid {
+  0%, 100% { transform: translateY(0) scaleX(1); }
+  50% { transform: translateY(-18px) scaleX(1.4); }
+}
+
 @keyframes delve-rise {
   from { transform: translateY(10%) scale(1.05); opacity: 0.35; }
   to { transform: none; opacity: 1; }
