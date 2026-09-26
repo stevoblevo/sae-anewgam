@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
 import { useAxis } from "@/components/glue";
+import { useAskInstall } from "@/components/install-sheet";
 
 const MOVES = [
-  { id: "still", src: "/anna.jpg" },
-  { id: "side", src: "/beat02.jpg" },
-  { id: "rise", src: "/trace-tall.jpg" },
-  { id: "group", src: "/face-lock.jpg" },
-  { id: "pass", src: "/depth-well.jpg" },
+  { id: "reign", src: "/depth-thea.jpg" },
+  { id: "well", src: "/reign-well.jpg" },
+  { id: "horizon", src: "/red-horizon.jpg" },
+  { id: "mint", src: "/peachfall-walk.jpg" },
+  { id: "pass", src: "/depth-grotto.jpg" },
 ];
 
 export function Rite({ onWalk }: { onWalk: () => void }) {
   const [at, setAt] = useState(0);
   const [playing, setPlaying] = useState(true);
+  const { ask, sheet } = useAskInstall();
   const move = MOVES[at] ?? MOVES[0];
 
   useEffect(() => {
@@ -27,6 +29,7 @@ export function Rite({ onWalk }: { onWalk: () => void }) {
 
   return (
     <div className="rite">
+      {sheet}
       <img key={move.src} src={move.src} alt="" decoding="async" fetchPriority="high" />
       <header className="player-chrome">
         <button type="button" className="nav-link" onClick={onWalk}>
@@ -34,6 +37,9 @@ export function Rite({ onWalk }: { onWalk: () => void }) {
         </button>
         <p className="brand">{move.id}</p>
         <div className="right">
+          <button type="button" className="nav-link" onClick={ask}>
+            install
+          </button>
           <button type="button" className="nav-link" onClick={() => setPlaying((on) => !on)}>
             {playing ? "hold" : "play"}
           </button>
