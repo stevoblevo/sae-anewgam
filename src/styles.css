@@ -2050,3 +2050,30 @@
   width: 3px;
   height: 16px;
 }
+
+.ci-under {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 4;
+  height: 42px;
+  width: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  opacity: 0.95;
+}
+
+.ci-fold {
+  position: absolute;
+  left: 8%;
+  bottom: 18%;
+  z-index: 3;
+  max-width: 18em;
+  margin: 0;
+  color: #fff8f2;
+  font-size: 26px;
+  line-height: 1.3;
+  text-shadow: 0 2px 14px rgb(0 0 0 / 0.7);
+  pointer-events: none;
+}

@@ -740,6 +740,9 @@ export function Player() {
                 <Link to="/ci" hash="love">
                   love
                 </Link>
+                <Link to="/ci" hash="under">
+                  under
+                </Link>
                 <Link to="/ball" search={{ stay: 1 }} className="nav-link">
                   ball
                 </Link>

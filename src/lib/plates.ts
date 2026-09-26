@@ -48,6 +48,8 @@ export const PLATES: Plate[] = [
   { id: "anna", title: "her, in pink.", note: "anna · peach fall", src: "/anna.jpg", motion: "/motion/anna.mp4", cast: "peach" },
   { id: "pink-notice", title: "she notices.", note: "the well, in pink", src: "/pink-notice.jpg", motion: "/motion/pink-notice.mp4", cast: "peach" },
   { id: "porchlight", title: "porch light.", note: "one light, and a leaf", src: "/porchlight.jpg", cast: "porch" },
+  { id: "sky-ski", title: "the sky.", note: "Gavin is already on the slope. peaches all around", src: "/sky-ski.jpg", motion: "/motion/sky-ski.mp4", cast: "peach" },
+  { id: "sky-under", title: "underside.", note: "looking up. the peaches are the weather", src: "/sky-under.jpg", cast: "peach" },
   { id: "bambi", title: "peach fall.", note: "on the path", src: "/bambi.jpg", motion: "/motion/wink.mp4", cast: "peach" },
   { id: "sisters", title: "say who. say hi.", note: "peach and red reign", src: "/sisters.jpg", motion: "/motion/sisters.mp4", cast: "peach" },
   { id: "peachfall", title: "peach fall.", note: "she looks down. pink and purple stay beside her", src: "/peachfall-walk.jpg", cast: "peach", seq: 0 },

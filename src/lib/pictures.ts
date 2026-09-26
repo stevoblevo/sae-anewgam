@@ -66,6 +66,8 @@ export const PICTURES = [
   "/scroll-leaf.jpg",
   "/scroll-meet.jpg",
   "/sisters.jpg",
+  "/sky-ski.jpg",
+  "/sky-under.jpg",
   "/small-one.jpg",
   "/stare.png",
   "/violet-phone.jpg",
