@@ -246,14 +246,9 @@
   background: #8d3a3a;
 }
 
-.player-shell.way-white .player-chrome,
-.player-shell.way-white .skein-rail,
-.player-shell.way-white .heads,
-.player-shell.way-white .bubbles,
 .player-shell.way-white .room .line,
 .player-shell.way-white .room .tag {
-  opacity: 0;
-  pointer-events: none;
+  opacity: 0.4;
 }
 
 .exit-immerse {
@@ -261,15 +256,16 @@
   top: 16px;
   right: 16px;
   z-index: 90;
-  width: 48px;
-  height: 48px;
-  border: 0;
+  width: 52px;
+  height: 52px;
+  border: 1px solid rgb(255 248 242 / 0.9);
   border-radius: 50%;
-  background: #1c1216;
+  background: rgb(20 12 16 / 0.82);
   color: #fff8f2;
-  font-size: 28px;
+  font-size: 32px;
   line-height: 1;
   pointer-events: auto;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.35);
 }
 
 .exit-immerse[hidden] {
@@ -286,18 +282,15 @@
   pointer-events: none;
 }
 
-.world.arriving {
-  z-index: 2;
-  animation: plate-in 900ms ease;
-}
-
-.world.leaving {
-  z-index: 1;
-  animation: plate-out 900ms ease forwards;
+.world.arriving,
+.world.leaving,
+.film-layer,
+.film-layer.arriving,
+.film-layer.leaving {
+  z-index: 0;
 }
 
 .film-layer {
-  z-index: 1;
   opacity: 0;
   transition: opacity 420ms ease;
 }
@@ -307,12 +300,16 @@
 }
 
 .film-layer.arriving {
-  z-index: 3;
+  animation: plate-in 900ms ease;
 }
 
-.film-layer.leaving {
-  z-index: 2;
+.film-layer.leaving,
+.world.leaving {
   animation: plate-out 900ms ease forwards;
+}
+
+.world.arriving {
+  animation: plate-in 900ms ease;
 }
 
 @keyframes plate-in {
@@ -460,7 +457,7 @@
 
 .film {
   position: relative;
-  z-index: 2;
+  z-index: 6;
   display: flex;
   gap: 8px;
   overflow-x: auto;
@@ -576,6 +573,8 @@
 }
 
 .player-chrome {
+  position: relative;
+  z-index: 6;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
@@ -620,6 +619,8 @@
 }
 
 .player-stage {
+  position: relative;
+  z-index: 6;
   display: grid;
   grid-template-columns: 168px 1fr;
   gap: 18px;
@@ -637,7 +638,7 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  opacity: 0.22;
+  opacity: 1;
 }
 
 .skein-rail:hover,
@@ -1104,32 +1105,10 @@
   text-transform: lowercase;
 }
 
-.player-shell.immersive .player-chrome > :not(.right),
 .player-shell.immersive .room .line,
-.player-shell.immersive .room .tag,
-.player-shell.immersive .skein-rail {
+.player-shell.immersive .room .tag {
   opacity: 0;
   pointer-events: none;
-}
-
-.player-shell.immersive .player-chrome {
-  background: none;
-  pointer-events: none;
-}
-
-.player-shell.immersive .right > :not(.immerse) {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.player-shell.immersive .immerse {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 80;
-  opacity: 1;
-  pointer-events: auto;
-  background: rgb(20 10 16 / 0.55);
 }
 
 .pop {
