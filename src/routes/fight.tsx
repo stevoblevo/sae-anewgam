@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { mountStare } from "@/lib/stare";
 
 export const Route = createFileRoute("/fight")({
@@ -8,6 +8,7 @@ export const Route = createFileRoute("/fight")({
 
 export function Fight() {
   const canvas = useRef<HTMLCanvasElement>(null);
+  const router = useRouter();
   const [line, setLine] = useState("Hold her eyes.");
 
   useEffect(() => {
@@ -21,21 +22,22 @@ export function Fight() {
         onLine: setLine,
       });
     } catch {
-      setLine("The stare couldn't start.");
+      setLine("The picture stays. The stare could not start.");
     }
   }, []);
 
   return (
     <div className="fight">
+      <img src="/stare.png" alt="" />
       <canvas ref={canvas} />
       <header className="player-chrome">
-        <Link to="/" className="nav-link">
+        <button type="button" className="nav-link" onClick={() => router.history.back()}>
           back
-        </Link>
+        </button>
         <p className="brand">porch fight</p>
         <div className="right">
-          <Link to="/tale" className="nav-link">
-            words
+          <Link to="/walk" className="nav-link">
+            porch
           </Link>
         </div>
       </header>

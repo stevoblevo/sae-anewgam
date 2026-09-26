@@ -9,9 +9,9 @@ const HOLD = 1100;
 
 export function mountStare(canvas: HTMLCanvasElement, opts: StareOpts): () => void {
   const gl = canvas.getContext("webgl", {
-    alpha: false,
+    alpha: true,
     antialias: false,
-    powerPreference: "high-performance",
+    premultipliedAlpha: false,
   });
   if (!gl) {
     opts.onLine("The stare couldn't start.");
@@ -157,15 +157,19 @@ export function mountStare(canvas: HTMLCanvasElement, opts: StareOpts): () => vo
     }
   };
 
-  Promise.all([load(opts.ring), load(opts.face), load(opts.well)]).then(([ring, face, well]) => {
-    if (!alive) return;
-    ringTex = makeTex(gl, ring);
-    faceTex = makeTex(gl, face);
-    wellTex = makeTex(gl, well);
-    ringSize = { w: ring.width, h: ring.height };
-    wellSize = { w: well.width, h: well.height };
-    raf = requestAnimationFrame(draw);
-  });
+  Promise.all([load(opts.ring), load(opts.face), load(opts.well)])
+    .then(([ring, face, well]) => {
+      if (!alive) return;
+      ringTex = makeTex(gl, ring);
+      faceTex = makeTex(gl, face);
+      wellTex = makeTex(gl, well);
+      ringSize = { w: ring.width, h: ring.height };
+      wellSize = { w: well.width, h: well.height };
+      raf = requestAnimationFrame(draw);
+    })
+    .catch(() => {
+      opts.onLine("The picture stays. Hold is unavailable.");
+    });
 
   return () => {
     alive = false;
