@@ -1363,7 +1363,112 @@
   object-fit: cover;
 }
 
+.z-compass {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.z-edge {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  color: #fff8f2;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-size: 15px;
+  letter-spacing: 0.14em;
+  text-decoration: none;
+  text-shadow: 0 2px 10px rgb(0 0 0 / 0.75);
+  opacity: 0.72;
+  pointer-events: auto;
+}
+
+.z-edge:hover,
+.z-edge:focus-visible {
+  opacity: 1;
+  background: rgb(20 14 16 / 0.28);
+}
+
+.z-up {
+  top: 0;
+  left: 16%;
+  right: 16%;
+  height: 16%;
+}
+
+.z-down {
+  bottom: 0;
+  left: 16%;
+  right: 16%;
+  height: 14%;
+  place-items: end center;
+  padding-bottom: 1.5%;
+}
+
+.z-left {
+  top: 18%;
+  bottom: 20%;
+  left: 0;
+  width: 12%;
+}
+
+.z-right {
+  top: 18%;
+  bottom: 20%;
+  right: 0;
+  width: 12%;
+}
+
+.z-find {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  overflow: auto;
+  padding: 72px 12% 8%;
+  background: rgb(20 14 16 / 0.9);
+}
+
+.z-find-title,
+.z-find button,
+.z-find a {
+  display: block;
+  width: 100%;
+  margin: 0 0 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fff8f2;
+  font: inherit;
+  font-size: 22px;
+  text-align: left;
+  text-decoration: none;
+}
+
+.z-find-title {
+  opacity: 0.6;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+}
+
+.z-find button.on {
+  text-decoration: underline;
+}
+
 .z-hint {
+  position: absolute;
+  top: 22%;
+  right: 7%;
+  z-index: 3;
+  margin: 0;
+  letter-spacing: 0.14em;
+  font-size: 14px;
+  color: #fff8f2;
+  text-shadow: 0 2px 10px rgb(0 0 0 / 0.7);
+  pointer-events: none;
+}
   position: absolute;
   top: 22%;
   right: 7%;
@@ -1390,14 +1495,15 @@
 .tableau-line {
   position: absolute;
   left: 8%;
-  right: 8%;
-  bottom: 12%;
-  z-index: 2;
+  right: 18%;
+  bottom: 14%;
+  z-index: 3;
   max-width: 36rem;
   margin: 0;
   font-size: 26px;
   line-height: 1.35;
   text-shadow: 0 2px 14px rgb(0 0 0 / 0.75);
+  pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -98,11 +98,13 @@ export const Route = createFileRoute("/fallen")({
 });
 
 export function Fallen() {
+  const root = useRef<HTMLDivElement>(null);
   const rail = useRef<HTMLDivElement>(null);
   const [at, setAt] = useState(0);
   const [depth, setDepth] = useState<-1 | 0 | 1>(0);
   const [both, setBoth] = useState(false);
   const [hint, setHint] = useState(true);
+  const [found, setFound] = useState(false);
   const rose = useRef(false);
   const sank = useRef(false);
   const beat = BEATS[at] ?? BEATS[0];
@@ -116,6 +118,14 @@ export function Fallen() {
     const next = Math.max(0, Math.min(BEATS.length - 1, n));
     el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
     setHint(false);
+  };
+
+  const dive = (dir: -1 | 1) => {
+    setDepth(dir);
+    setHint(false);
+    if (dir > 0) sank.current = true;
+    else rose.current = true;
+    if (rose.current && sank.current) setBoth(true);
   };
 
   useEffect(() => {
@@ -182,15 +192,46 @@ export function Fallen() {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "ArrowRight") go(at + 1);
       if (event.key === "ArrowLeft") go(at - 1);
-      if (event.key === "ArrowUp") setDepth(-1);
-      if (event.key === "ArrowDown") setDepth(1);
+      if (event.key === "ArrowUp") dive(-1);
+      if (event.key === "ArrowDown") dive(1);
+      if (event.key === "Escape") setFound(false);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [at]);
 
+  useEffect(() => {
+    const el = root.current;
+    if (!el) return;
+    let x = 0;
+    let y = 0;
+    let armed = false;
+    const start = (event: PointerEvent) => {
+      const t = event.target as HTMLElement | null;
+      if (t?.closest("a, button, .z-find")) return;
+      armed = true;
+      x = event.clientX;
+      y = event.clientY;
+    };
+    const end = (event: PointerEvent) => {
+      if (!armed) return;
+      armed = false;
+      const dx = event.clientX - x;
+      const dy = event.clientY - y;
+      if (Math.hypot(dx, dy) < 48) return;
+      if (Math.abs(dx) > Math.abs(dy)) go(at + (dx < 0 ? 1 : -1));
+      else dive(dy > 0 ? 1 : -1);
+    };
+    el.addEventListener("pointerdown", start);
+    el.addEventListener("pointerup", end);
+    return () => {
+      el.removeEventListener("pointerdown", start);
+      el.removeEventListener("pointerup", end);
+    };
+  }, [at]);
+
   return (
-    <div className="tableau">
+    <div className="tableau" ref={root}>
       <div className="z-rail" ref={rail}>
         {BEATS.map((item, n) => (
           <section className="z-beat" data-i={n} key={item.src + item.title}>
@@ -200,6 +241,32 @@ export function Fallen() {
             ) : null}
           </section>
         ))}
+      </div>
+      <div className="z-compass">
+        <button type="button" className="z-edge z-up" onClick={() => dive(-1)}>
+          rise
+        </button>
+        <button type="button" className="z-edge z-down" onClick={() => dive(1)}>
+          delve
+        </button>
+        {at === 0 ? (
+          <Link to="/walk" className="z-edge z-left">
+            porch
+          </Link>
+        ) : (
+          <button type="button" className="z-edge z-left" onClick={() => go(at - 1)}>
+            back
+          </button>
+        )}
+        {at === BEATS.length - 1 ? (
+          <Link to="/walk" className="z-edge z-right">
+            porch
+          </Link>
+        ) : (
+          <button type="button" className="z-edge z-right" onClick={() => go(at + 1)}>
+            on
+          </button>
+        )}
       </div>
       <header className="player-chrome">
         {at === 0 ? (
@@ -215,6 +282,9 @@ export function Fallen() {
           ver. Z · {depth < 0 ? "rise" : depth > 0 ? "delve" : "walk"} · {beat.title}
         </p>
         <div className="right">
+          <button type="button" className="nav-link" onClick={() => setFound((v) => !v)}>
+            find
+          </button>
           {at === BEATS.length - 1 ? (
             <Link to="/walk" className="nav-link">
               porch
@@ -226,9 +296,33 @@ export function Fallen() {
           )}
         </div>
       </header>
-      {hint ? <p className="z-hint">side wheel walks · wheel delves</p> : null}
+      {hint ? <p className="z-hint">edges, or the wheels if you have them</p> : null}
       <p className="tableau-line">{spoken}</p>
       <div className="tableau-dots" style={{ transform: `scaleX(${(at + 1) / BEATS.length})` }} />
+      {found ? (
+        <div className="z-find">
+          <p className="z-find-title">everything, without the wheel</p>
+          {BEATS.map((item, n) => (
+            <button
+              key={item.title}
+              type="button"
+              className={n === at ? "on" : ""}
+              onClick={() => {
+                go(n);
+                setFound(false);
+              }}
+            >
+              {item.title}
+            </button>
+          ))}
+          <Link to="/walk">porch</Link>
+          <Link to="/ball" search={{ stay: 1 }}>
+            ball
+          </Link>
+          <Link to="/fight">fight</Link>
+          <Link to="/tale">words</Link>
+        </div>
+      ) : null}
     </div>
   );
 }
