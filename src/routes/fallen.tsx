@@ -351,13 +351,18 @@ export function Fallen() {
               {item.title}
             </button>
           ))}
-          <p className="z-find-title">elsewhere</p>
-          <Link to="/walk">porch</Link>
+          <p className="z-find-title">plays</p>
+          <button type="button" onClick={() => setFound(false)}>
+            version Z · this
+          </button>
+          <Link to="/walk">porch walk · every scene</Link>
           <Link to="/ball" search={{ stay: 1 }}>
-            ball
+            peach ball
           </Link>
-          <Link to="/fight">fight</Link>
-          <Link to="/tale">words</Link>
+          <Link to="/fight">porch fight</Link>
+          <Link to="/tale">the words</Link>
+          <Link to="/her">her</Link>
+          <Link to="/farther">a little farther</Link>
         </div>
       ) : null}
     </div>
