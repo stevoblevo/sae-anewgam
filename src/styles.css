@@ -2289,3 +2289,56 @@
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-12px); }
 }
+
+.rite {
+  position: fixed;
+  inset: 0;
+  background: #2a2422;
+  overflow: hidden;
+}
+
+.rite img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rite-marks {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  z-index: 6;
+  display: flex;
+  gap: 10px;
+  transform: translateX(-50%);
+}
+
+.rite-marks button {
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #f3b183;
+  opacity: 0.45;
+}
+
+.rite-marks button.on {
+  opacity: 1;
+  background: #e25b4a;
+}
+
+.rite-marks button:nth-child(2) {
+  width: 22px;
+  height: 3px;
+  border-radius: 2px;
+  align-self: center;
+}
+
+.rite-marks button:nth-child(3) {
+  width: 3px;
+  height: 22px;
+  border-radius: 2px;
+}
