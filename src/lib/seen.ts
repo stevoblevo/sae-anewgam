@@ -25,6 +25,30 @@ export function markSeen(src: string): Record<string, number> {
   return all;
 }
 
+const GAMMA = "sae-gamma";
+
+export function readGamma(): Record<string, number> {
+  return readJson(GAMMA, {});
+}
+
+export function markGamma(src: string): Record<string, number> {
+  const all = readGamma();
+  all[src] = (all[src] || 0) + 1;
+  try {
+    localStorage.setItem(GAMMA, JSON.stringify(all));
+  } catch {
+    /* ignore */
+  }
+  return all;
+}
+
+export function sayDo(gamma: Record<string, number> = readGamma()): string[] {
+  return Object.entries(gamma)
+    .filter(([, n]) => n > 0)
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([src]) => src);
+}
+
 export function readFaves(): string[] {
   const list = readJson<string[]>(FAVES, []);
   return Array.isArray(list) ? list : [];
@@ -60,8 +84,10 @@ export function decodeHeat(raw: string): Record<string, number> {
   return counts;
 }
 
-export function shareHeat(counts: Record<string, number>) {
-  const url = `${location.origin}/?heat=${encodeURIComponent(encodeHeat(counts))}`;
+export function shareHeat(counts: Record<string, number>, gamma?: Record<string, number>) {
+  const heat = encodeHeat(counts);
+  const extra = gamma && Object.keys(gamma).length ? `&gamma=${encodeURIComponent(encodeHeat(gamma))}` : "";
+  const url = `${location.origin}/?heat=${encodeURIComponent(heat)}${extra}`;
   const text = "what I saw · @stevoblevo";
   window.open(
     `https://x.com/intent/post?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,

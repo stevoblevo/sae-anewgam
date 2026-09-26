@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, createFileRoute } from "@tanstack/react-router";
 import { PLATES } from "@/lib/plates";
-import { decodeHeat, markSeen, readFaves, readSeen, shareHeat, toggleFave } from "@/lib/seen";
+import { decodeHeat, markGamma, markSeen, readFaves, readGamma, readSeen, sayDo, shareHeat, toggleFave } from "@/lib/seen";
 
 const BEATS = [
   {
@@ -248,6 +248,7 @@ export function Fallen() {
   const [scroll, setScroll] = useState(false);
   const [heat, setHeat] = useState(false);
   const [counts, setCounts] = useState<Record<string, number>>({});
+  const [gamma, setGamma] = useState<Record<string, number>>({});
   const [faves, setFaves] = useState<string[]>([]);
   const [shared, setShared] = useState<Record<string, number> | null>(null);
   const scrollRef = useRef(false);
@@ -359,9 +360,12 @@ export function Fallen() {
 
   useEffect(() => {
     setCounts(readSeen());
+    setGamma(readGamma());
     setFaves(readFaves());
     const params = new URLSearchParams(window.location.search);
     const heatQ = params.get("heat");
+    const gammaQ = params.get("gamma");
+    if (gammaQ) setGamma(decodeHeat(gammaQ));
     if (heatQ) {
       setShared(decodeHeat(heatQ));
       setHeat(true);
@@ -691,7 +695,11 @@ export function Fallen() {
         <button type="button" className="z-edge z-right" aria-label="on" onClick={() => { setPlaying(false); along(1); }} />
       </div>
       <div className="z-dots">
-        <button type="button" className={motion ? "on" : ""} aria-label={motion ? "still" : "motion"} onClick={() => setMotion((v) => !v)} />
+        <button type="button" className={motion ? "on" : ""} aria-label={motion ? "still" : "motion"} onClick={() => setMotion((v) => {
+          const next = !v;
+          if (next && !beat.motion) setGamma(markGamma(beat.src));
+          return next;
+        })} />
         <button type="button" aria-label={found ? "close" : "map"} onClick={() => setFound((v) => !v)} />
       </div>
       {bubbles && bubbleSrcs.length ? (
@@ -724,6 +732,7 @@ export function Fallen() {
       {heat ? (
         <div className="heat">
           <p>{shared ? "A shared heat." : "On this machine."}</p>
+          {sayDo(gamma).length ? <p>say do {sayDo(gamma).length}</p> : null}
           <div>
             {ALL.map((item, n) => {
               const nSeen = heatCounts[item.src] || 0;
@@ -744,7 +753,7 @@ export function Fallen() {
               );
             })}
           </div>
-          <button type="button" onClick={() => shareHeat(counts)}>
+          <button type="button" onClick={() => shareHeat(counts, gamma)}>
             share with @stevoblevo
           </button>
           {shared ? (
@@ -764,7 +773,11 @@ export function Fallen() {
           <button type="button" onClick={() => setPlaying((v) => !v)}>
             {playing ? "pause" : "play"}
           </button>
-          <button type="button" onClick={() => setMotion((v) => !v)}>
+          <button type="button" onClick={() => setMotion((v) => {
+            const next = !v;
+            if (next && !beat.motion) setGamma(markGamma(beat.src));
+            return next;
+          })}>
             {motion ? "still" : "motion"}
           </button>
           <button type="button" onClick={() => setBubbles((v) => !v)}>
@@ -784,7 +797,7 @@ export function Fallen() {
           <button type="button" onClick={() => setHeat(true)}>
             heat
           </button>
-          <button type="button" onClick={() => shareHeat(counts)}>
+          <button type="button" onClick={() => shareHeat(counts, gamma)}>
             share with @stevoblevo
           </button>
           <p className="z-find-title">places</p>

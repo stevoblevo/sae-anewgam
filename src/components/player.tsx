@@ -4,6 +4,7 @@ import { ArrowRight, Home, Pause, Play } from "lucide-react";
 import { useAskInstall } from "@/components/install-sheet";
 import { PLATES, platesIn, type Cast } from "@/lib/plates";
 import { PICTURES } from "@/lib/pictures";
+import { markGamma } from "@/lib/seen";
 import { WAYS } from "@/lib/ways";
 
 const STORY = ["remember", "trace", "notice", "beside", "bambi", "farther", "porchfight-gal", "peachfall-all", "red-horizon", "reign-well"];
@@ -472,6 +473,7 @@ export function Player() {
               const next = !motionOn;
               setMotionChoice(next);
               setVidOn(next);
+              if (next && !plate.motion) markGamma(plate.src);
               const v = document.querySelector("video.world") as HTMLVideoElement | null;
               if (next) v?.play().catch(() => {});
               else v?.pause();
