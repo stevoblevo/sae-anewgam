@@ -5,6 +5,7 @@ import { useAxis } from "@/components/glue";
 
 const SCENES = [
   { id: "pink", title: "her, in pink.", note: "freckles. blue eyes.", src: "/portrait/pink.jpg", motion: "/motion/pink-tall.mp4", audio: "/audio/scenes/anna.mp3" },
+  { id: "notice", title: "she notices.", note: "the well, in pink.", src: "/pink-notice.jpg", motion: "/motion/pink-notice.mp4", audio: "/audio/scenes/anna.mp3" },
   { id: "real", title: "her, clearer.", note: "the same girl. sharp.", src: "/portrait/pink-real.jpg", motion: "/motion/pink-real.mp4", audio: "/audio/scenes/anna.mp3" },
   { id: "purple", title: "purple.", note: "blue eyes.", src: "/portrait/purple.jpg", motion: "/motion/purple-tall.mp4", audio: "/audio/scenes/savannah.mp3" },
   { id: "peach", title: "peach fall.", note: "she winks.", src: "/portrait/peach.jpg", motion: "/motion/peach-tall.mp4", audio: "/audio/scenes/bambi.mp3" },

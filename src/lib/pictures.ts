@@ -40,6 +40,8 @@ export const PICTURES = [
   "/peachfall-on.jpg",
   "/peachfall-walk.jpg",
   "/pink-forest.jpg",
+  "/pink-notice.jpg",
+  "/porchlight.jpg",
   "/porch-face.jpg",
   "/porch-lift.jpg",
   "/porch.jpg",

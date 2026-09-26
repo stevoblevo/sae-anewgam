@@ -2010,3 +2010,43 @@
   0%, 100% { filter: none; }
   40% { filter: brightness(1.4); }
 }
+
+.ci-motion {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.ci-line {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 18px;
+  z-index: 6;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  min-height: 16px;
+  pointer-events: none;
+}
+
+.ci-line i {
+  display: block;
+  background: #fff8f2;
+  opacity: 0.9;
+}
+
+.ci-line i.side {
+  width: 22px;
+  height: 3px;
+}
+
+.ci-line i.rise {
+  width: 3px;
+  height: 16px;
+}

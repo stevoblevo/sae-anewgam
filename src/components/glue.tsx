@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { pushSign, rollFlow } from "@/lib/flow";
 
 const FACES = [
   { src: "/stare.png", label: "porch", to: "/" as const },
@@ -48,10 +49,12 @@ export function Glue() {
       const dir = ((side ? event.deltaX : event.deltaY) || event.deltaY || event.deltaX) > 0 ? 1 : -1;
       setNote(side ? "she looks aside." : "she blinks.");
       setFlash((n) => n + 1);
-      const picture = document.querySelector(".player-stage img, .ball-scene img, .leaf img, .layers-ground, .tale-world, .fight img, .cinema video");
+      const picture = document.querySelector(".player-stage img, .ball-scene img, .leaf img, .layers-ground, .ci img, .tale-world, .fight img, .cinema video");
       picture?.classList.remove("sae-she");
       void (picture as HTMLElement | null)?.offsetWidth;
       picture?.classList.add("sae-she");
+      if (t.closest(".ci") && side) rollFlow();
+      else pushSign(side ? "side" : "rise", dir);
       const owned = t?.closest(".player-shell, .tableau");
       if (!owned) {
         window.dispatchEvent(new CustomEvent("sae-axis", { detail: { axis: side ? "side" : "rise", dir } }));

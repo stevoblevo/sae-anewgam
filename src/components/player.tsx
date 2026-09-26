@@ -7,7 +7,7 @@ import { PICTURES } from "@/lib/pictures";
 import { WAYS } from "@/lib/ways";
 
 const STORY = ["remember", "trace", "notice", "beside", "bambi", "farther", "porchfight-gal", "peachfall-all", "red-horizon", "reign-well"];
-const RING = ["remember", "trace", "notice", "beside", "bambi", "farther", "porchfight-gal", "peachfall", "peachfall-all", "red-horizon", "reign-well", "dear", "meet", "leaf-again", "corridor", "stare", "blossom", "sisters", "anna", "savannah"];
+const RING = ["remember", "trace", "notice", "beside", "bambi", "farther", "porchfight-gal", "peachfall", "peachfall-all", "red-horizon", "reign-well", "dear", "meet", "leaf-again", "corridor", "stare", "blossom", "sisters", "anna", "pink-notice", "porchlight", "savannah"];
 const HEADS = [{ id: "stare", src: "/stare.png", label: "face lock" }];
 const LOCK = ["remember", "stare", "farther"];
 const START = Math.max(0, PLATES.findIndex((p) => p.id === "painted-porch"));
@@ -736,6 +736,9 @@ export function Player() {
                 <Link to="/fallen">the picture</Link>
                 <Link to="/layers" search={{ img: "/peachfall-walk.jpg" }}>
                   layers
+                </Link>
+                <Link to="/ci" hash="love">
+                  love
                 </Link>
                 <Link to="/ball" search={{ stay: 1 }} className="nav-link">
                   ball
