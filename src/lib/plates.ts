@@ -19,7 +19,7 @@ export type Plate = {
 export const PLATES: Plate[] = [
   { id: "remember", title: "the water remembers.", note: "well", src: "/beat01.jpg", motion: "/motion/well.mp4", cast: "well", seq: 1 },
   { id: "approach", title: "she comes to the water.", note: "same well", src: "/approach.jpg", motion: "/motion/approach.mp4", shelf: "later", cast: "well" },
-  { id: "trace", title: "a trace, not a trophy.", note: "marks", src: "/beat02.jpg", motion: "/motion/trace.mp4", cast: "well", seq: 2 },
+  { id: "trace", title: "a trace, not a trophy.", note: "marks", src: "/beat02.jpg", motion: "/motion/trace-tall.mp4", cast: "well", seq: 2 },
   { id: "notice", title: "she notices.", note: "gaze", src: "/beat03.jpg", motion: "/motion/gaze.mp4", choose: true, cast: "well", seq: 3 },
   { id: "beside", title: "beside, not ahead.", note: "path", src: "/beat04.jpg", motion: "/motion/beside.mp4", cast: "well", seq: 4 },
   { id: "crown", title: "a living crown.", note: "kept", src: "/beat05.jpg", motion: "/motion/crown.mp4", shelf: "later", cast: "well" },
@@ -54,6 +54,8 @@ export const PLATES: Plate[] = [
   { id: "depth-fall", title: "falling.", note: "fluid lines, down the shaft", src: "/depth-fall.jpg", motion: "/motion/depth-fall.mp4", cast: "well" },
   { id: "depth-grotto", title: "the grotto.", note: "still water, peach from above", src: "/depth-grotto.jpg", cast: "well" },
   { id: "depth-thea", title: "red reign.", note: "under us, Thea", src: "/depth-thea.jpg", cast: "well" },
+  { id: "trace-tall", title: "the path.", note: "the same arch, tall", src: "/trace-tall.jpg", motion: "/motion/trace-tall.mp4", cast: "well" },
+  { id: "sisters-well", title: "they smile.", note: "not twins. the well is ahead", src: "/sisters-well.jpg", cast: "peach" },
   { id: "bambi", title: "peach fall.", note: "on the path", src: "/bambi.jpg", motion: "/motion/wink.mp4", cast: "peach" },
   { id: "sisters", title: "say who. say hi.", note: "peach and red reign", src: "/sisters.jpg", motion: "/motion/sisters.mp4", cast: "peach" },
   { id: "peachfall", title: "peach fall.", note: "she looks down. pink and purple stay beside her", src: "/peachfall-walk.jpg", cast: "peach", seq: 0 },

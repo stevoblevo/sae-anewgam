@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, createFileRoute } from "@tanstack/react-router";
 import { PLATES } from "@/lib/plates";
-import { decodeHeat, markGamma, markSeen, readFaves, readGamma, readSeen, sayDo, shareHeat, toggleFave } from "@/lib/seen";
+import { decodeHeat, markGamma, markSeen, readFaves, readGamma, readSeen, sayDo, shareHeat, toggleFave, SAY_DO_AT } from "@/lib/seen";
 
 const BEATS = [
   {
@@ -732,7 +732,14 @@ export function Fallen() {
       {heat ? (
         <div className="heat">
           <p>{shared ? "A shared heat." : "On this machine."}</p>
-          {sayDo(gamma).length ? <p>say do {sayDo(gamma).length}</p> : null}
+          {sayDo(gamma).length ? (
+            <p>
+              say do {sayDo(gamma).length}
+              {sayDo(gamma).filter((src) => (gamma[src] || 0) >= SAY_DO_AT).length
+                ? ` · decided ${sayDo(gamma).filter((src) => (gamma[src] || 0) >= SAY_DO_AT).length}`
+                : ""}
+            </p>
+          ) : null}
           <div>
             {ALL.map((item, n) => {
               const nSeen = heatCounts[item.src] || 0;

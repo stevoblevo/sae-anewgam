@@ -8,7 +8,7 @@ import { markGamma } from "@/lib/seen";
 import { WAYS } from "@/lib/ways";
 
 const STORY = ["remember", "trace", "notice", "beside", "bambi", "farther", "porchfight-gal", "peachfall-all", "red-horizon", "reign-well"];
-const RING = ["remember", "trace", "notice", "beside", "bambi", "farther", "porchfight-gal", "peachfall", "peachfall-all", "red-horizon", "reign-well", "dear", "meet", "leaf-again", "corridor", "stare", "blossom", "sisters", "anna", "pink-notice", "porchlight", "savannah"];
+const RING = ["remember", "trace", "trace-tall", "notice", "beside", "bambi", "farther", "porchfight-gal", "peachfall", "peachfall-all", "red-horizon", "reign-well", "dear", "meet", "leaf-again", "corridor", "stare", "blossom", "sisters", "sisters-well", "anna", "pink-notice", "porchlight", "savannah"];
 const HEADS = [{ id: "stare", src: "/stare.png", label: "face lock" }];
 const LOCK = ["remember", "stare", "farther"];
 const START = Math.max(0, PLATES.findIndex((p) => p.id === "painted-porch"));

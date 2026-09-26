@@ -26,6 +26,8 @@ export function markSeen(src: string): Record<string, number> {
 }
 
 const GAMMA = "sae-gamma";
+const DECIDED = "sae-decided";
+export const SAY_DO_AT = 3;
 
 export function readGamma(): Record<string, number> {
   return readJson(GAMMA, {});
@@ -36,10 +38,19 @@ export function markGamma(src: string): Record<string, number> {
   all[src] = (all[src] || 0) + 1;
   try {
     localStorage.setItem(GAMMA, JSON.stringify(all));
+    if (all[src] >= SAY_DO_AT) {
+      const decided = readDecided();
+      if (!decided.includes(src)) localStorage.setItem(DECIDED, JSON.stringify([src, ...decided]));
+    }
   } catch {
     /* ignore */
   }
   return all;
+}
+
+export function readDecided(): string[] {
+  const list = readJson<string[]>(DECIDED, []);
+  return Array.isArray(list) ? list : [];
 }
 
 export function sayDo(gamma: Record<string, number> = readGamma()): string[] {

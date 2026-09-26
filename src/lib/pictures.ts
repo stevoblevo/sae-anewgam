@@ -70,6 +70,8 @@ export const PICTURES = [
   "/scroll-leaf.jpg",
   "/scroll-meet.jpg",
   "/sisters.jpg",
+  "/sisters-well.jpg",
+  "/trace-tall.jpg",
   "/sky-ski.jpg",
   "/sky-under.jpg",
   "/small-one.jpg",
