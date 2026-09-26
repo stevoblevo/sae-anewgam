@@ -103,30 +103,62 @@ export function Fallen() {
   const [at, setAt] = useState(0);
   const [depth, setDepth] = useState<-1 | 0 | 1>(0);
   const [both, setBoth] = useState(false);
-  const [hint, setHint] = useState(true);
+  const [known, setKnown] = useState<Array<"walk" | "rise" | "delve">>([]);
+  const [note, setNote] = useState("");
   const [found, setFound] = useState(false);
   const rose = useRef(false);
   const sank = useRef(false);
+  const knownRef = useRef(known);
+  knownRef.current = known;
   const beat = BEATS[at] ?? BEATS[0];
   const look = depth < 0 ? "center 16%" : depth > 0 ? "center 84%" : "center 46%";
   const spoken =
     depth < 0 ? beat.over : depth > 0 ? beat.under : at === BEATS.length - 1 && both ? "You rose and you delved. Weee. The story fits." : beat.line;
+  const walked = known.includes("walk");
+  const roseKnown = known.includes("rise");
+  const sankKnown = known.includes("delve");
+
+  const learn = (axis: "walk" | "rise" | "delve", phrase: string) => {
+    if (knownRef.current.includes(axis)) return;
+    knownRef.current = [...knownRef.current, axis];
+    setKnown(knownRef.current);
+    setNote(phrase);
+  };
 
   const go = (n: number) => {
     const el = rail.current;
     if (!el) return;
     const next = Math.max(0, Math.min(BEATS.length - 1, n));
+    if (next === at) return;
     el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
-    setHint(false);
+    learn("walk", "sideways → walk");
   };
 
   const dive = (dir: -1 | 1) => {
     setDepth(dir);
-    setHint(false);
-    if (dir > 0) sank.current = true;
-    else rose.current = true;
+    if (dir > 0) {
+      sank.current = true;
+      learn("delve", "down → delve");
+    } else {
+      rose.current = true;
+      learn("rise", "up → rise");
+    }
     if (rose.current && sank.current) setBoth(true);
   };
+
+  const api = useRef({ go, dive, at });
+  api.current = { go, dive, at };
+
+  useEffect(() => {
+    const id = window.setTimeout(() => setNote((cur) => cur || "sideways walks"), 2200);
+    return () => window.clearTimeout(id);
+  }, []);
+
+  useEffect(() => {
+    if (!note) return;
+    const id = window.setTimeout(() => setNote(""), 1700);
+    return () => window.clearTimeout(id);
+  }, [note]);
 
   useEffect(() => {
     const el = rail.current;
@@ -157,7 +189,6 @@ export function Fallen() {
       const ay = Math.abs(event.deltaY);
       if (ax < 1 && ay < 1) return;
       event.preventDefault();
-      setHint(false);
       if (locked) return;
       if (ax > ay) {
         accX += event.deltaX;
@@ -165,20 +196,14 @@ export function Fallen() {
         const dir = accX > 0 ? 1 : -1;
         accX = 0;
         locked = true;
-        const width = el.clientWidth || 1;
-        const current = Math.round(el.scrollLeft / width);
-        const next = Math.max(0, Math.min(BEATS.length - 1, current + dir));
-        el.scrollTo({ left: next * width, behavior: "smooth" });
+        api.current.go(api.current.at + dir);
       } else {
         accY += event.deltaY;
         if (Math.abs(accY) < 28) return;
         const down = accY > 0;
         accY = 0;
         locked = true;
-        setDepth(down ? 1 : -1);
-        if (down) sank.current = true;
-        else rose.current = true;
-        if (rose.current && sank.current) setBoth(true);
+        api.current.dive(down ? 1 : -1);
       }
       window.setTimeout(() => {
         locked = false;
@@ -190,15 +215,16 @@ export function Fallen() {
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "ArrowRight") go(at + 1);
-      if (event.key === "ArrowLeft") go(at - 1);
-      if (event.key === "ArrowUp") dive(-1);
-      if (event.key === "ArrowDown") dive(1);
+      if (event.key === "ArrowRight") api.current.go(api.current.at + 1);
+      if (event.key === "ArrowLeft") api.current.go(api.current.at - 1);
+      if (event.key === "ArrowUp") api.current.dive(-1);
+      if (event.key === "ArrowDown") api.current.dive(1);
       if (event.key === "Escape") setFound(false);
+      if (event.key === "?" || event.key === "m") setFound(true);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [at]);
+  }, []);
 
   useEffect(() => {
     const el = root.current;
@@ -206,29 +232,53 @@ export function Fallen() {
     let x = 0;
     let y = 0;
     let armed = false;
+    let held = 0;
     const start = (event: PointerEvent) => {
       const t = event.target as HTMLElement | null;
       if (t?.closest("a, button, .z-find")) return;
       armed = true;
       x = event.clientX;
       y = event.clientY;
+      held = window.setTimeout(() => {
+        armed = false;
+        setFound(true);
+        setNote("hold → the list");
+      }, 520);
     };
     const end = (event: PointerEvent) => {
+      window.clearTimeout(held);
       if (!armed) return;
       armed = false;
       const dx = event.clientX - x;
       const dy = event.clientY - y;
-      if (Math.hypot(dx, dy) < 48) return;
-      if (Math.abs(dx) > Math.abs(dy)) go(at + (dx < 0 ? 1 : -1));
-      else dive(dy > 0 ? 1 : -1);
+      if (Math.hypot(dx, dy) < 18) {
+        setNote((cur) => {
+          if (!known.includes("walk")) return "sideways walks";
+          if (!known.includes("rise") && !known.includes("delve")) return "up rises · down delves";
+          return cur;
+        });
+        return;
+      }
+      if (Math.abs(dx) > Math.abs(dy)) api.current.go(api.current.at + (dx < 0 ? 1 : -1));
+      else api.current.dive(dy > 0 ? 1 : -1);
     };
     el.addEventListener("pointerdown", start);
     el.addEventListener("pointerup", end);
+    el.addEventListener("pointercancel", end);
     return () => {
+      window.clearTimeout(held);
       el.removeEventListener("pointerdown", start);
       el.removeEventListener("pointerup", end);
+      el.removeEventListener("pointercancel", end);
     };
-  }, [at]);
+  }, [known]);
+
+  const map = [
+    ["sideways", "walk", walked],
+    ["up", "rise", roseKnown],
+    ["down", "delve", sankKnown],
+    ["hold", "the list", found],
+  ] as const;
 
   return (
     <div className="tableau" ref={root}>
@@ -243,65 +293,51 @@ export function Fallen() {
         ))}
       </div>
       <div className="z-compass">
-        <button type="button" className="z-edge z-up" onClick={() => dive(-1)}>
+        <button type="button" className={roseKnown ? "z-edge z-up known" : "z-edge z-up"} onClick={() => dive(-1)}>
           rise
         </button>
-        <button type="button" className="z-edge z-down" onClick={() => dive(1)}>
+        <button type="button" className={sankKnown ? "z-edge z-down known" : "z-edge z-down"} onClick={() => dive(1)}>
           delve
         </button>
-        {at === 0 ? (
-          <Link to="/walk" className="z-edge z-left">
-            porch
-          </Link>
-        ) : (
-          <button type="button" className="z-edge z-left" onClick={() => go(at - 1)}>
-            back
-          </button>
-        )}
-        {at === BEATS.length - 1 ? (
-          <Link to="/walk" className="z-edge z-right">
-            porch
-          </Link>
-        ) : (
-          <button type="button" className="z-edge z-right" onClick={() => go(at + 1)}>
-            on
-          </button>
-        )}
+        <button type="button" className={walked ? "z-edge z-left known" : "z-edge z-left"} onClick={() => go(at - 1)}>
+          back
+        </button>
+        <button
+          type="button"
+          className={walked ? "z-edge z-right known" : "z-edge z-right"}
+          onClick={() => (at === BEATS.length - 1 ? setFound(true) : go(at + 1))}
+        >
+          {at === BEATS.length - 1 ? "more" : "on"}
+        </button>
       </div>
       <header className="player-chrome">
-        {at === 0 ? (
-          <Link to="/walk" className="nav-link">
-            porch
-          </Link>
-        ) : (
-          <button type="button" className="nav-link" onClick={() => go(at - 1)}>
-            back
-          </button>
-        )}
-        <p className="brand">
-          ver. Z · {depth < 0 ? "rise" : depth > 0 ? "delve" : "walk"} · {beat.title}
-        </p>
+        <p className="brand">{beat.title}</p>
         <div className="right">
           <button type="button" className="nav-link" onClick={() => setFound((v) => !v)}>
-            find
+            more
           </button>
-          {at === BEATS.length - 1 ? (
-            <Link to="/walk" className="nav-link">
-              porch
-            </Link>
-          ) : (
-            <button type="button" className="nav-link" onClick={() => go(at + 1)}>
-              on
-            </button>
-          )}
         </div>
       </header>
-      {hint ? <p className="z-hint">edges, or the wheels if you have them</p> : null}
+      {note ? <p className="z-hint">{note}</p> : null}
+      {known.length > 0 ? (
+        <p className="z-map">
+          {map
+            .filter((row) => row[2])
+            .map((row) => `${row[0]} → ${row[1]}`)
+            .join("   ")}
+        </p>
+      ) : null}
       <p className="tableau-line">{spoken}</p>
       <div className="tableau-dots" style={{ transform: `scaleX(${(at + 1) / BEATS.length})` }} />
       {found ? (
         <div className="z-find">
-          <p className="z-find-title">everything, without the wheel</p>
+          <p className="z-find-title">gesture map</p>
+          {map.map(([from, to, seen]) => (
+            <p key={from} className={seen ? "on" : ""}>
+              {from} → {seen ? to : "not yet"}
+            </p>
+          ))}
+          <p className="z-find-title">pictures</p>
           {BEATS.map((item, n) => (
             <button
               key={item.title}
@@ -315,6 +351,7 @@ export function Fallen() {
               {item.title}
             </button>
           ))}
+          <p className="z-find-title">elsewhere</p>
           <Link to="/walk">porch</Link>
           <Link to="/ball" search={{ stay: 1 }}>
             ball
