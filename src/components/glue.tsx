@@ -25,10 +25,38 @@ export function useAxis(onSide: (dir: number) => void, onRise: (dir: number) => 
 }
 
 const FOLLOW = [
-  { id: "anna", src: "/portrait/pink.jpg" },
-  { id: "lock", src: "/face-lock.jpg" },
-  { id: "sister", src: "/blink-sister.jpg" },
-  { id: "hearth", src: "/anna-hearth.jpg" },
+  {
+    id: "anna",
+    frames: [
+      { src: "/portrait/pink.jpg", room: "/anna.jpg" },
+      { src: "/anna-hearth.jpg", room: "/anna-hearth.jpg" },
+      { src: "/portrait/peach.jpg", room: "/peachfall-walk.jpg" },
+    ],
+  },
+  {
+    id: "lock",
+    frames: [
+      { src: "/face-lock.jpg", room: "/porchfight-gal.jpg" },
+      { src: "/garden-stare.jpg", room: "/garden-stare.jpg" },
+      { src: "/portrait/stare.jpg", room: "/reign-well.jpg" },
+    ],
+  },
+  {
+    id: "sister",
+    frames: [
+      { src: "/blink-sister.jpg", room: "/sisters-well.jpg" },
+      { src: "/portrait/sisters.jpg", room: "/sisters.jpg" },
+      { src: "/portrait/purple.jpg", room: "/violet.jpg" },
+    ],
+  },
+  {
+    id: "hearth",
+    frames: [
+      { src: "/anna-hearth.jpg", room: "/anna-hearth.jpg" },
+      { src: "/depth-thea.jpg", room: "/depth-thea.jpg" },
+      { src: "/red-horizon.jpg", room: "/red-horizon.jpg" },
+    ],
+  },
 ];
 
 /** Same numbers on the server and the first client paint. Viewport comes later. */
@@ -48,7 +76,20 @@ export function Glue() {
   const [awake, setAwake] = useState(0);
   const [places, setPlaces] = useState<Record<string, { x: number; y: number }>>({});
   const [threads, setThreads] = useState<Thread[]>([]);
+  const [tune, setTune] = useState<Record<string, number>>({});
+  const [onLayers, setOnLayers] = useState(false);
   const last = useRef(0);
+
+  useEffect(() => {
+    const look = () => setOnLayers(document.documentElement.dataset.layers === "1" || location.pathname.includes("/layers"));
+    look();
+    window.addEventListener("sae-layers", look);
+    window.addEventListener("popstate", look);
+    return () => {
+      window.removeEventListener("sae-layers", look);
+      window.removeEventListener("popstate", look);
+    };
+  }, []);
 
   useEffect(() => {
     if (localStorage.getItem("sae-faces") === "1") setFaces(true);
@@ -130,13 +171,15 @@ export function Glue() {
         ))}
       </div>
         {FOLLOW.map((item, n) => {
-          const place = places[item.id] ?? defaultSpot(n, SERVER_WIDTH);
+          const frame = item.frames[tune[item.id] ?? 0] ?? item.frames[0];
+          const width = typeof window === "undefined" ? SERVER_WIDTH : window.innerWidth;
+          const place = onLayers ? { x: width - 62, y: 68 + n * 56 } : (places[item.id] ?? defaultSpot(n, width));
           return (
             <Link
               key={item.id}
               to="/layers"
-              search={{ img: item.src }}
-              className={awake === n ? "follow awake" : "follow"}
+              search={{ img: frame.room }}
+              className={`${awake === n ? "follow awake" : "follow"}${onLayers ? " dock" : ""}`}
               style={{ left: place.x, top: place.y, right: "auto" }}
               aria-label={item.id}
               onPointerDown={(event) => {
@@ -146,6 +189,7 @@ export function Glue() {
                 const origin = place;
                 let moved = false;
                 const move = (ev: PointerEvent) => {
+                  if (onLayers) return;
                   if (Math.hypot(ev.clientX - startX, ev.clientY - startY) > 6) moved = true;
                   const next = { x: origin.x + ev.clientX - startX, y: origin.y + ev.clientY - startY };
                   setPlaces((all) => ({ ...all, [item.id]: next }));
@@ -153,22 +197,29 @@ export function Glue() {
                 const up = (ev: PointerEvent) => {
                   window.removeEventListener("pointermove", move);
                   window.removeEventListener("pointerup", up);
+                  if (onLayers || !moved) {
+                    const i = ((tune[item.id] ?? 0) + 1) % item.frames.length;
+                    const nextFrame = item.frames[i];
+                    setTune((all) => ({ ...all, [item.id]: i }));
+                    window.dispatchEvent(new CustomEvent("sae-tune", { detail: { img: nextFrame.room } }));
+                    if (!location.pathname.includes("/layers")) {
+                      window.location.href = `/layers?img=${encodeURIComponent(nextFrame.room)}`;
+                    }
+                    return;
+                  }
                   const next = { x: origin.x + ev.clientX - startX, y: origin.y + ev.clientY - startY };
                   setPlaces((all) => {
                     const saved = { ...all, [item.id]: next };
                     localStorage.setItem("sae-follow-spots", JSON.stringify(saved));
                     return saved;
                   });
-                  if (!moved) {
-                    window.location.href = `/layers?img=${encodeURIComponent(item.src)}`;
-                  }
                 };
                 window.addEventListener("pointermove", move);
                 window.addEventListener("pointerup", up);
               }}
               onClick={(event) => event.preventDefault()}
             >
-              <img src={item.src} alt="" decoding="async" draggable={false} />
+              <img src={frame.src} alt="" decoding="async" draggable={false} />
             </Link>
           );
         })}

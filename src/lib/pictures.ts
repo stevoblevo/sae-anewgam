@@ -84,5 +84,9 @@ export const PICTURES = [
   "/wait.jpg",
   "/weather.jpg",
   "/well-cry.jpg",
+  "/night-doll.jpg",
+  "/night-home.jpg",
+  "/night-porch.jpg",
+  "/night-sand.jpg",
   "/x-banner.jpg",
 ] as const;
