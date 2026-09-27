@@ -288,6 +288,11 @@ export function Immerse({
           <PeaceIcon mark="spark" />
           <span>glow</span>
         </Link>
+        <span className="bench-read">
+          <b>{reel === "friend" ? "friend" : "dawn"}</b>
+          <i>{String(at + 1).padStart(2, "0")}</i>
+          <em>{copy.word}</em>
+        </span>
         {ways ? (
           <div className="way-pics">
             <button type="button" onClick={() => enter("present")}>

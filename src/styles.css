@@ -22,8 +22,19 @@
 
 .still-nav {
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 10px;
+  gap: 2px;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  margin: 8px 12px 0;
+  padding: 4px;
+  overflow-x: auto;
+  background: rgb(22 16 12 / 0.46);
+  border: 1px solid rgb(246 239 232 / 0.28);
+  border-radius: 16px;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
 .still-nav .mark {
@@ -32,21 +43,50 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 12px;
+  padding: 0 12px;
   border: 0;
-  border-radius: 999px;
-  background: rgb(243 230 212 / 0.9);
-  color: #3a2a28;
+  border-radius: 12px;
+  background: transparent;
+  color: #f6efe8;
   text-decoration: none;
-  font: 13px/1 system-ui, sans-serif;
+  font: 13px/1 "Iowan Old Style", Palatino, serif;
 }
 
 .still-nav .mark.on {
   background: #e7c27a;
+  color: #1a140f;
 }
 
 .still-nav .mark:disabled {
   opacity: 0.35;
+}
+
+.bench-read {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 10px;
+  color: #f6efe8;
+  font: 13px/1 "Iowan Old Style", Palatino, serif;
+}
+
+.bench-read b {
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+}
+
+.bench-read i {
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.72;
+}
+
+.still-nav .way-pics,
+.still-nav .form-pick {
+  flex: 1 0 100%;
+  padding: 4px;
 }
 
 .way-pics {
@@ -228,29 +268,30 @@
   z-index: 8;
   left: 0;
   right: 0;
-  bottom: 28px;
+  bottom: 0;
   display: flex;
   gap: 8px;
   overflow-x: auto;
   touch-action: pan-x;
-  padding: 0 12px 6px;
+  padding: 28px 12px 10px;
   scroll-snap-type: x proximity;
+  background: linear-gradient(transparent, rgb(14 10 8 / 0.62));
 }
 
 .hfilm button {
   position: relative;
-  flex: 0 0 128px;
-  height: 76px;
+  flex: 0 0 112px;
+  height: 68px;
   padding: 0;
-  border: 1px solid transparent;
-  border-radius: 10px;
+  border: 1px solid rgb(246 239 232 / 0.35);
+  border-radius: 6px;
   overflow: hidden;
   scroll-snap-align: start;
-  background: #f3e6d4;
+  background: #1a140f;
 }
 
 .hfilm button.on {
-  border-color: #e25b4a;
+  border-color: #e7c27a;
 }
 
 .hfilm img {
@@ -531,11 +572,14 @@
   bottom: 118px;
   margin: 0;
   max-width: 22rem;
-  color: #3a2a28;
-  background: rgb(243 230 212 / 0.9);
-  border-radius: 999px;
-  padding: 7px 14px;
-  font: 15px/1.3 "Iowan Old Style", Palatino, serif;
+  color: #f6efe8;
+  background: rgb(22 16 12 / 0.42);
+  border: 1px solid rgb(246 239 232 / 0.22);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 14px;
+  padding: 8px 14px;
+  font: 16px/1.35 "Iowan Old Style", Palatino, serif;
 }
 
 .form-pick {
@@ -753,8 +797,11 @@ html[data-form="netbook"] .slice .face {
   justify-content: space-between;
   align-items: center;
   gap: 8px;
-  padding: 8px 14px;
-  background: rgb(246 239 226 / 0.94);
+  margin: 10px 12px 0;
+  padding: 4px 8px;
+  background: rgb(22 16 12 / 0.06);
+  border: 1px solid rgb(58 42 40 / 0.12);
+  border-radius: 16px;
 }
 
 .wall-bar a,
@@ -765,28 +812,31 @@ html[data-form="netbook"] .slice .face {
   min-height: 44px;
   border: 0;
   background: transparent;
-  color: inherit;
+  color: #3a2a28;
   font: 15px/1 "Iowan Old Style", Palatino, serif;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
+  padding: 0 12px;
+  border-radius: 12px;
 }
 
 .wall-shelves {
   display: flex;
-  gap: 8px;
-  padding: 0 12px 8px;
+  gap: 4px;
+  margin: 8px 12px;
+  padding: 4px;
   overflow-x: auto;
-}
-
-.wall-shelves button {
-  border-radius: 999px;
-  padding: 0 14px;
-  background: #f3e6d4;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  border: 1px solid rgb(58 42 40 / 0.12);
+  border-radius: 16px;
+  background: rgb(255 248 240 / 0.72);
 }
 
 .wall-shelves button.on {
-  background: #e7c27a;
+  background: #1a140f;
+  color: #f6efe8;
 }
 
 .wall-line {
