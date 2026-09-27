@@ -1,0 +1,33 @@
+name: Sae-wink component
+on:
+  pull_request:
+    paths:
+      - 'public/sae-wink/**'
+      - 'src/components/sae-wink.tsx'
+      - 'src/routes/__root.tsx'
+      - 'scripts/test-sae-wink*'
+      - '.github/workflows/sae-wink.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  component:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            public/sae-wink
+            scripts
+      - name: Unit and syntax checks
+        run: |
+          node --check public/sae-wink/sae-wink.js
+          node --test scripts/test-sae-wink.mjs
+      - name: Install isolated browser test tools
+        run: |
+          python -m pip install playwright==1.57.0
+          python -m playwright install --with-deps chromium
+      - name: Browser checks under strict CSP
+        run: python scripts/test-sae-wink-browser.py

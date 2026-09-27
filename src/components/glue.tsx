@@ -31,24 +31,44 @@ const FOLLOW = [
   { id: "hearth", src: "/anna-hearth.jpg" },
 ];
 
+/** Same numbers on the server and the first client paint. Viewport comes later. */
+function defaultSpot(n: number, width: number) {
+  return {
+    x: width - 120 - Math.floor(n / 2) * 80,
+    y: 80 + (n % 2) * 90,
+  };
+}
+
+const SERVER_WIDTH = 900;
+
 export function Glue() {
   const [faces, setFaces] = useState(false);
   const [note, setNote] = useState("");
   const [flash, setFlash] = useState(0);
   const [awake, setAwake] = useState(0);
-  const [places, setPlaces] = useState<Record<string, { x: number; y: number }>>(() => {
-    try {
-      const raw = JSON.parse(localStorage.getItem("sae-follow-spots") || "{}");
-      return raw && typeof raw === "object" ? raw : {};
-    } catch {
-      return {};
-    }
-  });
+  const [places, setPlaces] = useState<Record<string, { x: number; y: number }>>({});
   const [threads, setThreads] = useState<Thread[]>([]);
   const last = useRef(0);
 
   useEffect(() => {
     if (localStorage.getItem("sae-faces") === "1") setFaces(true);
+    let saved: Record<string, { x: number; y: number }> = {};
+    try {
+      const raw = JSON.parse(localStorage.getItem("sae-follow-spots") || "{}");
+      if (raw && typeof raw === "object") saved = raw;
+    } catch {
+      /* a new place is fine */
+    }
+    setPlaces(() => {
+      const next = { ...saved };
+      FOLLOW.forEach((item, n) => {
+        const spot = next[item.id];
+        if (!spot || typeof spot.x !== "number" || typeof spot.y !== "number") {
+          next[item.id] = defaultSpot(n, window.innerWidth);
+        }
+      });
+      return next;
+    });
   }, []);
 
   useEffect(() => {
@@ -110,10 +130,7 @@ export function Glue() {
         ))}
       </div>
         {FOLLOW.map((item, n) => {
-          const place = places[item.id] ?? {
-            x: (typeof window === "undefined" ? 900 : window.innerWidth) - 120 - Math.floor(n / 2) * 80,
-            y: 80 + (n % 2) * 90,
-          };
+          const place = places[item.id] ?? defaultSpot(n, SERVER_WIDTH);
           return (
             <Link
               key={item.id}
