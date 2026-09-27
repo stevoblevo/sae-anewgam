@@ -1,0 +1,97 @@
+{
+  "v": "course/0.1",
+  "site": "skein-doll",
+  "clock": "4gg.tim",
+  "tempo": 4.2,
+  "authorityEffect": "none",
+  "companion": "the small one",
+  "co": "https://saelion.co",
+  "sieve": ["family", "relic-eater", "private-polylite", "other-people-verse"],
+  "marks": {
+    "still": "●",
+    "side": "↔",
+    "rise": "↑",
+    "group": "◎",
+    "pass": "✧"
+  },
+  "discover": {
+    "peach": "sae://on#peach",
+    "reign": "sae://on#reign",
+    "thea": "sae://on#thea",
+    "dora": "sae://on#dora",
+    "kk": "sae://on#kk",
+    "polylite": "hold",
+    "saelion": "https://saelion.co"
+  },
+  "stations": [
+    {
+      "n": 1,
+      "mark": "●",
+      "verb": "GROW",
+      "room": "peach",
+      "line": "a tale about time and friendship",
+      "src": "https://x.com/Stevoblevo/status/2103955067225116907",
+      "plate": "peachfall"
+    },
+    {
+      "n": 2,
+      "mark": "↔",
+      "verb": "GATHER",
+      "room": "reign",
+      "line": "peachfall leads to red reign",
+      "src": "https://x.com/Stevoblevo/status/2101586645493399994",
+      "plate": "weather",
+      "choose": true
+    },
+    {
+      "n": 3,
+      "mark": "↑",
+      "verb": "DREAM",
+      "room": "thea",
+      "line": "under us, Thea",
+      "src": "sae://on#thea",
+      "plate": "depth-thea"
+    },
+    {
+      "n": 4,
+      "mark": "◎",
+      "verb": "MAP",
+      "room": "dora",
+      "line": "look back this session",
+      "src": "sae://on#dora",
+      "plate": "remember",
+      "choose": true
+    },
+    {
+      "n": 5,
+      "mark": "✧",
+      "verb": "GEN",
+      "room": "kk",
+      "line": "breakfast beskar · Dora soul · skein doll",
+      "src": "https://x.com/Stevoblevo/status/2099365811706048682",
+      "plate": "loom"
+    },
+    {
+      "n": 6,
+      "mark": "●",
+      "verb": "SYNC",
+      "room": "saelion",
+      "line": "a little farther. the way home stays open.",
+      "src": "https://saelion.co",
+      "plate": "farther"
+    }
+  ],
+  "fallen": [
+    "red rain on the same well.",
+    "two marks in the ripple.",
+    "gaze before greeting.",
+    "knight beside, not leading.",
+    "dear deer in the arch.",
+    "home stays open."
+  ],
+  "push": {
+    "peach-light": true,
+    "polylite": "named-not-hosted",
+    "saelion": "https://saelion.co"
+  }
+}
