@@ -1,8 +1,23 @@
 services:
   sae:
+    image: ghcr.io/stevoblevo/sae-anewgam:latest
     build: .
+    container_name: sae-anewgam
     ports:
       - "4180:4180"
     environment:
       HOST: 0.0.0.0
       PORT: "4180"
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:4180').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 25s
