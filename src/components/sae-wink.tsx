@@ -19,7 +19,8 @@ export function SaeWink() {
     if (!document.querySelector('script[data-sae-wink-module]')) {
       const script = document.createElement("script");
       script.type = "module";
-      script.src = "/sae-wink/sae-wink.js";
+      const base = import.meta.env.BASE_URL || "/";
+      script.src = `${base.endsWith("/") ? base : `${base}/`}sae-wink/sae-wink.js`;
       script.setAttribute("data-sae-wink-module", "");
       script.onerror = () => { eye.textContent = "Sae · unavailable"; };
       document.head.appendChild(script);
