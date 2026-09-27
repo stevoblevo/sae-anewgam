@@ -583,7 +583,7 @@
   overflow: auto;
   padding: 16px 16px 12px;
   border-radius: 16px;
-  background: rgb(20 12 16 / 0.88);
+  background: rgb(20 12 16 / 0.96);
 }
 
 .layers-sheet p {
@@ -2056,6 +2056,12 @@
   animation: float-y 1.6s ease-in-out 1;
 }
 
+.follow.dock {
+  width: 48px;
+  height: 48px;
+  z-index: 41;
+}
+
 .glue-face {
   width: 52px;
   height: 52px;
@@ -2420,4 +2426,129 @@ html[data-eye="in"] .follow {
   height: 100%;
   object-fit: cover;
   pointer-events: none;
+}
+
+.night {
+  position: fixed;
+  inset: 0;
+  background: #0d1218;
+}
+
+.night img,
+.night video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.night .red-shake img,
+.night .red-shake video {
+  animation: red-shake 420ms ease;
+}
+
+@keyframes red-shake {
+  0% { transform: none; filter: none; }
+  35% { transform: translateX(3px); filter: saturate(1.3) hue-rotate(-12deg); }
+  70% { transform: translateX(-2px); }
+  100% { transform: none; filter: none; }
+}
+
+.night-rail {
+  position: fixed;
+  left: 14px;
+  top: 50%;
+  z-index: 8;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.night-rail button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #d7fff4;
+  font: inherit;
+}
+
+.night-rail i {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid rgb(158 207 184 / 0.85);
+  box-shadow: 0 0 12px rgb(80 140 160 / 0.45);
+}
+
+.night-rail button.on i {
+  background: #9ecfb8;
+}
+
+.night-rail span {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-shadow: 0 2px 10px #0d1218;
+}
+
+.night-boop {
+  position: fixed;
+  left: 18px;
+  bottom: 22px;
+  z-index: 9;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #9ecfb8;
+  opacity: 0.55;
+}
+
+.occult .layers-leave {
+  pointer-events: auto;
+}
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.occult-galley {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 31;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 16px;
+  pointer-events: auto;
+  background: linear-gradient(transparent, rgb(6 8 14 / 0.88));
+}
+
+.occult-galley button {
+  flex: 0 0 120px;
+  height: 78px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  overflow: hidden;
+  background: transparent;
+}
+
+.occult-galley button.on {
+  border-color: #9ecfb8;
+}
+
+.occult-galley img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
