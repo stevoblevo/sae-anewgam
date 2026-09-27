@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Home, Pause, Play } from "lucide-react";
 import { useAskInstall } from "@/components/install-sheet";
+import { Fold } from "@/components/fold";
+import { Ask } from "@/components/ask";
 import { PLATES, platesIn, type Cast } from "@/lib/plates";
 import { PICTURES } from "@/lib/pictures";
 import { matchPicture } from "@/lib/find";
@@ -9,11 +11,23 @@ import { markGamma } from "@/lib/seen";
 import { WAYS } from "@/lib/ways";
 
 const PLAY = ["bambi", "farther", "peachfall", "peachfall-all", "red-horizon", "reign-well", "trace", "remember"];
-const STORY = [...PLAY, "notice", "beside", "porchfight-gal"];
-const RING = [...PLAY, "trace-tall", "notice", "beside", "porchfight-gal", "dear", "meet", "leaf-again", "corridor", "stare", "blossom", "sisters", "sisters-well", "anna", "anna-hearth", "face-lock", "blink-sister", "pink-notice", "porchlight", "savannah"];
+const SKEIN = [
+  { id: "pink-in-mint", mean: "pink inside mint", color: "#f3b183" },
+  { id: "love-arch", mean: "love in the arch", color: "#c4a07a" },
+  { id: "love-mint", mean: "love in the well", color: "#9ecfb8" },
+  { id: "the-riff", mean: "both, and love", color: "#f3d7a1" },
+  { id: "her-pink", mean: "pink is her", color: "#f3b183" },
+  { id: "into-mint", mean: "mint is the well", color: "#9ecfb8" },
+  { id: "moonrise", mean: "dark is wonder", color: "#1a1e28" },
+  { id: "enlight-doll", mean: "enlight is the doll", color: "#f3d7a1" },
+  { id: "obsidian-doll", mean: "obsidian is the riff", color: "#2a2418" },
+  { id: "knight-beside", mean: "love stays beside", color: "#c4a07a" },
+] as const;
+const QUIET = new Set(["veil", "her-pink", "into-mint", "moonrise", "enlight-doll", "obsidian-doll", "knight-beside", "love-arch", "love-mint", "the-riff", "pink-in-mint"]);
+const RING = ["veil", ...PLAY, "trace-tall", "notice", "beside", "porchfight-gal", "dear", "meet", "leaf-again", "corridor", "stare", "blossom", "sisters", "sisters-well", "anna", "anna-hearth", "face-lock", "blink-sister", "pink-notice", "porchlight", "savannah"];
 const HEADS = [{ id: "stare", src: "/stare.png", label: "face lock" }];
 const LOCK = ["remember", "stare", "farther"];
-const START = Math.max(0, PLATES.findIndex((p) => p.id === "anna"));
+const START = Math.max(0, PLATES.findIndex((p) => p.id === "pink-in-mint"));
 const BEAT_MS = 6000;
 const SHOWN = new Set(["painted-stare", "savannah", "bambi", "anna", "sisters", "stare", "loom", "weather", "kirby"]);
 const RING_STORY = [
@@ -34,6 +48,8 @@ const DEER_STORY = [
 ];
 const PEACH = ["hold.", "she smiles.", "again."];
 const CASTS: Cast[] = ["porch", "peach", "rain", "well", "kirby", "white"];
+const SHELVES = ["all", "enlight", "obsidian", "porch", "peach", "rain", "well", "kirby", "white", "kept"] as const;
+type Shelf = (typeof SHELVES)[number];
 const CAST_NAME: Record<Cast, string> = {
   porch: "porch fight",
   peach: "peach ball",
@@ -45,8 +61,10 @@ const CAST_NAME: Record<Cast, string> = {
 
 export function Player() {
   const [i, setI] = useState(START);
-  const [playing, setPlaying] = useState(true);
+  const [playing, setPlaying] = useState(false);
   const [gallery, setGallery] = useState(false);
+  const [shelf, setShelf] = useState<Shelf | null>(null);
+  const [seek, setSeek] = useState("");
   const [q, setQ] = useState("");
   const [mode, setMode] = useState<"tile" | "bubble" | "scene">("tile");
   const [whisper, setWhisper] = useState(false);
@@ -77,8 +95,7 @@ export function Player() {
   castRef.current = cast;
   const traceRef = useRef<string[]>([]);
   const wheelAt = useRef(0);
-  const touchY = useRef<number | null>(null);
-  const touchX = useRef<number | null>(null);
+  const drag = useRef<{ x: number; y: number; id: number } | null>(null);
   const popRef = useRef<number | null>(null);
   const leaveTimer = useRef(0);
   const navigate = useNavigate();
@@ -160,8 +177,39 @@ export function Player() {
     [go, navigate],
   );
 
+  const nextSkein = useCallback(() => {
+    const here = SKEIN.findIndex((s) => s.id === PLATES[iRef.current]?.id);
+    const step = SKEIN[here < 0 ? 0 : (here + 1) % SKEIN.length];
+    const n = PLATES.findIndex((p) => p.id === step?.id);
+    if (n >= 0) go(n);
+  }, [go]);
+
+  const nudge = useCallback(
+    (axis: "rise" | "side", dir: number) => {
+      setPlaying(false);
+      if (axis === "side") {
+        const here = WAYS.findIndex((w) => w.cast === castRef.current);
+        const next = WAYS[(here + dir + WAYS.length) % WAYS.length];
+        const n = PLATES.findIndex((p) => p.id === next?.start);
+        if (n >= 0) go(n);
+        return;
+      }
+      const onSkein = SKEIN.some((s) => s.id === PLATES[iRef.current]?.id);
+      if (onSkein) {
+        const here = SKEIN.findIndex((s) => s.id === PLATES[iRef.current]?.id);
+        const at = here < 0 ? 0 : here;
+        const step = SKEIN[(at + (dir > 0 ? 1 : -1) + SKEIN.length) % SKEIN.length];
+        const n = PLATES.findIndex((p) => p.id === step?.id);
+        if (n >= 0) go(n);
+        return;
+      }
+      stepShow(dir > 0 ? 1 : -1);
+    },
+    [go, stepShow],
+  );
+
   useEffect(() => {
-    if (!playing || gallery) return;
+    if (!playing || gallery || shelf) return;
     let raf = 0;
     let acc = 0;
     let last = performance.now();
@@ -187,7 +235,7 @@ export function Player() {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [playing, gallery, step, go]);
+  }, [playing, gallery, shelf, step, go]);
 
   useEffect(() => {
     if (!playing) {
@@ -198,28 +246,24 @@ export function Player() {
 
   useEffect(() => {
     const onWheel = (e: WheelEvent) => {
-      if (gallery) return;
+      if (gallery || shelf || PLATES[iRef.current]?.id === "veil") return;
       const t = e.target as HTMLElement | null;
       if (t?.closest(".film, .gallery, .skein-rail")) return;
       e.preventDefault();
       const now = performance.now();
       if (now - wheelAt.current < 380) return;
       wheelAt.current = now;
-      setPlaying(false);
       const horizontal = e.shiftKey || Math.abs(e.deltaX) > Math.abs(e.deltaY);
       if (horizontal) {
-        const here = WAYS.findIndex((w) => w.cast === castRef.current);
         const dir = (e.deltaX || e.deltaY) > 0 ? 1 : -1;
-        const next = WAYS[(here + dir + WAYS.length) % WAYS.length];
-        const n = PLATES.findIndex((p) => p.id === next?.start);
-        if (n >= 0) go(n);
+        nudge("side", dir);
         return;
       }
-      stepShow(e.deltaY > 0 ? 1 : -1);
+      nudge("rise", e.deltaY > 0 ? 1 : -1);
     };
     window.addEventListener("wheel", onWheel, { passive: false });
     return () => window.removeEventListener("wheel", onWheel);
-  }, [gallery, stepShow, go]);
+  }, [gallery, shelf, nudge]);
 
   useEffect(() => {
     const apply = () => setPhone(window.innerWidth / Math.max(window.innerHeight, 1) < 0.9);
@@ -247,7 +291,7 @@ export function Player() {
     }
   }, []);
 
-  const motionOn = motionChoice ?? !reduced;
+  const motionOn = motionChoice ?? (reduced ? false : false);
 
   useEffect(() => {
     setStory(plate.id === "ring" || plate.id === "weather" || plate.id === "raindear");
@@ -283,6 +327,12 @@ export function Player() {
     const outgoing = side.current === 0 ? nextRef.current : bedRef.current;
     side.current = 1 - side.current;
     if (!incoming) return;
+    if (QUIET.has(plate.id)) {
+      incoming.pause();
+      incoming.removeAttribute("src");
+      outgoing?.pause();
+      return;
+    }
     const src = `/audio/scenes/${plate.id}.mp3`;
     incoming.src = src;
     incoming.loop = true;
@@ -333,7 +383,7 @@ export function Player() {
 
   return (
     <div
-      className={`player-shell${immersive ? " immersive" : ""}${cast === "white" ? " way-white" : ""}`}
+      className={`player-shell${immersive ? " immersive" : ""}${cast === "white" ? " way-white" : ""}${plate.id === "veil" ? " on-veil" : ""}${["love-arch", "love-mint", "the-riff", "pink-in-mint"].includes(plate.id) ? " on-mash" : ""}${SKEIN.some((s) => s.id === plate.id) ? " on-skein" : ""}`}
       ref={shellRef}
       onPointerDown={(e) => {
         if (!hearRef.current) return;
@@ -343,30 +393,57 @@ export function Player() {
         live.muted = false;
         live.play().catch(() => {});
       }}
-      onTouchStart={(e) => {
-        touchY.current = e.changedTouches[0]?.clientY ?? null;
-        touchX.current = e.changedTouches[0]?.clientX ?? null;
-      }}
-      onTouchEnd={(e) => {
-        const y0 = touchY.current;
-        const x0 = touchX.current;
-        const y1 = e.changedTouches[0]?.clientY;
-        const x1 = e.changedTouches[0]?.clientX;
-        touchY.current = null;
-        touchX.current = null;
-        if (y0 == null || x0 == null || y1 == null || x1 == null) return;
-        const dx = x1 - x0;
-        const dy = y0 - y1;
-        if (Math.abs(dx) < 48 && Math.abs(dy) < 48) return;
-        setPlaying(false);
-        if (Math.abs(dx) > Math.abs(dy)) {
-          const here = WAYS.findIndex((w) => w.cast === cast);
-          const next = WAYS[(here + (dx < 0 ? 1 : -1) + WAYS.length) % WAYS.length];
-          const n = PLATES.findIndex((p) => p.id === next?.start);
-          if (n >= 0) go(n);
-          return;
+      onPointerDownCapture={(e) => {
+        if (e.button !== 0) return;
+        const t = e.target as HTMLElement;
+        if (t.closest("button, a, input, textarea, .film, .skein-rail, .see-all, .gallery, .occult, .ask")) return;
+        if (gallery || shelf || PLATES[iRef.current]?.id === "veil") return;
+        drag.current = { x: e.clientX, y: e.clientY, id: e.pointerId };
+        try {
+          shellRef.current?.setPointerCapture?.(e.pointerId);
+        } catch {
+          /* a finger that never landed can still finish on pointerup */
         }
-        stepShow(dy > 0 ? 1 : -1);
+      }}
+      onPointerMove={(e) => {
+        const held = drag.current;
+        if (!held || held.id !== e.pointerId) return;
+        const dx = e.clientX - held.x;
+        const dy = e.clientY - held.y;
+        if (Math.hypot(dx, dy) < 8) return;
+        const shell = shellRef.current;
+        if (!shell) return;
+        shell.classList.add("dragging");
+        const across = Math.abs(dx) > Math.abs(dy);
+        const shift = Math.max(-80, Math.min(80, (across ? dx : dy) * 0.45));
+        shell.style.setProperty("--drag-x", across ? `${shift}px` : "0px");
+        shell.style.setProperty("--drag-y", across ? "0px" : `${shift}px`);
+      }}
+      onPointerUp={(e) => {
+        const held = drag.current;
+        if (!held || held.id !== e.pointerId) return;
+        drag.current = null;
+        const shell = shellRef.current;
+        shell?.classList.remove("dragging");
+        shell?.style.setProperty("--drag-x", "0px");
+        shell?.style.setProperty("--drag-y", "0px");
+        try {
+          shell?.releasePointerCapture(e.pointerId);
+        } catch {
+          /* already released */
+        }
+        const dx = e.clientX - held.x;
+        const dy = e.clientY - held.y;
+        if (Math.hypot(dx, dy) < 48) return;
+        if (Math.abs(dx) > Math.abs(dy)) nudge("side", dx < 0 ? 1 : -1);
+        else nudge("rise", dy < 0 ? 1 : -1);
+      }}
+      onPointerCancel={() => {
+        drag.current = null;
+        const shell = shellRef.current;
+        shell?.classList.remove("dragging");
+        shell?.style.setProperty("--drag-x", "0px");
+        shell?.style.setProperty("--drag-y", "0px");
       }}
     >
       {installSheet}
@@ -392,8 +469,7 @@ export function Player() {
             aria-label={w.name}
             onClick={() => {
               const n = PLATES.findIndex((p) => p.id === w.start);
-              if (n >= 0) go(n, true);
-              setPlaying(true);
+              if (n >= 0) go(n);
             }}
           />
         ))}
@@ -461,14 +537,77 @@ export function Player() {
         </button>
       ) : null}
 
-      <header className="player-chrome">
-        <button type="button" className="nav-link" onClick={() => setGallery(true)}>
-          gallery
+      {plate.id === "veil" ? (
+        <div className="veil-doors">
+          <div className="veil-frame">
+            <button
+              type="button"
+              className="veil-door veil-beyond"
+              aria-label="beyond the veil"
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={() => {
+                setPlaying(false);
+                setShelf("all");
+              }}
+            />
+            <button
+              type="button"
+              className="veil-door veil-enlight"
+              aria-label="enlight"
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={() => {
+                setPlaying(false);
+                setShelf("enlight");
+              }}
+            />
+            <button
+              type="button"
+              className="veil-door veil-obsidian"
+              aria-label="obsidian"
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={() => {
+                setPlaying(false);
+                setShelf("obsidian");
+              }}
+            />
+          </div>
+          <div className="veil-hold">
+            <button type="button" className="nav-link" onClick={() => setPlaying((p) => !p)}>
+              {playing ? "hold" : "play"}
+            </button>
+            <button type="button" className="nav-link" onClick={nextSkein}>
+              next
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      {SKEIN.some((s) => s.id === plate.id) ? (
+        <div className="skein-now">
+          <i style={{ background: SKEIN.find((s) => s.id === plate.id)?.color }} />
+          <span>{SKEIN.find((s) => s.id === plate.id)?.mean}</span>
+          <button type="button" className="nav-link" onClick={nextSkein}>
+            next
+          </button>
+        </div>
+      ) : null}
+      <Ask />
+
+      <header className="player-chrome fold-chrome">
+        <button
+          type="button"
+          className="nav-link"
+          onClick={() => {
+            setPlaying(false);
+            setShelf("all");
+          }}
+        >
+          see all
         </button>
         <button type="button" className="brand brand-btn" onClick={() => setWhisper((w) => !w)}>
           Sae · .anewgam
         </button>
-        <div className="right">
+        <Fold>
           <button
             type="button"
             className="nav-link"
@@ -524,6 +663,9 @@ export function Player() {
           <Link to="/her" className="nav-link">
             her
           </Link>
+          <Link to="/knight" className="nav-link">
+            play
+          </Link>
           <Link to="/fight" className="nav-link">
             fight
           </Link>
@@ -536,28 +678,34 @@ export function Player() {
           <button type="button" className="nav-link" onClick={askInstall}>
             install
           </button>
-          {Math.max(0, path.indexOf(i)) + 1} / {Math.max(path.length, 1)}
-        </div>
+          <span className="chrome-count">
+            {Math.max(0, path.indexOf(i)) + 1} / {Math.max(path.length, 1)}
+          </span>
+        </Fold>
       </header>
 
       <div className="player-stage">
-        <aside className="skein-rail">
-          {STORY.map((id) => {
-            const n = PLATES.findIndex((p) => p.id === id);
-            const p = PLATES[n];
-            if (!p) return null;
+        <aside className="skein-rail" aria-label="the skein">
+          {SKEIN.map((step) => {
+            const n = PLATES.findIndex((p) => p.id === step.id);
+            const on = plate.id === step.id;
             return (
               <button
-                key={id}
+                key={step.id}
                 type="button"
-                className={`rail-slot${n === i ? " on" : n < i ? " seen" : ""}`}
-                onClick={() => touch(p.id)}
+                className={`rail-slot${on ? " on" : ""}`}
+                onClick={() => {
+                  if (n >= 0) go(n);
+                }}
               >
-                <div className="rail-ring" />
-                {p.id}
+                <i className="rail-ring" style={{ background: step.color, borderColor: step.color }} />
+                {step.mean}
               </button>
             );
           })}
+          <button type="button" className="nav-link skein-go" onClick={nextSkein}>
+            next
+          </button>
         </aside>
 
         <section
@@ -630,7 +778,7 @@ export function Player() {
           </div>
           <div className="controls">
             <div className="bar">
-              <button type="button" aria-label="next" onClick={step}>
+              <button type="button" aria-label="next" onClick={() => (SKEIN.some((s) => s.id === plate.id) ? nextSkein() : step())}>
                 <ArrowRight size={18} strokeWidth={1.6} />
               </button>
               <button
@@ -676,6 +824,70 @@ export function Player() {
           );
         })}
       </div>
+
+      {shelf ? (
+        <div className="see-all">
+          <header className="see-bar">
+            <button type="button" className="nav-link" onClick={() => setShelf(null)}>
+              close
+            </button>
+            <p className="brand">{shelf === "all" ? "see all" : shelf}</p>
+            <button
+              type="button"
+              className="nav-link"
+              onClick={() => {
+                setShelf(null);
+                setGallery(true);
+              }}
+            >
+              find
+            </button>
+          </header>
+          <div className="see-filters" role="tablist">
+            {SHELVES.map((name) => (
+              <button key={name} type="button" className={name === shelf ? "on" : ""} onClick={() => setShelf(name)}>
+                {name}
+              </button>
+            ))}
+          </div>
+          <label className="see-find">
+            <input value={seek} onChange={(e) => setSeek(e.target.value)} placeholder="peach, well, anna" aria-label="find a picture" />
+          </label>
+          <div className="see-grid">
+            {PLATES.flatMap((p, n) => {
+              const kept = p.shelf === "study" || p.shelf === "later";
+              const light = p.cast === "peach" || p.cast === "well" || p.cast === "white" || p.id === "enlight-doll" || p.id === "knight-beside" || p.id === "the-riff";
+              const dark = p.cast === "porch" || p.cast === "rain" || p.cast === "kirby" || p.id === "obsidian-doll" || p.id === "moonrise" || p.id === "the-riff";
+              const on =
+                shelf === "kept"
+                  ? kept
+                  : shelf === "enlight"
+                    ? !kept && light
+                    : shelf === "obsidian"
+                      ? !kept && dark
+                      : shelf === "all"
+                        ? !kept
+                        : !kept && p.cast === shelf;
+              if (!on) return [];
+              if (seek.trim() && !`${p.title} ${p.note} ${p.id}`.toLowerCase().includes(seek.trim().toLowerCase())) return [];
+              return [
+                <button
+                  key={p.id}
+                  type="button"
+                  className={n === i ? "on" : ""}
+                  onClick={() => {
+                    go(n);
+                    setShelf(null);
+                  }}
+                >
+                  <img src={p.src} alt="" />
+                  <span>{p.note}</span>
+                </button>,
+              ];
+            })}
+          </div>
+        </div>
+      ) : null}
 
       {gallery ? (
         <div className="gallery" onClick={(e) => e.target === e.currentTarget && setGallery(false)}>
@@ -762,9 +974,7 @@ export function Player() {
                       key={w.id}
                       type="button"
                       onClick={() => {
-                        setCast(w.cast);
                         go(n);
-                        setPlaying(true);
                         setGallery(false);
                       }}
                     >

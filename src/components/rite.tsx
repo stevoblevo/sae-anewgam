@@ -12,7 +12,7 @@ const MOVES = [
 
 export function Rite({ onWalk }: { onWalk: () => void }) {
   const [at, setAt] = useState(0);
-  const [playing, setPlaying] = useState(true);
+  const [playing, setPlaying] = useState(false);
   const { ask, sheet } = useAskInstall();
   const move = MOVES[at] ?? MOVES[0];
 

@@ -1,10 +1,31 @@
-const SHELL = "sae-shell-8";
-const MEDIA = "sae-media-8";
+const SHELL = "sae-shell-9";
+const MEDIA = "sae-media-9";
+
+const PLATES = [
+  "/enlight-way.jpg",
+  "/beauty-sun.jpg",
+  "/pale-light.jpg",
+  "/moonrise.jpg",
+  "/red-horizon.jpg",
+  "/black-field.jpg",
+  "/whole-sun.jpg",
+  "/obsidian-way.jpg",
+  "/reign-well.jpg",
+  "/knight-beside.jpg",
+  "/glow.jpg",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(SHELL).then((cache) =>
-      cache.addAll(["/", "/__grok/manifest.webmanifest", "/__grok/icon-192.png", "/__grok/icon-512.png"]).catch(() => undefined),
+    Promise.all([
+      caches.open(SHELL).then((cache) =>
+        cache.addAll(["/", "/__grok/manifest.webmanifest", "/__grok/icon-192.png", "/__grok/icon-512.png"]).catch(() => undefined),
+      ),
+      caches.open(MEDIA).then((cache) => cache.addAll(PLATES).catch(() => undefined)),
+    ]).then(() =>
+      self.clients.matchAll({ includeUncontrolled: true }).then((clients) => {
+        for (const client of clients) client.postMessage({ type: "sae-light" });
+      }),
     ),
   );
   self.skipWaiting();

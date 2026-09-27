@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useAskInstall } from "@/components/install-sheet";
+import { Fold } from "@/components/fold";
 import { useAxis } from "@/components/glue";
 
 const SCENES = [
@@ -123,12 +124,12 @@ export function Ball() {
       onTouchStart={() => setPlaying(false)}
     >
       {installSheet}
-      <header className="player-chrome">
+      <header className="player-chrome fold-chrome">
         <Link to="/" className="nav-link">
           back
         </Link>
         <p className="brand">peach ball</p>
-        <div className="right">
+        <Fold>
           <button
             type="button"
             className="nav-link"
@@ -162,7 +163,7 @@ export function Ball() {
           <Link to="/her" className="nav-link">
             her
           </Link>
-        </div>
+        </Fold>
       </header>
       <audio ref={audioRef} preload="none" />
       <nav className="ball-dots" aria-label="scenes">

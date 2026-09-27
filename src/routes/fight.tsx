@@ -28,7 +28,7 @@ export function Fight() {
         onLine: setLine,
       });
     } catch {
-      setLine("The picture stays. The stare could not start.");
+      setLine("Hold her eyes.");
     }
   }, []);
 
