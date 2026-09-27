@@ -7,7 +7,7 @@ Continuation after merged PR #2. This is not an all-sites-live claim.
 | Tree | Commit | What was exercised |
 | --- | --- | --- |
 | `sae-anewgam` `main` | `347f4cc7b0e780133ab91e86e2eba7fe8fe9d3b3` | Merged root mount. Public production serves this eye. |
-| `sae-anewgam` `cursor/sae-wink-sites-e3db` | `2c2249fab6d707f9eec3c309f33883af5d439a0f`, then the commit that adds this report and the `/in/gam` route-tree fix | Steven thread reader, 15 unit checks, 17 isolated browser checks, dev and built app smoke. |
+| `sae-anewgam` `cursor/sae-wink-sites-e3db` | `2c2249fab6d707f9eec3c309f33883af5d439a0f` (reader) and `c7858139dab64e38ce12688702e14c95b6c23655` (this report and the `/in/gam` route tree) | Steven thread reader, 15 unit checks, 17 isolated browser checks, dev and built app smoke. |
 | GitHub Pages doors | `7d4854b88a453a4272183033dc2cf177df734526` | Published Peachfall and Steven copies of the pre-reader module. |
 | isliv | `68e57e07506c47e52a18efde51a03bd31d61619f` | Colour door only. Not modified. |
 
