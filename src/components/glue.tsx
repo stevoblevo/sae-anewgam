@@ -131,7 +131,7 @@ export function Glue() {
   useEffect(() => {
     const onWheel = (event: WheelEvent) => {
       const t = event.target instanceof Element ? event.target : document.body;
-      if (t?.closest("input, textarea, .film, .layers-walk, .gallery")) return;
+      if (t?.closest("input, textarea, .film, .layers-walk, .gallery, .occult-galley, .trail")) return;
       const ax = Math.abs(event.deltaX);
       const ay = Math.abs(event.deltaY);
       if (ax < 1 && ay < 1) return;

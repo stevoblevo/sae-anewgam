@@ -2510,23 +2510,49 @@ html[data-eye="in"] .follow {
   opacity: 0.55;
 }
 
-.hearts {
+.night-stage {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+}
+
+.night-stage img,
+.night-stage video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.trail {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 112px;
+  bottom: 108px;
   z-index: 8;
   display: flex;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
+  pointer-events: auto;
 }
 
-.hearts button {
+.trail button {
   border: 0;
   padding: 0;
   background: transparent;
-  font-size: 28px;
+  font-size: 22px;
   line-height: 1;
+  opacity: 0.45;
+}
+
+.trail button.on {
+  opacity: 1;
+}
+
+.occult-galley {
+  touch-action: pan-x;
 }
 
 .occult .layers-leave {
