@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { pushSign, rollFlow, colonize, readFlow, type Thread } from "@/lib/flow";
+import { OCCULT_OFF, readOccult, type Occult } from "@/lib/occult";
 
 const FACES = [
   { src: "/stare.png", label: "porch", to: "/" as const },
@@ -42,16 +43,24 @@ function defaultSpot(n: number, width: number) {
 const SERVER_WIDTH = 900;
 
 export function Glue() {
-  const [faces, setFaces] = useState(false);
   const [note, setNote] = useState("");
   const [flash, setFlash] = useState(0);
   const [awake, setAwake] = useState(0);
   const [places, setPlaces] = useState<Record<string, { x: number; y: number }>>({});
   const [threads, setThreads] = useState<Thread[]>([]);
+  const [occult, setOccult] = useState<Occult>(OCCULT_OFF);
   const last = useRef(0);
+  const occultRef = useRef(occult);
+  occultRef.current = occult;
 
   useEffect(() => {
-    if (localStorage.getItem("sae-faces") === "1") setFaces(true);
+    const sync = () => setOccult(readOccult());
+    sync();
+    window.addEventListener("sae-occult", sync);
+    return () => window.removeEventListener("sae-occult", sync);
+  }, []);
+
+  useEffect(() => {
     let saved: Record<string, { x: number; y: number }> = {};
     try {
       const raw = JSON.parse(localStorage.getItem("sae-follow-spots") || "{}");
@@ -72,13 +81,14 @@ export function Glue() {
   }, []);
 
   useEffect(() => {
+    if (!occult.faces) return;
     const tick = () => {
       setAwake(Math.floor(Math.random() * FOLLOW.length));
       window.setTimeout(() => setAwake(-1), 1600);
     };
     const id = window.setInterval(tick, 7000);
     return () => window.clearInterval(id);
-  }, []);
+  }, [occult.faces]);
 
   useEffect(() => {
     const grow = () => setThreads(colonize(readFlow()).slice(-6));
@@ -88,40 +98,79 @@ export function Glue() {
   }, []);
 
   useEffect(() => {
-    const onWheel = (event: WheelEvent) => {
-      const t = event.target instanceof Element ? event.target : document.body;
-      if (t?.closest("input, textarea, .film, .layers-walk, .gallery")) return;
-      const ax = Math.abs(event.deltaX);
-      const ay = Math.abs(event.deltaY);
-      if (ax < 1 && ay < 1) return;
+    const gesture = (side: boolean, dir: 1 | -1, target: Element) => {
       const now = performance.now();
       if (now - last.current < 380) return;
       last.current = now;
-      event.preventDefault();
-      const side = event.shiftKey || ax > ay;
-      const dir = ((side ? event.deltaX : event.deltaY) || event.deltaY || event.deltaX) > 0 ? 1 : -1;
-      setNote(side ? "she looks aside." : "she blinks.");
-      setFlash((n) => n + 1);
-      window.dispatchEvent(new CustomEvent("sae-wink"));
-      const picture = document.querySelector(".you-scene, .rite img, .player-stage img, .ball-scene img, .leaf img, .layers-ground, .ci img, .tale-world, .fight img, .cinema video, .world");
-      picture?.classList.remove("sae-she");
-      void (picture as HTMLElement | null)?.offsetWidth;
-      picture?.classList.add("sae-she");
-      if (t.closest(".ci") && side) rollFlow();
+      const held = occultRef.current;
+      if (held.blink) {
+        setNote(side ? "she looks aside." : "she blinks.");
+        setFlash((n) => n + 1);
+        const picture = document.querySelector(".you-scene, .rite img, .player-stage img, .ball-scene img, .leaf img, .layers-ground, .ci img, .tale-world, .fight img, .cinema video, .world");
+        picture?.classList.remove("sae-she");
+        void (picture as HTMLElement | null)?.offsetWidth;
+        picture?.classList.add("sae-she");
+      }
+      if (held.wink) window.dispatchEvent(new CustomEvent("sae-wink"));
+      if (target.closest(".ci") && side) rollFlow();
       else pushSign(side ? "side" : "rise", dir);
-      const owned = t?.closest(".player-shell, .tableau");
-      if (!owned) {
+      if (!target.closest(".player-shell, .tableau")) {
         window.dispatchEvent(new CustomEvent("sae-axis", { detail: { axis: side ? "side" : "rise", dir } }));
       }
     };
+
+    const onWheel = (event: WheelEvent) => {
+      const t = event.target instanceof Element ? event.target : document.body;
+      if (t?.closest("input, textarea, .film, .layers-walk, .gallery, .immerse, .potato, .silent-all")) return;
+      const ax = Math.abs(event.deltaX);
+      const ay = Math.abs(event.deltaY);
+      if (ax < 1 && ay < 1) return;
+      event.preventDefault();
+      const side = event.shiftKey || ax > ay;
+      const dir = ((side ? event.deltaX : event.deltaY) || event.deltaY || event.deltaX) > 0 ? 1 : -1;
+      gesture(side, dir, t);
+    };
+
+    let x0 = 0;
+    let y0 = 0;
+    let armed = false;
+    const onStart = (event: TouchEvent) => {
+      const t = event.target instanceof Element ? event.target : document.body;
+      if (t.closest("input, textarea, button, a, .film, .layers-walk, .gallery, .see-all, .occult, .skein-rail, .ask, .immerse, .potato")) return;
+      const point = event.changedTouches[0];
+      if (!point) return;
+      x0 = point.clientX;
+      y0 = point.clientY;
+      armed = true;
+    };
+    const onEnd = (event: TouchEvent) => {
+      if (!armed) return;
+      armed = false;
+      const t = event.target instanceof Element ? event.target : document.body;
+      const point = event.changedTouches[0];
+      if (!point) return;
+      const dx = point.clientX - x0;
+      const dy = point.clientY - y0;
+      if (Math.hypot(dx, dy) < 48) return;
+      const side = Math.abs(dx) > Math.abs(dy);
+      const dir = side ? (dx < 0 ? 1 : -1) : dy < 0 ? 1 : -1;
+      gesture(side, dir, t);
+    };
+
     window.addEventListener("wheel", onWheel, { passive: false });
-    return () => window.removeEventListener("wheel", onWheel);
+    window.addEventListener("touchstart", onStart, { passive: true });
+    window.addEventListener("touchend", onEnd);
+    return () => {
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchstart", onStart);
+      window.removeEventListener("touchend", onEnd);
+    };
   }, []);
 
   return (
     <>
-      <div key={flash} className={flash ? "glue-blink on" : "glue-blink"} />
-      <p key={`n${flash}`} className={note ? "glue-note on" : "glue-note"}>
+      <div key={flash} className={occult.blink && flash ? "glue-blink on" : "glue-blink"} hidden={!occult.blink} />
+      <p key={`n${flash}`} className={note && occult.blink ? "glue-note on" : "glue-note"} hidden={!occult.blink}>
         {note}
       </p>
       <div className="fungi" aria-hidden="true">
@@ -129,7 +178,8 @@ export function Glue() {
           <i key={thread.id} className={thread.axis} />
         ))}
       </div>
-        {FOLLOW.map((item, n) => {
+        {occult.faces
+          ? FOLLOW.map((item, n) => {
           const place = places[item.id] ?? defaultSpot(n, SERVER_WIDTH);
           return (
             <Link
@@ -171,34 +221,23 @@ export function Glue() {
               <img src={item.src} alt="" decoding="async" draggable={false} />
             </Link>
           );
-        })}
-      <div className="glue-faces">
-        {faces
-          ? FACES.map((face) =>
-              face.to === "/ball" ? (
-                <Link key={face.label} to="/ball" search={{ stay: face.stay }} className="glue-face" aria-label={face.label}>
-                  <img src={face.src} alt="" />
-                </Link>
-              ) : (
-                <Link key={face.label} to={face.to} className="glue-face" aria-label={face.label}>
-                  <img src={face.src} alt="" />
-                </Link>
-              ),
-            )
+        })
           : null}
-        <button
-          type="button"
-          className="glue-toggle"
-          onClick={() =>
-            setFaces((on) => {
-              localStorage.setItem("sae-faces", on ? "0" : "1");
-              return !on;
-            })
-          }
-        >
-          {faces ? "faces away" : "faces"}
-        </button>
-      </div>
+      {occult.faces ? (
+        <div className="glue-faces">
+          {FACES.map((face) =>
+            face.to === "/ball" ? (
+              <Link key={face.label} to="/ball" search={{ stay: face.stay }} className="glue-face" aria-label={face.label}>
+                <img src={face.src} alt="" />
+              </Link>
+            ) : (
+              <Link key={face.label} to={face.to} className="glue-face" aria-label={face.label}>
+                <img src={face.src} alt="" />
+              </Link>
+            ),
+          )}
+        </div>
+      ) : null}
     </>
   );
 }

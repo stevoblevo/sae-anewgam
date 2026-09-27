@@ -13,7 +13,7 @@ const IN = [
 
 export function InGam({ onWalk, onRite }: { onWalk: () => void; onRite: () => void }) {
   const [at, setAt] = useState(0);
-  const [playing, setPlaying] = useState(true);
+  const [playing, setPlaying] = useState(false);
   const frame = IN[at] ?? IN[0];
 
   useEffect(() => {

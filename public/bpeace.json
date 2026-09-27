@@ -1,0 +1,26 @@
+{
+  "id": "bpeace",
+  "note": "checkpoint. riff from here. nothing plays itself.",
+  "story": "A kinder way. The red sister is lively. The porch is a pillow fight.",
+  "film": ["beauty", "sun", "light", "dawn", "red", "black", "whole", "obsidian", "reign", "knight", "glow"],
+  "path": ["door", "peachfall", "forest", "noctalia", "grotto", "beyond"],
+  "words": {
+    "beauty": "light",
+    "sun": "sun",
+    "light": "pale",
+    "dawn": "dawn",
+    "red": "red",
+    "black": "black",
+    "whole": "whole",
+    "obsidian": "way",
+    "reign": "reign",
+    "knight": "beside",
+    "glow": "glow",
+    "door": "begin",
+    "peachfall": "lively",
+    "forest": "trees",
+    "noctalia": "dreams",
+    "grotto": "depths",
+    "beyond": "light"
+  }
+}

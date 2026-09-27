@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { allowEye, compose, eyeReady, keepTake, snapEye, snapScene, type Take } from "@/lib/eye";
+import { readOccult } from "@/lib/occult";
 
 type Spot = { x: number; y: number };
 
@@ -53,6 +54,7 @@ function useDrag(spot: Spot, setSpot: (next: Spot) => void, key: string, onTap: 
 }
 
 export function Eye() {
+  const [on, setOn] = useState(false);
   const [ask, setAsk] = useState(false);
   const [line, setLine] = useState("I want to see you too.");
   const [take, setTake] = useState<Take | null>(null);
@@ -63,14 +65,27 @@ export function Eye() {
   const dragYou = useDrag(circle, setCircle, "sae-you", () => setWide((on) => !on));
 
   useEffect(() => {
+    const sync = () => setOn(readOccult().capture);
+    sync();
+    window.addEventListener("sae-occult", sync);
+    return () => window.removeEventListener("sae-occult", sync);
+  }, []);
+
+  useEffect(() => {
+    if (!on) {
+      setAsk(false);
+      setTake(null);
+      return;
+    }
     if (localStorage.getItem("sae-eye") === "1") {
       allowEye().catch(() => setAsk(true));
       return;
     }
     setAsk(true);
-  }, []);
+  }, [on]);
 
   useEffect(() => {
+    if (!on) return;
     let running = false;
     const onWink = async () => {
       if (!eyeReady() || running) return;
@@ -91,7 +106,7 @@ export function Eye() {
     };
     window.addEventListener("sae-wink", onWink);
     return () => window.removeEventListener("sae-wink", onWink);
-  }, []);
+  }, [on]);
 
   const allow = async () => {
     try {
@@ -103,6 +118,8 @@ export function Eye() {
       setAsk(true);
     }
   };
+
+  if (!on) return null;
 
   const face = take ? (take.shown === "before" ? take.before : take.after) : "";
 

@@ -17,6 +17,17 @@ export type Plate = {
 
 /** Stills stay. Motion is a loop on top of the same plate. */
 export const PLATES: Plate[] = [
+  { id: "veil", title: "beyond the veil.", note: "enlight · obsidian", src: "/veil.jpg", choose: true },
+  { id: "pink-in-mint", title: "pink inside mint.", note: "then love", src: "/pink-in-mint.jpg", cast: "well", seq: 11 },
+  { id: "love-arch", title: "love in the arch.", note: "the mash", src: "/love-arch.jpg", cast: "peach", seq: 10 },
+  { id: "love-mint", title: "love in the well.", note: "pink into mint", src: "/love-mint.jpg", cast: "well", seq: 10 },
+  { id: "the-riff", title: "both, and love.", note: "enlight · obsidian", src: "/the-riff.jpg", seq: 10 },
+  { id: "her-pink", title: "pink is her.", note: "her, in pink", src: "/her-pink.jpg", cast: "peach", seq: 8 },
+  { id: "into-mint", title: "mint is the well.", note: "beauty, into mint", src: "/into-mint.jpg", cast: "well", seq: 9 },
+  { id: "moonrise", title: "dark is wonder.", note: "a dark dawn", src: "/moonrise.jpg", seq: 9 },
+  { id: "enlight-doll", title: "enlight is the doll.", note: "the light riff", src: "/enlight-doll.jpg", cast: "white", seq: 4 },
+  { id: "obsidian-doll", title: "obsidian is the riff.", note: "the same doll, dark", src: "/obsidian-doll.jpg", seq: 9 },
+  { id: "knight-beside", title: "love stays beside.", note: "the knight, not ahead", src: "/knight-beside.jpg", cast: "peach", seq: 9 },
   { id: "remember", title: "the water remembers.", note: "well", src: "/beat01.jpg", motion: "/motion/well.mp4", cast: "well", seq: 1 },
   { id: "approach", title: "she comes to the water.", note: "same well", src: "/approach.jpg", motion: "/motion/approach.mp4", shelf: "later", cast: "well" },
   { id: "trace", title: "a trace, not a trophy.", note: "marks", src: "/beat02.jpg", motion: "/motion/trace-tall.mp4", cast: "well", seq: 2 },
