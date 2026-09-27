@@ -8,6 +8,7 @@ export function SaeWink() {
     const eye = document.createElement("sae-wink");
     eye.setAttribute("data-root", "");
     eye.setAttribute("world", "anewgam");
+    eye.style.setProperty("--sae-wink-bottom", "132px");
     eye.textContent = "Sae · loading";
     const place = () => (document.fullscreenElement || document.body).appendChild(eye);
     const marks = () => eye.setAttribute("mark-count", String(readFlow().length));
