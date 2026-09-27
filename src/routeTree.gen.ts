@@ -21,8 +21,10 @@ import { Route as KnightRouteImport } from './routes/knight'
 import { Route as LayersRouteImport } from './routes/layers'
 import { Route as LeafRouteImport } from './routes/leaf'
 import { Route as MarksRouteImport } from './routes/marks'
+import { Route as StoryRouteImport } from './routes/story'
 import { Route as TaleRouteImport } from './routes/tale'
 import { Route as WalkRouteImport } from './routes/walk'
+import { Route as WallRouteImport } from './routes/wall'
 import { Route as InGamRouteImport } from './routes/in.gam'
 
 const IndexRoute = IndexRouteImport.update({
@@ -85,6 +87,11 @@ const MarksRoute = MarksRouteImport.update({
   path: '/marks',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StoryRoute = StoryRouteImport.update({
+  id: '/story',
+  path: '/story',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TaleRoute = TaleRouteImport.update({
   id: '/tale',
   path: '/tale',
@@ -93,6 +100,11 @@ const TaleRoute = TaleRouteImport.update({
 const WalkRoute = WalkRouteImport.update({
   id: '/walk',
   path: '/walk',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WallRoute = WallRouteImport.update({
+  id: '/wall',
+  path: '/wall',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InGamRoute = InGamRouteImport.update({
@@ -114,8 +126,10 @@ export interface FileRoutesByFullPath {
   '/layers': typeof LayersRoute
   '/leaf': typeof LeafRoute
   '/marks': typeof MarksRoute
+  '/story': typeof StoryRoute
   '/tale': typeof TaleRoute
   '/walk': typeof WalkRoute
+  '/wall': typeof WallRoute
   '/in/gam': typeof InGamRoute
 }
 export interface FileRoutesByTo {
@@ -131,8 +145,10 @@ export interface FileRoutesByTo {
   '/layers': typeof LayersRoute
   '/leaf': typeof LeafRoute
   '/marks': typeof MarksRoute
+  '/story': typeof StoryRoute
   '/tale': typeof TaleRoute
   '/walk': typeof WalkRoute
+  '/wall': typeof WallRoute
   '/in/gam': typeof InGamRoute
 }
 export interface FileRoutesById {
@@ -149,8 +165,10 @@ export interface FileRoutesById {
   '/layers': typeof LayersRoute
   '/leaf': typeof LeafRoute
   '/marks': typeof MarksRoute
+  '/story': typeof StoryRoute
   '/tale': typeof TaleRoute
   '/walk': typeof WalkRoute
+  '/wall': typeof WallRoute
   '/in/gam': typeof InGamRoute
 }
 export interface FileRouteTypes {
@@ -168,8 +186,10 @@ export interface FileRouteTypes {
     | '/layers'
     | '/leaf'
     | '/marks'
+    | '/story'
     | '/tale'
     | '/walk'
+    | '/wall'
     | '/in/gam'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -185,8 +205,10 @@ export interface FileRouteTypes {
     | '/layers'
     | '/leaf'
     | '/marks'
+    | '/story'
     | '/tale'
     | '/walk'
+    | '/wall'
     | '/in/gam'
   id:
     | '__root__'
@@ -202,8 +224,10 @@ export interface FileRouteTypes {
     | '/layers'
     | '/leaf'
     | '/marks'
+    | '/story'
     | '/tale'
     | '/walk'
+    | '/wall'
     | '/in/gam'
   fileRoutesById: FileRoutesById
 }
@@ -220,8 +244,10 @@ export interface RootRouteChildren {
   LayersRoute: typeof LayersRoute
   LeafRoute: typeof LeafRoute
   MarksRoute: typeof MarksRoute
+  StoryRoute: typeof StoryRoute
   TaleRoute: typeof TaleRoute
   WalkRoute: typeof WalkRoute
+  WallRoute: typeof WallRoute
   InGamRoute: typeof InGamRoute
 }
 
@@ -311,6 +337,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarksRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/story': {
+      id: '/story'
+      path: '/story'
+      fullPath: '/story'
+      preLoaderRoute: typeof StoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tale': {
       id: '/tale'
       path: '/tale'
@@ -323,6 +356,13 @@ declare module '@tanstack/react-router' {
       path: '/walk'
       fullPath: '/walk'
       preLoaderRoute: typeof WalkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wall': {
+      id: '/wall'
+      path: '/wall'
+      fullPath: '/wall'
+      preLoaderRoute: typeof WallRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/in/gam': {
@@ -348,8 +388,10 @@ const rootRouteChildren: RootRouteChildren = {
   LayersRoute: LayersRoute,
   LeafRoute: LeafRoute,
   MarksRoute: MarksRoute,
+  StoryRoute: StoryRoute,
   TaleRoute: TaleRoute,
   WalkRoute: WalkRoute,
+  WallRoute: WallRoute,
   InGamRoute: InGamRoute,
 }
 export const routeTree = rootRouteImport

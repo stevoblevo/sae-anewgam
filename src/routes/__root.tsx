@@ -7,6 +7,7 @@ import { Glue } from "@/components/glue";
 import { Eye } from "@/components/eye";
 import { SaeWink } from "@/components/sae-wink";
 import { Settings } from "@/components/settings";
+import { FormFit } from "@/components/form-fit";
 import appCss from "../styles.css?url";
 
 const APP_NAME = "Sae · .anewgam";
@@ -91,6 +92,7 @@ export const Route = createRootRoute({
       </head>
       <body>
         <PreviewHostBridge />
+        <FormFit />
         <Installable />
         <AuthProvider>
           <Outlet />

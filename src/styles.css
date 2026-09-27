@@ -28,17 +28,17 @@
 
 .still-nav .mark {
   width: auto;
-  height: auto;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 8px;
+  padding: 8px 12px;
   border: 0;
   border-radius: 999px;
   background: rgb(243 230 212 / 0.9);
   color: #3a2a28;
   text-decoration: none;
-  font: 12px/1 system-ui, sans-serif;
+  font: 13px/1 system-ui, sans-serif;
 }
 
 .still-nav .mark.on {
@@ -59,11 +59,11 @@
 .way-pics a,
 .way-pics button {
   flex: none;
-  width: 54px;
-  height: 36px;
+  width: 64px;
+  height: 44px;
   padding: 0;
   border: 0;
-  border-radius: 6px;
+  border-radius: 8px;
   overflow: hidden;
   background: none;
 }
@@ -86,22 +86,34 @@
 
 .receipt button,
 .beads button {
-  width: 12px;
-  height: 12px;
+  width: 44px;
   padding: 0;
   border: 0;
+  background-clip: content-box;
+  box-sizing: border-box;
+}
+
+.receipt button {
+  height: 44px;
+  padding: 16px;
   border-radius: 50%;
 }
 
 .beads {
   position: absolute;
   z-index: 8;
-  left: 12px;
+  left: 4px;
   top: 50%;
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 0;
   transform: translateY(-50%);
+}
+
+.beads button {
+  height: 44px;
+  padding: 16px;
+  border-radius: 50%;
 }
 
 .beads button.on {
@@ -122,8 +134,8 @@
 
 .axis-marks button,
 .all-mark {
-  width: 22px;
-  height: 22px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -175,7 +187,8 @@
   height: 100dvh;
   overflow-x: auto;
   overflow-y: hidden;
-  scroll-snap-type: none;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
   touch-action: pan-x;
   overscroll-behavior-x: contain;
 }
@@ -186,6 +199,8 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 .slice .face,
@@ -427,4 +442,439 @@
   border-radius: 999px;
   padding: 6px 12px;
   font: 13px/1.3 system-ui, sans-serif;
+}
+
+.slice .face {
+  transition: opacity 1.15s ease;
+}
+
+.immerse.gone .slice.on .face {
+  opacity: 0;
+}
+
+.light-wash {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle at 50% 40%, rgb(255 250 236 / 0.94), rgb(255 228 186 / 0.42) 42%, transparent 72%);
+  transition: opacity 1.15s ease;
+}
+
+.immerse.gone .light-wash {
+  opacity: 1;
+}
+
+.story-fold {
+  position: absolute;
+  z-index: 9;
+  left: 12px;
+  right: 64px;
+  bottom: 108px;
+  max-height: min(46dvh, 420px);
+  overflow: auto;
+  margin: 0;
+  padding: 8px;
+  border-radius: 16px;
+  background: rgb(244 234 216 / 0.94);
+  color: #3a2a28;
+}
+
+.story-fold > p {
+  margin: 4px 10px 8px;
+  font: 18px/1.3 "Iowan Old Style", Palatino, serif;
+}
+
+.story-fold button {
+  display: grid;
+  grid-template-columns: 12px auto 1fr;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  font: 14px/1.3 "Iowan Old Style", Palatino, serif;
+}
+
+.story-fold button.on {
+  background: #e7c27a;
+}
+
+.story-fold i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.story-fold b {
+  font-weight: 600;
+}
+
+.story-fold span {
+  opacity: 0.8;
+}
+
+.immerse.telling .beat-line {
+  display: none;
+}
+
+.beat-line {
+  position: absolute;
+  z-index: 8;
+  left: 16px;
+  bottom: 118px;
+  margin: 0;
+  max-width: 22rem;
+  color: #3a2a28;
+  background: rgb(243 230 212 / 0.9);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font: 15px/1.3 "Iowan Old Style", Palatino, serif;
+}
+
+.form-pick {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  touch-action: pan-x;
+}
+
+.form-pick button {
+  flex: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: rgb(255 248 240 / 0.88);
+  color: #3a2a28;
+  font: 12px/1 system-ui, sans-serif;
+}
+
+.form-pick button.on {
+  background: #e7c27a;
+}
+
+html[data-form] .immerse,
+html[data-form] .potato,
+html[data-form] .potato > .slice,
+html[data-form] .frame {
+  width: 100%;
+  max-width: none;
+  height: 100dvh;
+  margin: 0;
+}
+
+.frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+html[data-form="chromebook"] .mark:focus-visible,
+html[data-form="chromebook"] .hfilm button:focus-visible {
+  outline: 2px solid #e7c27a;
+  outline-offset: 2px;
+}
+
+html[data-form="netbook"] .hfilm button,
+html[data-form="pi"] .hfilm button {
+  flex-basis: 84px;
+  height: 48px;
+}
+
+html[data-form="netbook"] .beat-line,
+html[data-form="pi"] .beat-line {
+  font-size: 13px;
+  max-width: 16rem;
+}
+
+html[data-form="netbook"] .light-wash,
+html[data-form="pi"] .light-wash,
+html[data-form="pi"] .axis-marks,
+html[data-form="pi"] .receipt {
+  display: none;
+}
+
+html[data-form="android"] .still-nav .mark,
+html[data-form="tablet"] .still-nav .mark {
+  min-height: 44px;
+}
+
+html[data-form="android"] .beat-line {
+  max-width: 14rem;
+  bottom: 92px;
+}
+
+html[data-form="android"] .hfilm {
+  bottom: 8px;
+}
+
+html[data-form="tablet"] .hfilm button {
+  flex-basis: 168px;
+  height: 96px;
+}
+
+html[data-form="tablet"] .beads button {
+  width: 18px;
+  height: 18px;
+}
+
+html[data-form="high"] .slice.on .over {
+  opacity: 0.28;
+}
+
+html[data-form="high"] .slice.on .under {
+  opacity: 0.16;
+}
+
+html[data-form="vr"] .beat-line {
+  left: 50%;
+  bottom: 22%;
+  transform: translateX(-50%);
+  font-size: 28px;
+  text-align: center;
+}
+
+html[data-form="vr"] .hfilm button {
+  flex-basis: 180px;
+  height: 112px;
+}
+
+html[data-form="vr"] .still-nav .mark {
+  min-height: 48px;
+  font-size: 16px;
+}
+
+html[data-form="vr"] .slice .face,
+html[data-form="pi"] .slice .face,
+html[data-form="netbook"] .slice .face {
+  transition: none;
+}
+
+.play-mov {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.play-mark {
+  position: absolute;
+  z-index: 8;
+  right: 18px;
+  bottom: 124px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #e0b15a;
+  color: #1a1410;
+  font: 700 11px/1 system-ui, sans-serif;
+}
+
+.pops {
+  position: absolute;
+  z-index: 8;
+  right: 16px;
+  top: 16%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pops button {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  padding: 0;
+  border: 2px solid rgb(255 248 240 / 0.92);
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f3d7c4;
+  animation: pop-in 0.55s ease both;
+}
+
+.pops button:nth-child(2) { animation-delay: 0.12s; }
+.pops button:nth-child(3) { animation-delay: 0.24s; }
+
+.pops img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.pops span {
+  position: absolute;
+  left: 50%;
+  bottom: 6px;
+  transform: translateX(-50%);
+  color: #3a2a28;
+  background: rgb(255 248 240 / 0.92);
+  border-radius: 999px;
+  padding: 1px 6px;
+  font: 11px/1.2 system-ui, sans-serif;
+  opacity: 0;
+}
+
+.pops button.said span { opacity: 1; }
+
+@keyframes pop-in {
+  from { transform: scale(0.2); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pops button { animation: none; }
+}
+
+.wall {
+  min-height: 100dvh;
+  background: #f6efe2;
+  color: #3a2a28;
+  overflow-x: hidden;
+}
+
+.wall-bar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgb(246 239 226 / 0.94);
+}
+
+.wall-bar a,
+.wall-bar button,
+.wall-shelves button,
+.wall-step,
+.wall-open p a {
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: 15px/1 "Iowan Old Style", Palatino, serif;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.wall-shelves {
+  display: flex;
+  gap: 8px;
+  padding: 0 12px 8px;
+  overflow-x: auto;
+}
+
+.wall-shelves button {
+  border-radius: 999px;
+  padding: 0 14px;
+  background: #f3e6d4;
+}
+
+.wall-shelves button.on {
+  background: #e7c27a;
+}
+
+.wall-line {
+  margin: 0 14px 10px;
+  font: 18px/1.3 "Iowan Old Style", Palatino, serif;
+}
+
+.wall-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+  padding: 0 10px 28px;
+}
+
+.wall-grid button {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  aspect-ratio: 4 / 3;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #e7d7c4;
+}
+
+.wall-grid img,
+.wall-tile {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.wall-tile {
+  display: grid;
+  place-items: center;
+  padding: 8px;
+  text-align: center;
+  font: 13px/1.2 "Iowan Old Style", Palatino, serif;
+}
+
+.wall-open {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background: rgb(20 16 14 / 0.88);
+}
+
+.wall-open img,
+.wall-open video {
+  width: 100%;
+  max-width: 100%;
+  max-height: 86dvh;
+  margin: auto;
+  object-fit: contain;
+}
+
+.wall-open p {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 14px;
+  margin: 0;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  color: #f6efe2;
+  font: 16px/1 "Iowan Old Style", Palatino, serif;
+}
+
+.wall-open p a {
+  color: #e7c27a;
+}
+
+.wall-step {
+  border-radius: 999px;
+  padding: 0 14px;
+  background: rgb(246 239 226 / 0.92);
+  color: #3a2a28;
+}
+
+@media (max-width: 720px) {
+  .wall-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

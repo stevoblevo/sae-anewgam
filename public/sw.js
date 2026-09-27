@@ -1,5 +1,5 @@
 const SHELL = "sae-shell-9";
-const MEDIA = "sae-media-9";
+const MEDIA = "sae-media-10";
 
 const PLATES = [
   "/enlight-way.jpg",
@@ -13,6 +13,15 @@ const PLATES = [
   "/reign-well.jpg",
   "/knight-beside.jpg",
   "/glow.jpg",
+  "/farther-well.jpg",
+  "/pink-forest.jpg",
+  "/leaf-deer.jpg",
+  "/scroll-meet.jpg",
+  "/weather.jpg",
+  "/mark-orange.jpg",
+  "/peachfall-walk.jpg",
+  "/sisters-well.jpg",
+  "/scroll-doors.jpg",
 ];
 
 self.addEventListener("install", (event) => {
