@@ -21,6 +21,7 @@ import { Route as LeafRouteImport } from './routes/leaf'
 import { Route as MarksRouteImport } from './routes/marks'
 import { Route as TaleRouteImport } from './routes/tale'
 import { Route as WalkRouteImport } from './routes/walk'
+import { Route as InGamRouteImport } from './routes/in.gam'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -82,6 +83,11 @@ const WalkRoute = WalkRouteImport.update({
   path: '/walk',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InGamRoute = InGamRouteImport.update({
+  id: '/in/gam',
+  path: '/in/gam',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/marks': typeof MarksRoute
   '/tale': typeof TaleRoute
   '/walk': typeof WalkRoute
+  '/in/gam': typeof InGamRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByTo {
   '/marks': typeof MarksRoute
   '/tale': typeof TaleRoute
   '/walk': typeof WalkRoute
+  '/in/gam': typeof InGamRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -125,6 +133,7 @@ export interface FileRoutesById {
   '/marks': typeof MarksRoute
   '/tale': typeof TaleRoute
   '/walk': typeof WalkRoute
+  '/in/gam': typeof InGamRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/marks'
     | '/tale'
     | '/walk'
+    | '/in/gam'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -155,6 +165,7 @@ export interface FileRouteTypes {
     | '/marks'
     | '/tale'
     | '/walk'
+    | '/in/gam'
   id:
     | '__root__'
     | '/'
@@ -169,6 +180,7 @@ export interface FileRouteTypes {
     | '/marks'
     | '/tale'
     | '/walk'
+    | '/in/gam'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -184,6 +196,7 @@ export interface RootRouteChildren {
   MarksRoute: typeof MarksRoute
   TaleRoute: typeof TaleRoute
   WalkRoute: typeof WalkRoute
+  InGamRoute: typeof InGamRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -272,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WalkRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/in/gam': {
+      id: '/in/gam'
+      path: '/in/gam'
+      fullPath: '/in/gam'
+      preLoaderRoute: typeof InGamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -288,6 +308,7 @@ const rootRouteChildren: RootRouteChildren = {
   MarksRoute: MarksRoute,
   TaleRoute: TaleRoute,
   WalkRoute: WalkRoute,
+  InGamRoute: InGamRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

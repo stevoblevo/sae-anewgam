@@ -78,3 +78,9 @@ independent review and deployed route checks are still required.
 
 Rollback the feature commit, or remove its single root mount and import.
 No original art, application route, dependency, save or camera module was changed.
+
+## After merge `347f4cc7`
+
+PR #2 is merged. The continuation record is `docs/SAE_WINK_SITE_REPORT.md`.
+That report is per site. A root mount in this project is not a claim that
+every Peachfall world is live. `sae://on.lyphanGETouai.ly` is still only a name.
