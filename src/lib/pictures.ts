@@ -2,6 +2,10 @@
 export const PICTURES = [
   "/anna.jpg",
   "/anne-16x10.jpg",
+  "/anne-home.jpg",
+  "/anne-porch.jpg",
+  "/anne-sand.jpg",
+  "/anne-savanna.jpg",
   "/anna-hearth.jpg",
   "/approach.jpg",
   "/bambi.jpg",

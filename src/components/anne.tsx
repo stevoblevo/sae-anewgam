@@ -1,11 +1,11 @@
-import { useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { useAxis } from "@/components/glue";
 
 const ANNE = [
-  { id: "notice", src: "/anne-16x10.jpg" },
-  { id: "feel", src: "/night-doll.jpg" },
-  { id: "flow", src: "/night-sand.jpg" },
-  { id: "home", src: "/night-home.jpg" },
+  { id: "porchlight", src: "/anne-porch.jpg" },
+  { id: "sandman", src: "/anne-sand.jpg" },
+  { id: "savanna", src: "/anne-savanna.jpg" },
+  { id: "home", src: "/anne-home.jpg" },
 ];
 
 export function Anne({ onNight }: { onNight: () => void }) {
@@ -15,6 +15,11 @@ export function Anne({ onNight }: { onNight: () => void }) {
   const step = (dir: number) => setAt((n) => (n + dir + ANNE.length) % ANNE.length);
 
   useAxis(step, step);
+
+  useEffect(() => {
+    const id = window.setInterval(() => step(1), 5200);
+    return () => window.clearInterval(id);
+  }, [at]);
 
   const onStage = (event: ReactPointerEvent) => {
     if ((event.target as HTMLElement).closest("button, a")) return;
