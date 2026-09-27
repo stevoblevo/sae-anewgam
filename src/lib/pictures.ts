@@ -1,6 +1,7 @@
 /** Every still on the site. The gallery and the layers view both read this. */
 export const PICTURES = [
   "/anna.jpg",
+  "/anne-16x10.jpg",
   "/anna-hearth.jpg",
   "/approach.jpg",
   "/bambi.jpg",
