@@ -928,3 +928,81 @@ html[data-form="netbook"] .slice .face {
 @media (max-width: 720px) {
   .wall-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+.immerse.gate-land .slice .face,
+.immerse.gate-land .slice .over,
+.immerse.gate-land .slice .under,
+.immerse.gate-land .play-mov,
+.immerse.gate-land > .frame,
+.immerse.gate-port .slice .face,
+.immerse.gate-port .slice .over,
+.immerse.gate-port .slice .under,
+.immerse.gate-port .play-mov,
+.immerse.gate-port > .frame {
+  position: absolute;
+  inset: auto;
+  left: 50%;
+  top: 44%;
+  object-fit: cover;
+  object-position: center 26%;
+  transform: translate(-50%, -50%);
+}
+
+.immerse.gate-land .slice .face,
+.immerse.gate-land .slice .over,
+.immerse.gate-land .slice .under,
+.immerse.gate-land .play-mov,
+.immerse.gate-land > .frame {
+  width: min(94vw, calc(70dvh * 16 / 10));
+  height: min(70dvh, calc(94vw * 10 / 16));
+}
+
+.immerse.gate-port .slice .face,
+.immerse.gate-port .slice .over,
+.immerse.gate-port .slice .under,
+.immerse.gate-port .play-mov,
+.immerse.gate-port > .frame {
+  width: min(62vw, calc(76dvh * 10 / 16));
+  height: min(76dvh, calc(62vw * 16 / 10));
+}
+
+.immerse .slice.on .face {
+  transform: translate(-50%, -50%) scale(var(--zoom, 1));
+}
+
+.pops {
+  left: 12px;
+  right: auto;
+  top: auto;
+  bottom: 108px;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.pops button {
+  width: 44px;
+  height: 44px;
+  animation: none;
+}
+
+.chat-say,
+.chat-ease {
+  width: auto;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgb(246 239 232 / 0.35);
+  background: rgb(22 16 12 / 0.5);
+  color: #f6efe8;
+  font: 15px/1 "Iowan Old Style", Palatino, serif;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.axis-marks,
+.all-mark,
+.play-mark {
+  display: none;
+}

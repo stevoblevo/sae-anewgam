@@ -11,6 +11,7 @@ const POPS = [
   { id: "blink", src: "/pop-blink.jpg", word: "" },
 ] as const;
 
+const CLOSER = 1.12;
 const SWIPE = 64;
 
 function receiptKey(reel: ReelId) {
@@ -49,7 +50,8 @@ export function Immerse({
   const [reel, setReel] = useState<ReelId>(start);
   const [at, setAt] = useState(startAt);
   const [open, setOpen] = useState(true);
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(CLOSER);
+  const [gate, setGate] = useState<"land" | "port">("land");
   const [depth, setDepth] = useState<-1 | 0 | 1>(0);
   const [both, setBoth] = useState(false);
   const [ways, setWays] = useState(false);
@@ -80,7 +82,7 @@ export function Immerse({
     const length = filmFor(which).length;
     const dest = ((n % length) + length) % length;
     setDepth(0);
-    setZoom(1);
+    setZoom(CLOSER);
     zoomRef.current = 1;
     setAt(dest);
     setPlay(null);
@@ -107,7 +109,7 @@ export function Immerse({
     setAt(0);
     setPlay(null);
     setDepth(0);
-    setZoom(1);
+    setZoom(CLOSER);
     zoomRef.current = 1;
     setGone(false);
     setWays(false);
@@ -245,7 +247,7 @@ export function Immerse({
 
   return (
     <section
-      className={`immerse${open ? " open" : ""}${lit ? " lit" : ""}${gone ? " gone" : ""}${fold ? " telling" : ""}`}
+      className={`immerse gate-${gate}${open ? " open" : ""}${lit ? " lit" : ""}${gone ? " gone" : ""}${fold ? " telling" : ""}`}
       data-cast={frame.id}
       data-reel={reel}
       style={{ ["--zoom" as string]: zoom }}
@@ -293,6 +295,23 @@ export function Immerse({
           <i>{String(at + 1).padStart(2, "0")}</i>
           <em>{copy.word}</em>
         </span>
+        <button type="button" className={depth < 0 ? "mark on" : "mark"} onClick={() => layer(-1)}>
+          <span>rise</span>
+        </button>
+        <button type="button" className={depth > 0 ? "mark on" : "mark"} onClick={() => layer(1)}>
+          <span>delve</span>
+        </button>
+        <button type="button" className={open ? "mark on" : "mark"} onClick={() => setOpen((on) => !on)}>
+          <span>all</span>
+        </button>
+        <button type="button" className={gate === "port" ? "mark on" : "mark"} onClick={() => setGate((now) => (now === "land" ? "port" : "land"))}>
+          <span>{gate === "land" ? "16:10" : "10:16"}</span>
+        </button>
+        {"motion" in frame && frame.motion ? (
+          <button type="button" className={play === frame.id ? "mark on" : "mark"} onClick={() => setPlay((now) => (now === frame.id ? null : frame.id))}>
+            <span>{play === frame.id ? "still" : "play"}</span>
+          </button>
+        ) : null}
         {ways ? (
           <div className="way-pics">
             <button type="button" onClick={() => enter("present")}>
@@ -378,7 +397,7 @@ export function Immerse({
                 className={`slice${n === at ? " on" : ""}${n === at && depth < 0 ? " risen" : ""}${n === at && depth > 0 ? " sunk" : ""}${both && n === at ? " both" : ""}`}
                 data-i={n}
               >
-                <img className="face" src={beat.src} alt="" style={n === at ? { transform: `scale(${zoom})` } : undefined} />
+                <img className="face" src={beat.src} alt="" />
                 {lean ? null : <img className="over" src={beat.high} alt="" />}
                 {lean ? null : <img className="under" src={beat.low} alt="" />}
                 {"motion" in beat && beat.motion && play === beat.id ? (
@@ -423,11 +442,6 @@ export function Immerse({
               })}
             </aside>
           ) : null}
-          {"motion" in frame && frame.motion ? (
-            <button type="button" className="play-mark" onClick={() => setPlay((now) => (now === frame.id ? null : frame.id))}>
-              {play === frame.id ? "still" : "play"}
-            </button>
-          ) : null}
           <div className="pops">
             {POPS.map((bubble) => (
               <button
@@ -440,6 +454,12 @@ export function Immerse({
                 {bubble.word ? <span>{bubble.word}</span> : null}
               </button>
             ))}
+            <button type="button" className="chat-say" onClick={() => enter("friend")}>
+              hi
+            </button>
+            <Link to="/wall" className="chat-ease">
+              gallery
+            </Link>
           </div>
           <div className="light-wash" />
         </>
@@ -458,20 +478,6 @@ export function Immerse({
           />
         ))}
       </div>
-      <div className="axis-marks">
-        <button type="button" className={depth < 0 ? "rise on" : "rise"} onClick={() => layer(-1)} aria-label="rise">
-          <i />
-        </button>
-        <button type="button" className={depth > 0 ? "delve on" : "delve"} onClick={() => layer(1)} aria-label="delve">
-          <i />
-        </button>
-      </div>
-      <button type="button" className="all-mark" onClick={() => setOpen((on) => !on)} aria-label="all">
-        <i />
-        <i />
-        <i />
-        <i />
-      </button>
     </section>
   );
 }
