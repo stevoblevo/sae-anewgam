@@ -1,94 +1,77 @@
 import { useEffect, useState } from "react";
 import { useAxis } from "@/components/glue";
+import { PICTURES } from "@/lib/pictures";
+import { markSeen, readSeen } from "@/lib/seen";
 
-const NIGHT = [
-  { id: "notice", src: "/night-porch.jpg", motion: "/motion/night-porch.mp4" },
-  { id: "feel", src: "/night-porch.jpg", motion: "/motion/night-porch.mp4" },
-  { id: "choose", src: "/night-doll.jpg" },
-  { id: "flow", src: "/night-sand.jpg" },
-  { id: "grow", src: "/night-home.jpg" },
-];
+const HEARTS = ["❤️", "💙", "💜", "💖", "💗", "💘", "❤️"];
 
-const MARKS = ["notice", "feel", "choose", "flow", "grow"];
-
-const GALLEY = [
-  { id: "porchlight", src: "/night-porch.jpg" },
-  { id: "bambi", src: "/bambi.jpg" },
-  { id: "path", src: "/beat02.jpg" },
-  { id: "hearth", src: "/anna-hearth.jpg" },
-  { id: "home", src: "/night-home.jpg" },
-  { id: "sand", src: "/night-sand.jpg" },
-];
+function buildReel(): string[] {
+  const known = PICTURES as readonly string[];
+  const seen = Object.keys(readSeen()).filter((src) => known.includes(src));
+  const rest = known.filter((src) => !seen.includes(src));
+  return [...seen, ...rest];
+}
 
 export function Night({ onDay }: { onDay: () => void }) {
+  const [reel, setReel] = useState<string[]>(["/night-porch.jpg"]);
   const [at, setAt] = useState(0);
   const [playing, setPlaying] = useState(true);
-  const [shake, setShake] = useState(0);
-  const [galley, setGalley] = useState(false);
-  const [held, setHeld] = useState("");
-  const frame = NIGHT[at] ?? NIGHT[0];
-  const shown = held || frame.src;
+  const src = reel[at] ?? reel[0];
 
   useEffect(() => {
-    if (!playing || galley) return;
-    const id = window.setInterval(() => {
-      setAt((n) => (n + 1) % NIGHT.length);
-      setShake((n) => n + 1);
-    }, 4200);
-    return () => window.clearInterval(id);
-  }, [playing, galley]);
+    setReel(buildReel());
+  }, []);
 
-  useAxis(
-    (dir) => {
-      setAt((n) => (n + dir + NIGHT.length) % NIGHT.length);
-      setShake((n) => n + 1);
-    },
-    () => setPlaying((on) => !on),
-  );
+  useEffect(() => {
+    if (src) markSeen(src);
+  }, [src]);
+
+  useEffect(() => {
+    if (!playing || reel.length < 2) return;
+    const id = window.setInterval(() => setAt((n) => (n + 1) % reel.length), 4200);
+    return () => window.clearInterval(id);
+  }, [playing, reel.length]);
+
+  useEffect(() => {
+    document.querySelector(".occult-galley .on")?.scrollIntoView({ inline: "center", block: "nearest" });
+  }, [at]);
+
+  const step = (dir: number) => setAt((n) => (n + dir + reel.length) % reel.length);
+
+  useAxis(step, () => setPlaying((on) => !on));
 
   return (
     <div className="night">
-      <div key={shake} className="red-shake">
-        {frame.motion && playing && !held && !galley ? (
-          <video src={frame.motion} poster={frame.src} autoPlay muted loop playsInline />
-        ) : (
-          <img src={shown} alt="" />
-        )}
-      </div>
-      <button type="button" className="night-boop" aria-label="boop" onClick={() => setGalley(true)} />
-      {galley ? (
-        <div className="occult">
-          <button type="button" className="layers-leave" onClick={() => { setGalley(false); setHeld(""); }}>
-            leave
-          </button>
-          <div className="occult-galley">
-            {GALLEY.map((item) => (
-              <button key={item.id} type="button" className={shown === item.src ? "on" : ""} aria-label={item.id} onClick={() => setHeld(item.src)}>
-                <img src={item.src} alt="" />
-              </button>
-            ))}
-          </div>
-        </div>
-      ) : null}
+      {src === "/night-porch.jpg" && playing ? (
+        <video key={src} src="/motion/night-porch.mp4" poster={src} autoPlay muted loop playsInline />
+      ) : (
+        <img key={src} src={src} alt="" />
+      )}
       <header className="player-chrome">
         <button type="button" className="nav-link" onClick={onDay}>
           day
         </button>
-        <p className="brand">night</p>
+        <p className="brand">seen</p>
         <div className="right">
           <button type="button" className="nav-link" onClick={() => setPlaying((on) => !on)}>
             {playing ? "hold" : "play"}
           </button>
         </div>
       </header>
-      <nav className="night-rail" aria-label="night">
-        {MARKS.map((mark, n) => (
-          <button key={mark} type="button" className={n === at ? "on" : ""} onClick={() => setAt(n)} aria-label={mark}>
-            <i />
-            {n === at ? <span>{mark}</span> : null}
+      <nav className="hearts" aria-label="next">
+        {HEARTS.map((heart, n) => (
+          <button key={n} type="button" onClick={() => step(1)} aria-label="next">
+            {heart}
           </button>
         ))}
       </nav>
+      <div className="occult-galley">
+        {reel.map((item, n) => (
+          <button key={item} type="button" className={n === at ? "on" : ""} onClick={() => setAt(n)}>
+            <img src={item} alt="" loading="lazy" />
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

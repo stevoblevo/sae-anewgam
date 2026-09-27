@@ -2510,6 +2510,25 @@ html[data-eye="in"] .follow {
   opacity: 0.55;
 }
 
+.hearts {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 112px;
+  z-index: 8;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.hearts button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font-size: 28px;
+  line-height: 1;
+}
+
 .occult .layers-leave {
   pointer-events: auto;
 }
