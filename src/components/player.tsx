@@ -7,6 +7,8 @@ import { PICTURES } from "@/lib/pictures";
 import { matchPicture } from "@/lib/find";
 import { markGamma } from "@/lib/seen";
 import { WAYS } from "@/lib/ways";
+import { TIM } from "@/lib/tim";
+import { loadPosts, talkFor, speakLine, type PostsFile, POSTS_EMPTY } from "@/lib/posts";
 
 const PLAY = ["bambi", "farther", "peachfall", "peachfall-all", "red-horizon", "reign-well", "trace", "remember"];
 const STORY = [...PLAY, "notice", "beside", "porchfight-gal"];
@@ -14,7 +16,7 @@ const RING = [...PLAY, "trace-tall", "notice", "beside", "porchfight-gal", "dear
 const HEADS = [{ id: "stare", src: "/stare.png", label: "face lock" }];
 const LOCK = ["remember", "stare", "farther"];
 const START = Math.max(0, PLATES.findIndex((p) => p.id === "anna"));
-const BEAT_MS = 6000;
+const BEAT_MS = TIM.ms;
 const SHOWN = new Set(["painted-stare", "savannah", "bambi", "anna", "sisters", "stare", "loom", "weather", "kirby"]);
 const RING_STORY = [
   "She is in the ring. The boards are still dry. Nobody has been put down on them.",
@@ -60,6 +62,9 @@ export function Player() {
   const [phone, setPhone] = useState(false);
   const [leaving, setLeaving] = useState<{ src: string; motion?: string } | null>(null);
   const [pop, setPop] = useState<{ n: number; top: number; left: number } | null>(null);
+  const [posts, setPosts] = useState<PostsFile>(POSTS_EMPTY);
+  const postsRef = useRef(POSTS_EMPTY);
+  postsRef.current = posts;
   const [pink, setPink] = useState(false);
   const [hear, setHear] = useState(true);
   const hearRef = useRef(true);
@@ -82,6 +87,10 @@ export function Player() {
   const popRef = useRef<number | null>(null);
   const leaveTimer = useRef(0);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    loadPosts().then(setPosts);
+  }, []);
 
   const plate = PLATES[i] ?? PLATES[0];
   const shown = phone && plate.srcPhone ? plate.srcPhone : plate.src;
@@ -122,6 +131,8 @@ export function Player() {
     iRef.current = next;
     setI(next);
     if (!keepPlay) setPlaying(false);
+    const said = talkFor(PLATES[next]?.id ?? "", postsRef.current);
+    if (said && hearRef.current) speakLine(said.line);
   }, []);
 
   const stepShow = useCallback(
@@ -457,7 +468,7 @@ export function Player() {
           onClick={() => go(pop.n, true)}
         >
           <img src={PLATES[pop.n]?.src} alt="" />
-          <span>{PLATES[pop.n]?.note}</span>
+          <span>{talkFor(PLATES[pop.n]?.id ?? "", posts)?.line ?? PLATES[pop.n]?.note}</span>
         </button>
       ) : null}
 
