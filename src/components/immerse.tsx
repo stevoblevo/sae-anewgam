@@ -398,8 +398,22 @@ export function Immerse({
             onPointerMove={onPotatoMove}
             onClick={(event) => {
               if (drag.current.moved) return;
+              if ((event.target as HTMLElement).closest("button, a")) return;
               const slice = (event.target as HTMLElement).closest(".slice");
               if (!slice) return;
+              const box = event.currentTarget.getBoundingClientRect();
+              const x = (event.clientX - box.left) / box.width;
+              const y = (event.clientY - box.top) / box.height;
+              const dx = Math.min(x, 1 - x);
+              const dy = Math.min(y, 1 - y);
+              if (dx < 0.22 && dx < dy) {
+                land(x < 0.5 ? at - 1 : at + 1);
+                return;
+              }
+              if (dy < 0.22) {
+                layer(y < 0.5 ? -1 : 1);
+                return;
+              }
               const beat = film[Number(slice.getAttribute("data-i"))];
               if (reel === "present" && beat?.id === "glow") navigate({ to: "/goal" });
               if (reel === "show" && beat?.id === "ball") navigate({ to: "/ball", search: { stay: 1 } });
