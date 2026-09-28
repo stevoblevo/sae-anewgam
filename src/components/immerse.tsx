@@ -424,6 +424,7 @@ export function Immerse({
               }
               const beat = film[Number(slice.getAttribute("data-i"))];
               if (reel === "present" && beat?.id === "glow") navigate({ to: "/goal" });
+              if (reel === "present" && beat?.id === "stone") onRestart?.();
               if (reel === "show" && beat?.id === "ball") navigate({ to: "/ball", search: { stay: 1 } });
             }}
             onWheel={(event) => {

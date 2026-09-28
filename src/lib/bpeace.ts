@@ -22,6 +22,11 @@ export const BPEACE = {
     { id: "knight", word: "beside", mark: "feather", line: "He stays beside her." },
     { id: "glow", word: "glow", mark: "spark", line: "The last light is a door." },
     { id: "pane", word: "sun", mark: "sun", line: "" },
+    { id: "moon", word: "moon", mark: "moon", line: "The sun sat down. The moon took the water." },
+    { id: "shore", word: "fawn", mark: "feather", line: "A fawn at the edge looks back." },
+    { id: "path", word: "path", mark: "sun", line: "Two walkers, too far to name, step onto the light." },
+    { id: "lantern", word: "lantern", mark: "spark", line: "A lantern on the far shore. He does not cross." },
+    { id: "stone", word: "stone", mark: "circle", line: "A whole stone. Meet it. Do not take it." },
   ],
   path: [
     { id: "door", word: "begin", mark: "door" },

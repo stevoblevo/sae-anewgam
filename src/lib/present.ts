@@ -21,6 +21,11 @@ export const PRESENT = [
   { id: "knight", src: "/knight-beside.jpg", color: "#c4a07a", high: "/glow.jpg", low: "/reign-well.jpg" },
   { id: "glow", src: "/glow.jpg", color: "#f3d7a1", high: "/whole-sun.jpg", low: "/knight-beside.jpg" },
   { id: "pane", src: "/scene-sun.jpg", color: "#f3e2b0", high: "/whole-sun.jpg", low: "/beauty-sun.jpg" },
+  { id: "moon", src: "/scene-moon.jpg", color: "#1c1a18", high: "/scene-shore.jpg", low: "/scene-path.jpg" },
+  { id: "shore", src: "/scene-shore.jpg", color: "#c4a574", high: "/scene-moon.jpg", low: "/scene-stone.jpg" },
+  { id: "path", src: "/scene-path.jpg", color: "#e7c27a", high: "/scene-lantern.jpg", low: "/scene-moon.jpg" },
+  { id: "lantern", src: "/scene-lantern.jpg", color: "#f0d48a", high: "/scene-path.jpg", low: "/scene-stone.jpg" },
+  { id: "stone", src: "/scene-stone.jpg", color: "#e7b183", high: "/scene-shore.jpg", low: "/scene-moon.jpg" },
 ] as const;
 
 export const PRESENT_SRC = PRESENT.map((beat) => beat.src);
