@@ -26,6 +26,8 @@ export const PRESENT = [
   { id: "path", src: "/scene-path.jpg", color: "#e7c27a", high: "/scene-lantern.jpg", low: "/scene-moon.jpg" },
   { id: "lantern", src: "/scene-lantern.jpg", color: "#f0d48a", high: "/scene-path.jpg", low: "/scene-stone.jpg" },
   { id: "stone", src: "/scene-stone.jpg", color: "#e7b183", high: "/scene-shore.jpg", low: "/scene-moon.jpg" },
+  { id: "observatory", src: "/scene-observatory.jpg", color: "#1a2430", high: "/scene-page.jpg", low: "/scene-lantern.jpg" },
+  { id: "page", src: "/scene-page.jpg", color: "#f3e6d0", high: "/scene-observatory.jpg", low: "/scene-sun.jpg" },
 ] as const;
 
 export const PRESENT_SRC = PRESENT.map((beat) => beat.src);

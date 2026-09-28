@@ -78,6 +78,16 @@ export function toggleFave(src: string): string[] {
   return next;
 }
 
+export function noteHeat(row: { x: number; y: number; what: string; form: string }) {
+  try {
+    const prev = JSON.parse(localStorage.getItem("sae-heat") || "[]");
+    const next = [...(Array.isArray(prev) ? prev : []), { ...row, t: Date.now() }].slice(-80);
+    localStorage.setItem("sae-heat", JSON.stringify(next));
+  } catch {
+    /* the click still happened */
+  }
+}
+
 export function encodeHeat(counts: Record<string, number>): string {
   return Object.entries(counts)
     .filter(([, n]) => n > 0)

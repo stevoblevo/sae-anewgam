@@ -27,6 +27,8 @@ export const BPEACE = {
     { id: "path", word: "path", mark: "sun", line: "Two walkers, too far to name, step onto the light." },
     { id: "lantern", word: "lantern", mark: "spark", line: "A lantern on the far shore. He does not cross." },
     { id: "stone", word: "stone", mark: "circle", line: "A whole stone. Meet it. Do not take it." },
+    { id: "observatory", word: "night", mark: "moon", line: "The terrace keeps the night. The book is inside." },
+    { id: "page", word: "page", mark: "feather", line: "" },
   ],
   path: [
     { id: "door", word: "begin", mark: "door" },

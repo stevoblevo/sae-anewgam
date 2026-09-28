@@ -3,6 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { FRIEND_LINE, PRESENT, filmFor, type ReelId } from "@/lib/present";
 import { peaceLine, peaceMark, peaceWord, type PeaceMark } from "@/lib/bpeace";
 import { FORMS, chooseForm, readForm, type FormId } from "@/lib/forms";
+import { noteHeat } from "@/lib/seen";
 import { PeaceIcon } from "@/components/peace-mark";
 
 const POPS = [
@@ -21,7 +22,63 @@ const CREW = [
 
 type CrewLook = { id: (typeof CREW)[number]["id"]; mode: "dress" | "dance" | "sing" };
 
+const INKS = ["#e07a5f", "#7dbaa8", "#e7c27a", "#8a3a32"] as const;
+const BRUSHES = ["wet", "bloom", "dry", "glaze", "lift"] as const;
+type Brush = (typeof BRUSHES)[number];
+
+const OWN = [
+  { word: "liv", href: "https://isliv.vercel.app/#view=isliv" },
+  { word: "house", href: "https://sae-anewgam.vercel.app" },
+  { word: "repo", href: "https://github.com/stevoblevo/sae-anewgam/tree/sae/bpeace-20260927" },
+] as const;
+
 const SWIPE = 64;
+
+function dab(canvas: HTMLCanvasElement, x: number, y: number, ink: string, brush: Brush) {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  ctx.globalCompositeOperation = "source-over";
+  if (brush === "lift") {
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.globalAlpha = 0.22;
+    ctx.fillStyle = "#000";
+    ctx.beginPath();
+    ctx.ellipse(x, y, 26, 16, 0, 0, Math.PI * 2);
+    ctx.fill();
+    return;
+  }
+  if (brush === "bloom") {
+    const glow = ctx.createRadialGradient(x, y, 1, x, y, 42);
+    glow.addColorStop(0, ink);
+    glow.addColorStop(0.45, ink);
+    glow.addColorStop(1, "transparent");
+    ctx.globalAlpha = 0.4;
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(x, y, 42, 0, Math.PI * 2);
+    ctx.fill();
+    return;
+  }
+  if (brush === "dry") {
+    ctx.globalAlpha = 0.62;
+    ctx.fillStyle = ink;
+    for (let i = 0; i < 4; i += 1) ctx.fillRect(x + (i - 2) * 5, y + (i % 2) * 3, 1.6, 8);
+    return;
+  }
+  if (brush === "glaze") {
+    ctx.globalAlpha = 0.1;
+    ctx.fillStyle = ink;
+    ctx.beginPath();
+    ctx.ellipse(x, y, 48, 28, 0, 0, Math.PI * 2);
+    ctx.fill();
+    return;
+  }
+  ctx.globalAlpha = 0.3;
+  ctx.fillStyle = ink;
+  ctx.beginPath();
+  ctx.arc(x, y, 20, 0, Math.PI * 2);
+  ctx.fill();
+}
 
 function receiptKey(reel: ReelId) {
   if (reel === "friend") return "sae-receipt-friend";
@@ -73,11 +130,16 @@ export function Immerse({
   const [lit, setLit] = useState(false);
   const [gone, setGone] = useState(false);
   const [form, setForm] = useState<FormId>("daylight");
+  const [pulp, setPulp] = useState(false);
+  const [ink, setInk] = useState<(typeof INKS)[number]>("#e07a5f");
+  const [brush, setBrush] = useState<Brush>("wet");
   const [pick, setPick] = useState(false);
   const [play, setPlay] = useState<string | null>(null);
   const [said, setSaid] = useState<string | null>(null);
   const [crew, setCrew] = useState<CrewLook | null>(null);
   const [pup, setPup] = useState(false);
+  const paintRef = useRef<HTMLCanvasElement>(null);
+  const painting = useRef(false);
   const song = useRef<HTMLAudioElement | null>(null);
   const [fold, setFold] = useState(tell);
   const [trail, setTrail] = useState<number[]>(() => readReceipt(start));
@@ -202,6 +264,32 @@ export function Immerse({
   }, []);
 
   useEffect(() => {
+    if (form === "daylight") {
+      setBare(true);
+      setGate("land");
+      return;
+    }
+    setBare(false);
+    setOpen(true);
+    if (form === "laptop43") setGate("four");
+    else if (form === "android") setGate("port");
+    else setGate("land");
+    if (form === "high" || form === "vr") setBoth(true);
+  }, [form]);
+
+  useEffect(() => {
+    noteHeat({ x: 0.5, y: 0.5, what: `plate:${frame.id}`, form });
+  }, [frame.id, form]);
+
+  useEffect(() => {
+    const canvas = paintRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = Math.max(2, Math.floor(rect.width));
+    canvas.height = Math.max(2, Math.floor(rect.height));
+  }, [pulp, form, gate]);
+
+  useEffect(() => {
     const root = potato.current;
     if (!root) return;
     const slices = [...root.querySelectorAll<HTMLElement>(".slice")];
@@ -277,9 +365,21 @@ export function Immerse({
 
   return (
     <section
-      className={`immerse gate-${gate}${bare ? " bare" : ""}${open ? " open" : ""}${lit ? " lit" : ""}${gone ? " gone" : ""}${fold ? " telling" : ""}`}
+      className={`immerse gate-${gate}${bare ? " bare" : ""}${open ? " open" : ""}${lit ? " lit" : ""}${gone ? " gone" : ""}${fold ? " telling" : ""}${pulp ? " pulp" : ""}`}
       data-cast={frame.id}
       data-reel={reel}
+      onPointerUp={(event) => {
+        if (drag.current.moved) return;
+        const host = event.currentTarget.getBoundingClientRect();
+        const hit = event.target as HTMLElement;
+        const what = hit.closest("[data-heat]")?.getAttribute("data-heat") || hit.getAttribute("aria-label") || "picture";
+        noteHeat({
+          x: +((event.clientX - host.left) / host.width).toFixed(3),
+          y: +((event.clientY - host.top) / host.height).toFixed(3),
+          what,
+          form,
+        });
+      }}
       style={{ ["--zoom" as string]: zoom }}
     >
       <header className="player-chrome fold-chrome still-nav">
@@ -296,7 +396,7 @@ export function Immerse({
           <span>light</span>
         </button>
         <button type="button" className={pick ? "mark on" : "mark"} onClick={() => setPick((on) => !on)}>
-          <span>form</span>
+          <span>{form === "daylight" ? "form" : FORMS.find((item) => item.id === form)?.name}</span>
         </button>
         {pick ? (
           <div className="form-pick">
@@ -307,8 +407,18 @@ export function Immerse({
             ))}
           </div>
         ) : null}
-        <button type="button" className={fold ? "mark on" : "mark"} onClick={() => setFold((on) => !on)}>
+        <button
+          type="button"
+          className={fold ? "mark on" : "mark"}
+          onClick={() => {
+            setFold((on) => !on);
+            if (!fold && form === "daylight") setPulp(true);
+          }}
+        >
           <span>story</span>
+        </button>
+        <button type="button" className={pulp ? "mark on" : "mark"} data-heat="pulp" onClick={() => setPulp((on) => !on)}>
+          <span>pulp</span>
         </button>
         <button type="button" className={reel === "show" ? "mark on" : "mark"} onClick={() => enter("show")}>
           <span>show</span>
@@ -479,7 +589,14 @@ export function Immerse({
           ) : null}
           {fold ? (
             <aside className="story-fold">
-              <p>{reel === "friend" ? FRIEND_LINE : reel === "show" ? "Held for her. Then the show." : reel === "peach" ? "Peach, and who stays beside her." : "A kinder way."}</p>
+              <p>{fold && form === "daylight" ? "Inspire the water. Aspire the color. It is hers." : reel === "friend" ? FRIEND_LINE : reel === "show" ? "Held for her. Then the show." : reel === "peach" ? "Peach, and who stays beside her." : "A kinder way."}</p>
+              <nav className="own">
+                {OWN.map((link) => (
+                  <a key={link.word} href={link.href} data-heat={link.word}>
+                    {link.word}
+                  </a>
+                ))}
+              </nav>
               {film.map((beat, n) => {
                 const words = sliceCopy(beat);
                 return (
@@ -580,7 +697,52 @@ export function Immerse({
           />
         ))}
       </div>
-      <button type="button" className={bare ? "peach-fold" : "peach-fold on"} onClick={() => setBare((on) => !on)} aria-label={bare ? "open" : "fold"} />
+      {pulp && form === "daylight" ? (
+        <>
+          <canvas
+            ref={paintRef}
+            className="wash"
+            data-heat="paint"
+            onPointerDown={(event) => {
+              painting.current = true;
+              const canvas = event.currentTarget;
+              const rect = canvas.getBoundingClientRect();
+              dab(canvas, ((event.clientX - rect.left) / rect.width) * canvas.width, ((event.clientY - rect.top) / rect.height) * canvas.height, ink, brush);
+              canvas.setPointerCapture(event.pointerId);
+            }}
+            onPointerMove={(event) => {
+              if (!painting.current) return;
+              const canvas = event.currentTarget;
+              const rect = canvas.getBoundingClientRect();
+              dab(canvas, ((event.clientX - rect.left) / rect.width) * canvas.width, ((event.clientY - rect.top) / rect.height) * canvas.height, ink, brush);
+            }}
+            onPointerUp={() => {
+              painting.current = false;
+            }}
+          />
+          <div className="inks">
+            {INKS.map((color) => (
+              <button key={color} type="button" data-heat="ink" className={ink === color ? "on" : ""} style={{ background: color }} onClick={() => setInk(color)} aria-label="color" />
+            ))}
+            <button
+              type="button"
+              data-heat="clear"
+              onClick={() => paintRef.current?.getContext("2d")?.clearRect(0, 0, paintRef.current.width, paintRef.current.height)}
+              aria-label="water"
+            />
+          </div>
+          {fold ? (
+            <div className="brushes">
+              {BRUSHES.map((name) => (
+                <button key={name} type="button" data-heat={name} className={brush === name ? "on" : ""} onClick={() => setBrush(name)}>
+                  {name}
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </>
+      ) : null}
+      <button type="button" className={bare ? "peach-fold" : "peach-fold on"} data-heat="fold" onClick={() => setBare((on) => !on)} aria-label={bare ? "open" : "fold"} />
     </section>
   );
 }

@@ -1328,3 +1328,151 @@ html[data-form="netbook"] .slice .face {
   left: 18px;
   bottom: 18px;
 }
+
+.heat-bed {
+  position: absolute;
+  z-index: 8;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 5px;
+  max-width: min(92vw, 720px);
+  overflow: auto;
+  padding: 4px;
+}
+
+.heat-bed button {
+  flex: none;
+  width: 18px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: color-mix(in srgb, #241816 calc((1 - var(--heat, 0)) * 100%), #f3b183 calc(var(--heat, 0) * 100%));
+}
+
+.heat-bed button.on {
+  outline: 1px solid #f6efe8;
+  outline-offset: 2px;
+}
+
+.heat-bed button.door {
+  width: 28px;
+}
+
+.immerse.bare .heat-bed {
+  display: none;
+}
+
+html[data-form="netbook"] .heat-bed button,
+html[data-form="pi"] .heat-bed button {
+  width: 12px;
+  height: 32px;
+}
+
+html[data-form="tablet"] .heat-bed button,
+html[data-form="vr"] .heat-bed button {
+  width: 26px;
+  height: 56px;
+}
+
+html[data-form="high"] .heat-bed button.on {
+  box-shadow: 0 0 14px #f3b183;
+}
+
+html[data-form="chromebook"] .heat-bed button:focus-visible {
+  outline: 2px solid #e7c27a;
+}
+
+.immerse.pulp .slice .face,
+.immerse.pulp .slice .over,
+.immerse.pulp .slice .under,
+.immerse.pulp > .frame {
+  filter: grayscale(1) contrast(1.28);
+}
+
+html[data-form="daylight"] .immerse.pulp .slice .face,
+html[data-form="daylight"] .immerse.pulp > .frame {
+  filter: grayscale(0.35) saturate(0.85) contrast(1.04);
+}
+
+.wash {
+  position: absolute;
+  z-index: 7;
+  left: 50%;
+  top: 44%;
+  width: min(92vw, calc(78dvh * 16 / 10));
+  height: min(78dvh, calc(92vw * 10 / 16));
+  transform: translate(-50%, -50%);
+  touch-action: none;
+  background: transparent;
+}
+
+.inks {
+  position: absolute;
+  z-index: 9;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.inks button {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 2px solid rgb(246 239 232 / 0.8);
+  border-radius: 50%;
+  background: #f6efe8;
+}
+
+.inks button.on {
+  outline: 2px solid #f6efe8;
+  outline-offset: 2px;
+}
+
+.brushes {
+  position: absolute;
+  z-index: 9;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  max-width: 92vw;
+}
+
+.brushes button {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(246 239 232 / 0.92);
+  color: #3a2a28;
+  font: 15px/1 "Iowan Old Style", Palatino, serif;
+}
+
+.brushes button.on {
+  background: #f3b183;
+}
+
+.own {
+  display: flex;
+  gap: 8px;
+  padding: 0 10px 8px;
+}
+
+.own a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #f3d4c2;
+  color: #2a1814;
+  text-decoration: none;
+  font: 15px/1 "Iowan Old Style", Palatino, serif;
+}
