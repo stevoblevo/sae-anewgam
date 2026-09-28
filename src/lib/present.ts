@@ -24,7 +24,7 @@ export const PRESENT = [
 
 export const PRESENT_SRC = PRESENT.map((beat) => beat.src);
 
-export type ReelId = "present" | "friend";
+export type ReelId = "present" | "friend" | "peach";
 
 export type FriendSlice = {
   id: string;
@@ -141,6 +141,82 @@ export const FRIEND_FILM: readonly FriendSlice[] = [
 
 export const FRIEND_LINE = "The fawn looked back. That is how a we began.";
 
+/** Peach only. Existing stills. Words live on the fold, not on the picture. */
+export const PEACH_FILM: readonly FriendSlice[] = [
+  {
+    id: "walk",
+    src: "/peachfall-walk.jpg",
+    color: "#f3b183",
+    high: "/her-pink.jpg",
+    low: "/peachfall-on.jpg",
+    word: "walk",
+    line: "She looks down. They stay beside her.",
+    mark: "heart",
+  },
+  {
+    id: "pink",
+    src: "/her-pink.jpg",
+    color: "#f3c6c0",
+    high: "/anna.jpg",
+    low: "/peachfall-walk.jpg",
+    word: "pink",
+    line: "Pink is her.",
+    mark: "heart",
+  },
+  {
+    id: "together",
+    src: "/peachfall-all.jpg",
+    color: "#e7b7c8",
+    high: "/sisters-well.jpg",
+    low: "/peachfall-walk.jpg",
+    word: "together",
+    line: "Pink, red, and purple, together.",
+    mark: "circle",
+  },
+  {
+    id: "smile",
+    src: "/sisters-well.jpg",
+    color: "#f0c9b0",
+    high: "/blink-sister.jpg",
+    low: "/her-pink.jpg",
+    word: "smile",
+    line: "They smile. The well is ahead.",
+    mark: "feather",
+  },
+  {
+    id: "ring",
+    src: "/garden-ring.jpg",
+    color: "#f3d0b0",
+    high: "/love-arch.jpg",
+    low: "/garden-stare.jpg",
+    word: "ring",
+    line: "A ring of blossoms.",
+    mark: "circle",
+  },
+  {
+    id: "arch",
+    src: "/love-arch.jpg",
+    color: "#e8b898",
+    high: "/knight-beside.jpg",
+    low: "/garden-ring.jpg",
+    word: "arch",
+    line: "Love in the arch.",
+    mark: "door",
+  },
+  {
+    id: "beside",
+    src: "/knight-beside.jpg",
+    color: "#c4a07a",
+    high: "/glow.jpg",
+    low: "/love-arch.jpg",
+    word: "beside",
+    line: "Love stays beside.",
+    mark: "feather",
+  },
+];
+
 export function filmFor(reel: ReelId) {
-  return reel === "friend" ? FRIEND_FILM : PRESENT;
+  if (reel === "friend") return FRIEND_FILM;
+  if (reel === "peach") return PEACH_FILM;
+  return PRESENT;
 }

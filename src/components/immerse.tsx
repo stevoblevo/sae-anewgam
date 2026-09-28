@@ -15,7 +15,9 @@ const CLOSER = 1.12;
 const SWIPE = 64;
 
 function receiptKey(reel: ReelId) {
-  return reel === "friend" ? "sae-receipt-friend" : "sae-receipt";
+  if (reel === "friend") return "sae-receipt-friend";
+  if (reel === "peach") return "sae-receipt-peach";
+  return "sae-receipt";
 }
 
 function readReceipt(reel: ReelId): number[] {
@@ -38,7 +40,7 @@ function sliceCopy(beat: { id: string; word?: string; line?: string; mark?: Peac
 
 export function Immerse({
   onWalk,
-  start = "present",
+  start = "peach",
   startAt = 0,
   tell = false,
 }: {
@@ -51,6 +53,7 @@ export function Immerse({
   const [at, setAt] = useState(startAt);
   const [open, setOpen] = useState(true);
   const [zoom, setZoom] = useState(CLOSER);
+  const [bare, setBare] = useState(true);
   const [gate, setGate] = useState<"land" | "port">("land");
   const [depth, setDepth] = useState<-1 | 0 | 1>(0);
   const [both, setBoth] = useState(false);
@@ -247,7 +250,7 @@ export function Immerse({
 
   return (
     <section
-      className={`immerse gate-${gate}${open ? " open" : ""}${lit ? " lit" : ""}${gone ? " gone" : ""}${fold ? " telling" : ""}`}
+      className={`immerse gate-${gate}${bare ? " bare" : ""}${open ? " open" : ""}${lit ? " lit" : ""}${gone ? " gone" : ""}${fold ? " telling" : ""}`}
       data-cast={frame.id}
       data-reel={reel}
       style={{ ["--zoom" as string]: zoom }}
@@ -277,10 +280,7 @@ export function Immerse({
             ))}
           </div>
         ) : null}
-        <button type="button" className={fold ? "mark on" : "mark"} onClick={() => {
-          if (reel !== "friend") enter("friend");
-          setFold((on) => (reel === "friend" ? !on : true));
-        }}>
+        <button type="button" className={fold ? "mark on" : "mark"} onClick={() => setFold((on) => !on)}>
           <span>story</span>
         </button>
         <Link to="/wall" className="mark">
@@ -291,7 +291,7 @@ export function Immerse({
           <span>glow</span>
         </Link>
         <span className="bench-read">
-          <b>{reel === "friend" ? "friend" : "dawn"}</b>
+          <b>{reel === "friend" ? "friend" : reel === "peach" ? "peach" : "dawn"}</b>
           <i>{String(at + 1).padStart(2, "0")}</i>
           <em>{copy.word}</em>
         </span>
@@ -429,7 +429,7 @@ export function Immerse({
           <p className="beat-line">{gone ? "She goes into the light." : reel === "friend" && at === 0 ? FRIEND_LINE : copy.line}</p>
           {fold ? (
             <aside className="story-fold">
-              <p>{reel === "friend" ? FRIEND_LINE : "A kinder way."}</p>
+              <p>{reel === "friend" ? FRIEND_LINE : reel === "peach" ? "Peach, and who stays beside her." : "A kinder way."}</p>
               {film.map((beat, n) => {
                 const words = sliceCopy(beat);
                 return (
@@ -478,6 +478,7 @@ export function Immerse({
           />
         ))}
       </div>
+      <button type="button" className={bare ? "peach-fold" : "peach-fold on"} onClick={() => setBare((on) => !on)} aria-label={bare ? "open" : "fold"} />
     </section>
   );
 }

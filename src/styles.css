@@ -1001,8 +1001,38 @@ html[data-form="netbook"] .slice .face {
   align-items: center;
 }
 
-.axis-marks,
-.all-mark,
-.play-mark {
+.immerse.bare {
+  background: #f3d4c2;
+}
+
+.immerse.bare .still-nav,
+.immerse.bare .hfilm,
+.immerse.bare .beat-line,
+.immerse.bare .pops,
+.immerse.bare .beads,
+.immerse.bare .receipt,
+.immerse.bare .story-fold {
   display: none;
+}
+
+.peach-fold {
+  position: absolute;
+  z-index: 9;
+  left: 18px;
+  bottom: 18px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #f3b183;
+  box-shadow: 0 10px 28px rgb(120 62 40 / 0.18);
+}
+
+.peach-fold.on {
+  background: #e7c27a;
+}
+
+.immerse {
+  background: #f3d4c2;
 }
