@@ -14,7 +14,16 @@ export const TIM = {
 } as const;
 
 export function parseTim(text: string) {
-  const next = { ...TIM, seconds: TIM.seconds, ms: TIM.ms };
+  const next: {
+    version: string;
+    seconds: number;
+    ms: number;
+    still: number;
+    side: number;
+    rise: number;
+    group: number;
+    pass: number;
+  } = { ...TIM };
   for (const raw of String(text || "").split(/\r?\n/)) {
     const line = raw.trim();
     if (!line || line.startsWith("#")) continue;

@@ -2558,6 +2558,8 @@ html[data-eye="in"] .follow {
 .occult .layers-leave {
   pointer-events: auto;
 }
+
+.occult {
   position: fixed;
   inset: 0;
   z-index: 30;
