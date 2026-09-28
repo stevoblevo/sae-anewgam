@@ -1,0 +1,90 @@
+name: Container lock repair proof
+on:
+  push:
+    branches: [sae/ci-container-repair-20260927]
+    paths: [.github/workflows/container-repair.yml]
+permissions:
+  contents: read
+concurrency:
+  group: container-lock-repair-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  repair:
+    if: github.repository == 'stevoblevo/sae-anewgam' && github.ref == 'refs/heads/sae/ci-container-repair-20260927'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    outputs:
+      sha: ${{ steps.commit.outputs.sha }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Reconcile the lock with the actual Docker build toolchain
+        run: |
+          set -euo pipefail
+          docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp \
+            -v "$PWD:/app" -w /app node:22-bookworm-slim \
+            sh -ec 'node --version; npm --version; npm install --package-lock-only --ignore-scripts --no-audit --no-fund; npm ci --dry-run --ignore-scripts --no-audit --no-fund'
+          git diff --exit-code -- package.json
+          git diff --stat -- package-lock.json
+      - name: Commit only the repaired lock to this exact repair branch
+        id: commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/sae/ci-container-repair-20260927
+          remote_sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/sae/ci-container-repair-20260927" --jq .object.sha)
+          test "$remote_sha" = "$GITHUB_SHA" || { echo 'Repair branch moved; refusing stale write'; exit 1; }
+          if git diff --quiet -- package-lock.json; then
+            echo "sha=$GITHUB_SHA" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          python3 - <<'PY'
+          import base64, json, os, pathlib, subprocess
+          changed = subprocess.check_output(['git', 'diff', '--name-only'], text=True).splitlines()
+          if changed != ['package-lock.json']:
+              raise SystemExit(f'Refusing unexpected tracked changes: {changed}')
+          payload = {
+              'message': 'fix: synchronize npm lockfile for Node 22 container installs',
+              'branch': 'sae/ci-container-repair-20260927',
+              'sha': subprocess.check_output(['git', 'rev-parse', 'HEAD:package-lock.json'], text=True).strip(),
+              'content': base64.b64encode(pathlib.Path('package-lock.json').read_bytes()).decode(),
+          }
+          pathlib.Path(os.environ['RUNNER_TEMP'], 'lock-update.json').write_text(json.dumps(payload))
+          PY
+          fixed_sha=$(gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/package-lock.json" \
+            --input "$RUNNER_TEMP/lock-update.json" --jq .commit.sha)
+          echo "sha=$fixed_sha" >> "$GITHUB_OUTPUT"
+          echo "Repaired lock commit: $fixed_sha" >> "$GITHUB_STEP_SUMMARY"
+  proof:
+    needs: repair
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ needs.repair.outputs.sha }}
+          persist-credentials: false
+      - name: Build the actual Dockerfile without publishing
+        run: docker build --progress=plain --tag sae-anewgam:ci-repair .
+      - name: Smoke-test the production container on loopback only
+        run: |
+          set -euo pipefail
+          cid=$(docker run -d --name sae-ci-proof -p 127.0.0.1:4180:4180 sae-anewgam:ci-repair)
+          trap 'docker logs "$cid"; docker rm -f "$cid" >/dev/null' EXIT
+          ok=false
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --show-error --max-time 3 http://127.0.0.1:4180/ > /tmp/sae-home.html; then
+              ok=true
+              break
+            fi
+            sleep 2
+          done
+          test "$ok" = true
+          grep -qi '<html' /tmp/sae-home.html
+          echo "Container build and loopback root HTTP smoke passed for ${{ needs.repair.outputs.sha }}. No image published; no production promotion." >> "$GITHUB_STEP_SUMMARY"
