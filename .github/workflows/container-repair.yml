@@ -1,0 +1,39 @@
+# The one-time lock reconciliation is complete. This workflow never writes
+# repository contents, publishes an image, or receives deployment secrets.
+name: Container install build smoke
+on:
+  pull_request:
+  push:
+    branches: [main, sae/ci-container-repair-20260927]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: container-proof-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Build the real Dockerfile with its frozen npm ci install
+        run: docker build --progress=plain --tag sae-anewgam:ci-proof .
+      - name: Smoke-test the production container on loopback only
+        run: |
+          set -euo pipefail
+          cid=$(docker run -d --name sae-ci-proof -p 127.0.0.1:4180:4180 sae-anewgam:ci-proof)
+          trap 'docker logs "$cid"; docker rm -f "$cid" >/dev/null' EXIT
+          ok=false
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --show-error --max-time 3 http://127.0.0.1:4180/ > /tmp/sae-home.html; then
+              ok=true
+              break
+            fi
+            sleep 2
+          done
+          test "$ok" = true
+          grep -qi '<html' /tmp/sae-home.html
+          echo "Frozen install, production container build, and root HTTP smoke passed for $GITHUB_SHA. No image published by this job." >> "$GITHUB_STEP_SUMMARY"
