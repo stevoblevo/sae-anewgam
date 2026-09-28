@@ -2667,3 +2667,55 @@ html[data-eye="in"] .follow {
   right: 16px;
   z-index: 8;
 }
+
+.dev-door {
+  position: fixed;
+  inset: 0;
+  background: #161018;
+  touch-action: none;
+}
+
+.dev-plate {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+}
+
+.dev-tag {
+  position: fixed;
+  top: 18px;
+  left: 16px;
+  z-index: 8;
+  margin: 0;
+  color: #f6efe8;
+  font-family: var(--font-serif);
+  letter-spacing: 0.16em;
+  font-size: 15px;
+  text-shadow: 0 2px 12px #140e10;
+}
+
+.dev-line {
+  position: fixed;
+  left: 20px;
+  right: 20px;
+  bottom: 78px;
+  z-index: 8;
+  margin: 0;
+  text-align: center;
+  color: #fff8f2;
+  font-family: var(--font-serif);
+  font-size: 1.45rem;
+  line-height: 1.35;
+  text-shadow: 0 2px 18px #140e10;
+  pointer-events: none;
+}
+
+.dev-marks button {
+  min-width: 44px;
+  min-height: 44px;
+  justify-content: center;
+}
