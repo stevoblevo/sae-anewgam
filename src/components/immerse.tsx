@@ -50,7 +50,7 @@ function sliceCopy(beat: { id: string; word?: string; line?: string; mark?: Peac
 
 export function Immerse({
   onWalk,
-  start = "peach",
+  start = "present",
   startAt = 0,
   tell = false,
 }: {
@@ -64,7 +64,7 @@ export function Immerse({
   const [open, setOpen] = useState(true);
   const [zoom, setZoom] = useState(CLOSER);
   const [bare, setBare] = useState(true);
-  const [gate, setGate] = useState<"land" | "port">("land");
+  const [gate, setGate] = useState<"land" | "four" | "port">("land");
   const [depth, setDepth] = useState<-1 | 0 | 1>(0);
   const [both, setBoth] = useState(false);
   const [ways, setWays] = useState(false);
@@ -75,6 +75,7 @@ export function Immerse({
   const [play, setPlay] = useState<string | null>(null);
   const [said, setSaid] = useState<string | null>(null);
   const [crew, setCrew] = useState<CrewLook | null>(null);
+  const [pup, setPup] = useState(false);
   const song = useRef<HTMLAudioElement | null>(null);
   const [fold, setFold] = useState(tell);
   const [trail, setTrail] = useState<number[]>(() => readReceipt(start));
@@ -90,6 +91,11 @@ export function Immerse({
   const film = filmFor(reel);
   const frame = film[at] ?? film[0];
   const copy = sliceCopy(frame);
+  if (typeof document !== "undefined") document.documentElement.dataset.bare = bare ? "1" : "0";
+
+  useEffect(() => {
+    document.documentElement.dataset.bare = bare ? "1" : "0";
+  }, [bare]);
 
   useEffect(() => {
     if (frame.id !== "party") {
@@ -326,8 +332,12 @@ export function Immerse({
         <button type="button" className={open ? "mark on" : "mark"} onClick={() => setOpen((on) => !on)}>
           <span>all</span>
         </button>
-        <button type="button" className={gate === "port" ? "mark on" : "mark"} onClick={() => setGate((now) => (now === "land" ? "port" : "land"))}>
-          <span>{gate === "land" ? "16:10" : "10:16"}</span>
+        <button
+          type="button"
+          className={gate !== "land" ? "mark on" : "mark"}
+          onClick={() => setGate((now) => (now === "land" ? "four" : now === "four" ? "port" : "land"))}
+        >
+          <span>{gate === "land" ? "16:10" : gate === "four" ? "4:3" : "10:16"}</span>
         </button>
         {"motion" in frame && frame.motion ? (
           <button type="button" className={play === frame.id ? "mark on" : "mark"} onClick={() => setPlay((now) => (now === frame.id ? null : frame.id))}>
@@ -464,6 +474,18 @@ export function Immerse({
                 );
               })}
             </aside>
+          ) : null}
+          {reel === "present" ? (
+            <div className="pups">
+              <button type="button" className={pup ? "on" : ""} onClick={() => setPup((on) => !on)} aria-label="behind">
+                <img src="/pup-avatar.jpg" alt="" />
+              </button>
+              {pup ? (
+                <figure>
+                  <img src="/pup-haze.jpg" alt="" />
+                </figure>
+              ) : null}
+            </div>
           ) : null}
           {reel === "show" && frame.id === "party" ? (
             <div className="crew">
