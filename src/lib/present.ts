@@ -275,6 +275,16 @@ export const SHOW_FILM: readonly FriendSlice[] = [
     mark: "spark",
   },
   {
+    id: "party",
+    src: "/show-party.jpg",
+    color: "#e7b7a8",
+    high: "/show-golden.jpg",
+    low: "/portrait/rain.jpg",
+    word: "party",
+    line: "Spekl at the party. Behind the scenes. Not a portrait.",
+    mark: "heart",
+  },
+  {
     id: "ball",
     src: "/portrait/peach.jpg",
     color: "#f3b183",

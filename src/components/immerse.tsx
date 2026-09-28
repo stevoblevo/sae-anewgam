@@ -12,6 +12,15 @@ const POPS = [
 ] as const;
 
 const CLOSER = 1.12;
+const CREW = [
+  { id: "spekl", src: "/show-speckle.jpg", dress: "/show-party.jpg", line: "this dress", sing: "" },
+  { id: "golden", src: "/show-golden.jpg", dress: "/show-golden.jpg", line: "the silk", sing: "" },
+  { id: "reign", src: "/portrait/rain.jpg", dress: "/portrait/rain.jpg", line: "red reign", sing: "/audio/scenes/raindear.mp3" },
+  { id: "ball", src: "/portrait/peach.jpg", dress: "/portrait/peach.jpg", line: "peach ball", sing: "/audio/scenes/bambi.mp3" },
+] as const;
+
+type CrewLook = { id: (typeof CREW)[number]["id"]; mode: "dress" | "dance" | "sing" };
+
 const SWIPE = 64;
 
 function receiptKey(reel: ReelId) {
@@ -65,6 +74,8 @@ export function Immerse({
   const [pick, setPick] = useState(false);
   const [play, setPlay] = useState<string | null>(null);
   const [said, setSaid] = useState<string | null>(null);
+  const [crew, setCrew] = useState<CrewLook | null>(null);
+  const song = useRef<HTMLAudioElement | null>(null);
   const [fold, setFold] = useState(tell);
   const [trail, setTrail] = useState<number[]>(() => readReceipt(start));
   const rose = useRef(false);
@@ -79,6 +90,13 @@ export function Immerse({
   const film = filmFor(reel);
   const frame = film[at] ?? film[0];
   const copy = sliceCopy(frame);
+
+  useEffect(() => {
+    if (frame.id !== "party") {
+      setCrew(null);
+      song.current?.pause();
+    }
+  }, [frame.id]);
   const lean = form === "pi" || form === "netbook";
   const navigate = useNavigate();
 
@@ -446,6 +464,46 @@ export function Immerse({
                 );
               })}
             </aside>
+          ) : null}
+          {reel === "show" && frame.id === "party" ? (
+            <div className="crew">
+              {CREW.map((one) => {
+                const on = crew?.id === one.id;
+                return (
+                  <button
+                    key={one.id}
+                    type="button"
+                    className={on ? `said ${crew.mode}` : ""}
+                    onClick={() => {
+                      setCrew((now) => {
+                        if (now?.id !== one.id) return { id: one.id, mode: "dress" };
+                        if (now.mode === "dress") return { id: one.id, mode: "dance" };
+                        if (one.sing && now.mode === "dance") {
+                          song.current?.pause();
+                          const audio = new Audio(one.sing);
+                          song.current = audio;
+                          audio.play().catch(() => undefined);
+                          return { id: one.id, mode: "sing" };
+                        }
+                        song.current?.pause();
+                        return null;
+                      });
+                    }}
+                  >
+                    <img src={one.src} alt="" />
+                    {on ? <span>{crew.mode === "sing" ? "sing" : one.line}</span> : null}
+                  </button>
+                );
+              })}
+              {crew ? (
+                <figure className={crew.mode}>
+                  <img src={CREW.find((one) => one.id === crew.id)?.dress} alt="" />
+                </figure>
+              ) : null}
+              <button type="button" className="making" onClick={() => setSaid((now) => (now === "making" ? null : "making"))}>
+                {said === "making" ? "Spekl at the party. Not a portrait." : "making"}
+              </button>
+            </div>
           ) : null}
           <div className="pops">
             {POPS.map((bubble) => (
