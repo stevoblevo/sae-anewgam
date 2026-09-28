@@ -1,0 +1,40 @@
+{
+  "v": "posts/0.1",
+  "from": "Stevoblevo",
+  "allow": "public",
+  "talk": true,
+  "display": "chart-bubble",
+  "sieve": ["family", "private-polylite", "kids-mod"],
+  "authorityEffect": "none",
+  "posts": [
+    {
+      "id": "2103955067225116907",
+      "room": "peach",
+      "line": "a tale about time and friendship",
+      "href": "https://x.com/Stevoblevo/status/2103955067225116907",
+      "plate": "peachfall"
+    },
+    {
+      "id": "2101586645493399994",
+      "room": "reign",
+      "line": "peachfall leads to red reign",
+      "href": "https://x.com/Stevoblevo/status/2101586645493399994",
+      "plate": "weather"
+    },
+    {
+      "id": "2099365811706048682",
+      "room": "kk",
+      "line": "breakfast beskar. Dora soul. skein doll.",
+      "href": "https://x.com/Stevoblevo/status/2099365811706048682",
+      "plate": "loom"
+    },
+    {
+      "id": "2099285425126822077",
+      "room": "polylite",
+      "line": "image comms. hold for Steven.",
+      "href": "https://x.com/Stevoblevo/status/2099285425126822077",
+      "plate": "loom",
+      "live": false
+    }
+  ]
+}
