@@ -75,10 +75,18 @@ export function Glue() {
   const [flash, setFlash] = useState(0);
   const [awake, setAwake] = useState(0);
   const [places, setPlaces] = useState<Record<string, { x: number; y: number }>>({});
+  const [width, setWidth] = useState(SERVER_WIDTH);
   const [threads, setThreads] = useState<Thread[]>([]);
   const [tune, setTune] = useState<Record<string, number>>({});
   const [onLayers, setOnLayers] = useState(false);
   const last = useRef(0);
+
+  useEffect(() => {
+    const fit = () => setWidth(window.innerWidth || SERVER_WIDTH);
+    fit();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, []);
 
   useEffect(() => {
     const look = () => setOnLayers(document.documentElement.dataset.layers === "1" || location.pathname.includes("/layers"));
@@ -172,8 +180,9 @@ export function Glue() {
       </div>
         {FOLLOW.map((item, n) => {
           const frame = item.frames[tune[item.id] ?? 0] ?? item.frames[0];
-          const width = typeof window === "undefined" ? SERVER_WIDTH : window.innerWidth;
-          const place = onLayers ? { x: width - 62, y: 68 + n * 56 } : (places[item.id] ?? defaultSpot(n, width));
+          const place = onLayers
+            ? { x: width - 62, y: 68 + n * 56 }
+            : (places[item.id] ?? defaultSpot(n, SERVER_WIDTH));
           return (
             <Link
               key={item.id}
