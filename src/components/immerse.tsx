@@ -43,18 +43,20 @@ function readReceipt(reel: ReelId): number[] {
 function sliceCopy(beat: { id: string; word?: string; line?: string; mark?: PeaceMark }) {
   return {
     word: beat.word || peaceWord(beat.id),
-    line: beat.line || peaceLine(beat.id),
+    line: beat.id === "pane" ? "" : beat.line || peaceLine(beat.id),
     mark: (beat.mark || peaceMark(beat.id)) as PeaceMark,
   };
 }
 
 export function Immerse({
   onWalk,
+  onRestart,
   start = "present",
   startAt = 0,
   tell = false,
 }: {
   onWalk: () => void;
+  onRestart?: () => void;
   start?: ReelId;
   startAt?: number;
   tell?: boolean;
@@ -366,6 +368,12 @@ export function Immerse({
             <Link to="/layers" search={{ img: "/peachfall-walk.jpg" }}><img src="/love-arch.jpg" alt="" /><span>layers</span></Link>
             <Link to="/walk"><img src="/peachfall-on.jpg" alt="" /><span>walk</span></Link>
             <Link to="/in/gam"><img src="/knight-beside.jpg" alt="" /><span>play</span></Link>
+            {onRestart ? (
+              <button type="button" onClick={onRestart}>
+                <img src="/scene-sun.jpg" alt="" />
+                <span>restart</span>
+              </button>
+            ) : null}
           </div>
         ) : null}
       </header>
@@ -463,7 +471,11 @@ export function Immerse({
               );
             })}
           </nav>
-          <p key={`${reel}-${frame.id}`} className="unveil">{copy.line}</p>
+          {copy.line ? (
+            <p key={`${reel}-${frame.id}`} className="unveil">
+              {copy.line}
+            </p>
+          ) : null}
           {fold ? (
             <aside className="story-fold">
               <p>{reel === "friend" ? FRIEND_LINE : reel === "show" ? "Held for her. Then the show." : reel === "peach" ? "Peach, and who stays beside her." : "A kinder way."}</p>
