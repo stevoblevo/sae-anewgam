@@ -345,37 +345,27 @@ export function Immerse({
           </button>
         ) : null}
         {ways ? (
-          <div className="way-pics">
-            <button type="button" onClick={() => enter("present")}>
-              <img src="/sae-do.jpg" alt="" />
-            </button>
-            <button type="button" onClick={onWalk}>
-              <img src="/peachfall-walk.jpg" alt="" />
-            </button>
-            <Link to="/fallen">
-              <img src="/everdelve.jpg" alt="" />
-            </Link>
-            <Link to="/her">
-              <img src="/her-pink.jpg" alt="" />
-            </Link>
-            <Link to="/knight">
-              <img src="/knight-beside.jpg" alt="" />
-            </Link>
-            <Link to="/fight">
-              <img src="/pillow-fight.jpg" alt="" />
-            </Link>
-            <Link to="/leaf">
-              <img src="/leaf-path.jpg" alt="" />
-            </Link>
-            <Link to="/marks">
-              <img src="/garden-ring.jpg" alt="" />
-            </Link>
-            <button type="button" onClick={() => enter("friend")} aria-label="farther well">
-              <img src="/farther-well.jpg" alt="" />
-            </button>
-            <Link to="/layers" search={{ img: "/peachfall-walk.jpg" }}>
-              <img src="/love-arch.jpg" alt="" />
-            </Link>
+          <div className="way-pics discover">
+            <button type="button" onClick={() => enter("present")}><img src="/sae-do.jpg" alt="" /><span>present</span></button>
+            <button type="button" onClick={() => enter("peach")}><img src="/peachfall-walk.jpg" alt="" /><span>peach</span></button>
+            <button type="button" onClick={() => enter("friend")}><img src="/farther-well.jpg" alt="" /><span>friend</span></button>
+            <button type="button" onClick={() => enter("show")}><img src="/show-party.jpg" alt="" /><span>show</span></button>
+            <Link to="/wall"><img src="/garden-ring.jpg" alt="" /><span>wall</span></Link>
+            <Link to="/story" search={{ at: 0 }}><img src="/leaf-deer.jpg" alt="" /><span>story</span></Link>
+            <Link to="/ball" search={{ stay: 1 }}><img src="/portrait/peach.jpg" alt="" /><span>ball</span></Link>
+            <Link to="/goal"><img src="/glow.jpg" alt="" /><span>glow</span></Link>
+            <Link to="/her"><img src="/her-pink.jpg" alt="" /><span>her</span></Link>
+            <Link to="/knight"><img src="/knight-beside.jpg" alt="" /><span>knight</span></Link>
+            <Link to="/fight"><img src="/pillow-fight.jpg" alt="" /><span>fight</span></Link>
+            <Link to="/leaf"><img src="/leaf-path.jpg" alt="" /><span>leaf</span></Link>
+            <Link to="/marks"><img src="/mark-leaf.jpg" alt="" /><span>marks</span></Link>
+            <Link to="/fallen"><img src="/everdelve.jpg" alt="" /><span>delve</span></Link>
+            <Link to="/farther"><img src="/depth-well.jpg" alt="" /><span>farther</span></Link>
+            <Link to="/tale"><img src="/porch.jpg" alt="" /><span>tale</span></Link>
+            <Link to="/ci"><img src="/sky-ski.jpg" alt="" /><span>sky</span></Link>
+            <Link to="/layers" search={{ img: "/peachfall-walk.jpg" }}><img src="/love-arch.jpg" alt="" /><span>layers</span></Link>
+            <Link to="/walk"><img src="/peachfall-on.jpg" alt="" /><span>walk</span></Link>
+            <Link to="/in/gam"><img src="/knight-beside.jpg" alt="" /><span>play</span></Link>
           </div>
         ) : null}
       </header>
@@ -459,7 +449,7 @@ export function Immerse({
               );
             })}
           </nav>
-          <p className="beat-line">{gone ? "She goes into the light." : reel === "friend" && at === 0 ? FRIEND_LINE : copy.line}</p>
+          <p key={`${reel}-${frame.id}`} className="unveil">{copy.line}</p>
           {fold ? (
             <aside className="story-fold">
               <p>{reel === "friend" ? FRIEND_LINE : reel === "show" ? "Held for her. Then the show." : reel === "peach" ? "Peach, and who stays beside her." : "A kinder way."}</p>

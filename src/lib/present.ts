@@ -20,6 +20,7 @@ export const PRESENT = [
   { id: "reign", src: "/reign-well.jpg", color: "#6e2a28", high: "/red-horizon.jpg", low: "/knight-beside.jpg" },
   { id: "knight", src: "/knight-beside.jpg", color: "#c4a07a", high: "/glow.jpg", low: "/reign-well.jpg" },
   { id: "glow", src: "/glow.jpg", color: "#f3d7a1", high: "/whole-sun.jpg", low: "/knight-beside.jpg" },
+  { id: "pane", src: "/scene-sun.jpg", color: "#f3e2b0", high: "/whole-sun.jpg", low: "/beauty-sun.jpg" },
 ] as const;
 
 export const PRESENT_SRC = PRESENT.map((beat) => beat.src);

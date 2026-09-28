@@ -1,8 +1,11 @@
+# Tower: docker compose up -d --build
+# The house listens on 4180.
 services:
   sae:
     build: .
     ports:
       - "4180:4180"
+    restart: unless-stopped
     environment:
       HOST: 0.0.0.0
       PORT: "4180"

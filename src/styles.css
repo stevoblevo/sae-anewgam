@@ -1194,3 +1194,56 @@ html[data-form="netbook"] .slice .face {
 .occult {
   display: none;
 }
+
+.unveil {
+  position: absolute;
+  z-index: 8;
+  left: 50%;
+  bottom: 7%;
+  transform: translateX(-50%);
+  margin: 0;
+  max-width: min(28rem, 86vw);
+  text-align: center;
+  color: #f7f1ea;
+  font: 22px/1.35 "Iowan Old Style", Palatino, serif;
+  letter-spacing: 0.03em;
+  text-shadow: 0 2px 16px rgb(18 10 8 / 0.55);
+  pointer-events: none;
+  animation: unveil 1.6s ease both;
+}
+
+@keyframes unveil {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to { opacity: 1; transform: translateX(-50%); }
+}
+
+.way-pics.discover {
+  flex-wrap: wrap;
+  max-height: min(46dvh, 420px);
+  width: min(100%, 640px);
+  padding: 8px;
+}
+
+.way-pics.discover a,
+.way-pics.discover button {
+  width: 96px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #f6efe8;
+  font: 13px/1.2 "Iowan Old Style", Palatino, serif;
+}
+
+.way-pics.discover img {
+  height: 54px;
+  border-radius: 8px;
+}
+
+.way-pics.discover span {
+  text-align: left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .unveil { animation: none; }
+}

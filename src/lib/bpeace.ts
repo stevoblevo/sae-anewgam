@@ -21,6 +21,7 @@ export const BPEACE = {
     { id: "reign", word: "reign", mark: "heart", line: "The red stays. Not a reign." },
     { id: "knight", word: "beside", mark: "feather", line: "He stays beside her." },
     { id: "glow", word: "glow", mark: "spark", line: "The last light is a door." },
+    { id: "pane", word: "sun", mark: "sun", line: "The whole sun. Nothing written on the light." },
   ],
   path: [
     { id: "door", word: "begin", mark: "door" },
