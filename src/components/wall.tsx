@@ -1,20 +1,21 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { WALL } from "@/lib/wall";
-import { FRIEND_FILM, PEACH_FILM, PRESENT } from "@/lib/present";
+import { FRIEND_FILM, PEACH_FILM, PRESENT, SHOW_FILM } from "@/lib/present";
 
 function nameOf(src: string) {
   const file = src.split("/").pop() ?? src;
   return file.replace(/\.[a-z0-9]+$/i, "").replaceAll("-", " ");
 }
 
-const SHELVES = ["peach", "friend", "dawn", "later", "all"] as const;
+const SHELVES = ["peach", "show", "friend", "dawn", "later", "all"] as const;
 type Shelf = (typeof SHELVES)[number];
 
 const LATER = ["/gen2.jpg", "/gen4.jpg", "/gen22.jpg", "/motion/gen2.mp4", "/motion/gen4.mp4", "/motion/gen22.mp4"];
 
 function piecesFor(shelf: Shelf) {
   if (shelf === "peach") return PEACH_FILM.map((beat) => beat.src);
+  if (shelf === "show") return SHOW_FILM.map((beat) => beat.src);
   if (shelf === "friend") return FRIEND_FILM.map((beat) => beat.src);
   if (shelf === "dawn") return PRESENT.map((beat) => beat.src);
   if (shelf === "later") return LATER;

@@ -24,7 +24,7 @@ export const PRESENT = [
 
 export const PRESENT_SRC = PRESENT.map((beat) => beat.src);
 
-export type ReelId = "present" | "friend" | "peach";
+export type ReelId = "present" | "friend" | "peach" | "show";
 
 export type FriendSlice = {
   id: string;
@@ -218,5 +218,70 @@ export const PEACH_FILM: readonly FriendSlice[] = [
 export function filmFor(reel: ReelId) {
   if (reel === "friend") return FRIEND_FILM;
   if (reel === "peach") return PEACH_FILM;
+  if (reel === "show") return SHOW_FILM;
   return PRESENT;
 }
+
+/** Held for her. Golden buns, sunshine, strawberry, the speckled tomboy, then peach ball. */
+export const SHOW_FILM: readonly FriendSlice[] = [
+  {
+    id: "hold",
+    src: "/her-pink.jpg",
+    color: "#f3c6c0",
+    high: "/peachfall-walk.jpg",
+    low: "/show-golden.jpg",
+    word: "her",
+    line: "Held for her. The show does not take her place.",
+    mark: "heart",
+  },
+  {
+    id: "golden",
+    src: "/show-golden.jpg",
+    color: "#e7c27a",
+    high: "/show-sunbun.jpg",
+    low: "/her-pink.jpg",
+    word: "golden",
+    line: "Golden buns. Sunshine on the silk.",
+    mark: "sun",
+  },
+  {
+    id: "sun",
+    src: "/show-sunbun.jpg",
+    color: "#f0d48a",
+    high: "/show-golden.jpg",
+    low: "/show-berry.jpg",
+    word: "bun",
+    line: "A small sunshine, sitting still.",
+    mark: "sun",
+  },
+  {
+    id: "berry",
+    src: "/show-berry.jpg",
+    color: "#e25b4a",
+    high: "/show-speckle.jpg",
+    low: "/show-sunbun.jpg",
+    word: "berry",
+    line: "Strawberry, and the peach light over the field.",
+    mark: "heart",
+  },
+  {
+    id: "tomboy",
+    src: "/show-speckle.jpg",
+    color: "#9ecfc4",
+    high: "/show-berry.jpg",
+    low: "/portrait/peach.jpg",
+    word: "speckle",
+    line: "Speckled tomboy. Cute, and ready to play.",
+    mark: "spark",
+  },
+  {
+    id: "ball",
+    src: "/portrait/peach.jpg",
+    color: "#f3b183",
+    high: "/show-speckle.jpg",
+    low: "/peachfall-walk.jpg",
+    word: "ball",
+    line: "Peach ball. Tap the picture.",
+    mark: "circle",
+  },
+];

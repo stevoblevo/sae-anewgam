@@ -17,6 +17,7 @@ const SWIPE = 64;
 function receiptKey(reel: ReelId) {
   if (reel === "friend") return "sae-receipt-friend";
   if (reel === "peach") return "sae-receipt-peach";
+  if (reel === "show") return "sae-receipt-show";
   return "sae-receipt";
 }
 
@@ -283,6 +284,9 @@ export function Immerse({
         <button type="button" className={fold ? "mark on" : "mark"} onClick={() => setFold((on) => !on)}>
           <span>story</span>
         </button>
+        <button type="button" className={reel === "show" ? "mark on" : "mark"} onClick={() => enter("show")}>
+          <span>show</span>
+        </button>
         <Link to="/wall" className="mark">
           <span>wall</span>
         </Link>
@@ -291,7 +295,7 @@ export function Immerse({
           <span>glow</span>
         </Link>
         <span className="bench-read">
-          <b>{reel === "friend" ? "friend" : reel === "peach" ? "peach" : "dawn"}</b>
+          <b>{reel === "friend" ? "friend" : reel === "peach" ? "peach" : reel === "show" ? "show" : "dawn"}</b>
           <i>{String(at + 1).padStart(2, "0")}</i>
           <em>{copy.word}</em>
         </span>
@@ -380,6 +384,7 @@ export function Immerse({
               if (!slice) return;
               const beat = film[Number(slice.getAttribute("data-i"))];
               if (reel === "present" && beat?.id === "glow") navigate({ to: "/goal" });
+              if (reel === "show" && beat?.id === "ball") navigate({ to: "/ball", search: { stay: 1 } });
             }}
             onWheel={(event) => {
               if (!event.ctrlKey && !event.metaKey) return;
@@ -429,7 +434,7 @@ export function Immerse({
           <p className="beat-line">{gone ? "She goes into the light." : reel === "friend" && at === 0 ? FRIEND_LINE : copy.line}</p>
           {fold ? (
             <aside className="story-fold">
-              <p>{reel === "friend" ? FRIEND_LINE : reel === "peach" ? "Peach, and who stays beside her." : "A kinder way."}</p>
+              <p>{reel === "friend" ? FRIEND_LINE : reel === "show" ? "Held for her. Then the show." : reel === "peach" ? "Peach, and who stays beside her." : "A kinder way."}</p>
               {film.map((beat, n) => {
                 const words = sliceCopy(beat);
                 return (
