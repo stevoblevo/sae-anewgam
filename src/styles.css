@@ -182,11 +182,6 @@
   100% { opacity: 0; }
 }
 
-.rail-slot {
-  color: transparent;
-  font-size: 0;
-}
-
 .way-marks {
   position: fixed;
   left: 16px;
@@ -849,6 +844,14 @@
 
 .rail-slot.on {
   color: var(--color-ink);
+}
+
+.rail-slot img {
+  width: 42px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex: 0 0 42px;
 }
 
 .rail-ring {

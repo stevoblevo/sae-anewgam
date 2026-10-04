@@ -530,19 +530,19 @@ export function Player() {
             {immersive ? "close" : "immerse"}
           </button>
           <Link to="/fallen" className="nav-link">
-            picture
+            picture · page
           </Link>
           <Link to="/her" className="nav-link">
-            her
+            her · page
           </Link>
           <Link to="/fight" className="nav-link">
-            fight
+            fight · page
           </Link>
           <Link to="/tale" className="nav-link">
-            words
+            words · page
           </Link>
           <Link to="/ball" search={{ stay: 1 }} className="nav-link">
-            ball
+            ball · page
           </Link>
           <button type="button" className="nav-link" onClick={askInstall}>
             install
@@ -564,8 +564,9 @@ export function Player() {
                 className={`rail-slot${n === i ? " on" : n < i ? " seen" : ""}`}
                 onClick={() => touch(p.id)}
               >
+                <img src={p.src} alt="" />
                 <div className="rail-ring" />
-                {p.id}
+                {p.title}
               </button>
             );
           })}
