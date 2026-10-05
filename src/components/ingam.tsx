@@ -25,7 +25,7 @@ export function InGam({ onWalk, onRite }: { onWalk: () => void; onRite: () => vo
 
   useEffect(() => {
     if (!playing) return;
-    const id = window.setInterval(() => setAt((n) => (n + 1) % IN.length), 4200);
+    const id = window.setInterval(() => setAt((n) => (n + 1) % IN.length), 5200);
     return () => window.clearInterval(id);
   }, [playing]);
 
@@ -35,7 +35,8 @@ export function InGam({ onWalk, onRite }: { onWalk: () => void; onRite: () => vo
   );
 
   return (
-    <div className="rite">
+    <div className="rite shine">
+      <style>{".rite.shine .player-chrome{opacity:0;transition:opacity .6s ease}.rite.shine:hover .player-chrome,.rite.shine:focus-within .player-chrome{opacity:1}.rite.shine .nav-link{min-width:44px;min-height:36px}.rite.shine .rite-marks{opacity:.7}.rite.shine .rite-marks button{box-shadow:0 0 12px rgba(255,220,180,.35)}"}</style>
       <img key={frame.src} src={frame.src} alt="" decoding="async" fetchPriority="high" />
       <header className="player-chrome">
         <button type="button" className="nav-link" onClick={onRite}>
