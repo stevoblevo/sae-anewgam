@@ -85,7 +85,7 @@ export function Night({ onDay }: { onDay: () => void }) {
       </div>
       <header className="player-chrome">
         <button type="button" className="nav-link" onClick={onDay}>
-          day
+          home
         </button>
         <p className="brand">seen</p>
         <div className="right">

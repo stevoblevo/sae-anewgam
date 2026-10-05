@@ -42,6 +42,7 @@
   #app {
     margin: 0;
     min-height: 100%;
+    overflow-x: clip;
     background: var(--color-cream);
     color: var(--color-ink);
     font-family: var(--font-serif);
@@ -3507,4 +3508,132 @@ html[data-eye="in"] .follow {
 }
 .back-led {
   backdrop-filter: blur(10px);
+}
+
+
+.immerse {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #061018;
+  color: #f5f0e8;
+}
+
+.immerse-world {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  animation: immerse-in 1.2s ease;
+}
+
+.immerse-world img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: immerse-breathe 18s ease-in-out infinite alternate;
+}
+
+.immerse-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgb(240 199 94 / 0.16), transparent 55%),
+    linear-gradient(180deg, rgb(6 16 24 / 0.12), transparent 30%, transparent 58%, rgb(6 16 24 / 0.78));
+}
+
+.immerse-line {
+  position: fixed;
+  left: 50%;
+  top: 16%;
+  z-index: 6;
+  margin: 0;
+  color: #f0c75e;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.15rem;
+  letter-spacing: 0.08em;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%);
+  transition: opacity 1.2s ease;
+}
+
+.immerse-line.on {
+  opacity: 1;
+}
+
+.immerse-signs {
+  position: fixed;
+  right: 0;
+  bottom: 22px;
+  left: 0;
+  z-index: 8;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 16px;
+}
+
+.immerse-signs button {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 200px;
+  min-height: 64px;
+  padding: 10px 14px;
+  border: 1px solid rgb(240 199 94 / 0.35);
+  border-radius: 14px;
+  background: rgb(6 16 24 / 0.5);
+  color: #f5f0e8;
+  font-family: Georgia, "Times New Roman", serif;
+  text-align: left;
+}
+
+.immerse-signs button.on {
+  border-color: #00e5ff;
+}
+
+.immerse-signs strong {
+  display: block;
+  color: #f0c75e;
+  font-weight: 500;
+}
+
+.immerse-signs span {
+  display: block;
+  margin-top: 2px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  opacity: 0.72;
+}
+
+.immerse-back {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 40;
+  border: 0;
+  background: transparent;
+  color: #f0c75e;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+}
+
+@keyframes immerse-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes immerse-breathe {
+  from { transform: scale(1); }
+  to { transform: scale(1.045); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .immerse-world,
+  .immerse-world img,
+  .immerse-line {
+    animation: none;
+    transition: none;
+  }
 }

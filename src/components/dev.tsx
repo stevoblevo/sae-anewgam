@@ -11,7 +11,7 @@ const STATIONS = [
   { id: "saelion", verb: "sync", line: "a little farther. the way home stays open.", src: "/beat06.jpg" },
 ] as const;
 
-export function Dev({ onAnne, onGarden }: { onAnne: () => void; onGarden: () => void }) {
+export function Dev({ onAnne, onGarden, onHome }: { onAnne: () => void; onGarden: () => void; onHome: () => void }) {
   const [at, setAt] = useState(0);
   const last = useRef(0);
   const station = STATIONS[at] ?? STATIONS[0];
@@ -44,7 +44,9 @@ export function Dev({ onAnne, onGarden }: { onAnne: () => void; onGarden: () => 
   return (
     <div className="dev-door" onPointerDown={onStage}>
       <img key={station.src} className="dev-plate" src={station.src} alt="" />
-      <p className="dev-tag">dev</p>
+      <button type="button" className="nav-link dev-tag" onClick={onHome}>
+        home
+      </button>
       <p className="dev-line">{station.line}</p>
       <nav className="anne-marks dev-marks" aria-label="course">
         {STATIONS.map((item, n) => (

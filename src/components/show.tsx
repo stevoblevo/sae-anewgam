@@ -136,8 +136,8 @@ export function Show({ onDoor }: { onDoor?: () => void }) {
         <section className="chapter night end" data-i={BEATS.length}>
           <div className="end-card">
             <p>Same world. Nothing left behind.</p>
-            <Link to="/reel">the reel</Link>
-            <Link to="/gg">what gg means</Link>
+            <Link to="/walk">the reel</Link>
+            <Link to="/tale">what gg means</Link>
             <button type="button" onClick={() => setWall(true)}>
               the wall
             </button>
