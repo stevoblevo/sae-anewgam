@@ -74,3 +74,13 @@ export function speakLine(line: string) {
   if (emily) utterance.voice = emily;
   window.speechSynthesis.speak(utterance);
 }
+
+export async function loadPosts(url = "/posts.json") {
+  try {
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) return POSTS_EMPTY;
+    return parsePosts(await res.json());
+  } catch {
+    return POSTS_EMPTY;
+  }
+}

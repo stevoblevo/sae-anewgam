@@ -1,0 +1,32 @@
+/** Still hold inside the Everfallen reel. Clips play out in full. */
+export const EVER_MS = 14000;
+
+export const EVER: Record<string, string> = {
+  open: "A light points, and the garden starts to fall.",
+  thea: "The table is still set when the day drops.",
+  peachfall: "The fruit keeps the last of the warmth.",
+  ember: "Orange leans toward red, and does not jump.",
+  weather: "Then the rain comes down red.",
+  remember: "The well keeps what fell.",
+  skein: "The doll holds the thread.",
+  dora: "She is still herself. Coffee first. The hour can wait.",
+  light: "A little light comes home.",
+  loom: "Green begins in the yarn.",
+  farther: "The path does not stop.",
+  crossing: "The causeway has gone quiet.",
+  garden: "The party waits under the leaves.",
+  sanctuary: "One door stays lit.",
+  peach2: "Another peach, the same fall.",
+  mint: "Rest is a cool garden.",
+  blue: "The lake holds the hour.",
+  green: "The meadow lies down.",
+  obsidian: "Stone, just before dawn.",
+  dawn: "First light on the ridge.",
+  redsun: "The sun sits low and red.",
+  bunbun: "Summer light. The small one sits in it.",
+  hold: "Found her. Pale, and looking back.",
+  mercury: "A grey plain. No air.",
+  moon: "Silver ground, and the dog close.",
+  europa: "Ice. Someone is already there.",
+  pass: "Same world. The night loops.",
+};

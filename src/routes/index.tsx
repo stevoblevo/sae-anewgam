@@ -6,14 +6,16 @@ import { InGam } from "@/components/ingam";
 import { Night } from "@/components/night";
 import { Anne } from "@/components/anne";
 import { Dev } from "@/components/dev";
+import { Show } from "@/components/show";
 
 export const Route = createFileRoute("/")({
   component: Home,
 });
 
 function Home() {
-  const [view, setView] = useState<"dev" | "anne" | "night" | "in" | "rite" | "walk">("dev");
-  if (view === "dev") return <Dev onAnne={() => setView("anne")} />;
+  const [view, setView] = useState<"dev" | "anne" | "night" | "in" | "rite" | "walk" | "garden">("dev");
+  if (view === "garden") return <Show onDoor={() => setView("dev")} />;
+  if (view === "dev") return <Dev onAnne={() => setView("anne")} onGarden={() => setView("garden")} />;
   if (view === "night") return <Night onDay={() => setView("in")} />;
   if (view === "in") return <InGam onWalk={() => setView("walk")} onRite={() => setView("rite")} />;
   if (view === "rite") return <Rite onWalk={() => setView("walk")} />;
