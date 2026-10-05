@@ -13,12 +13,12 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const [view, setView] = useState<"dev" | "anne" | "night" | "in" | "rite" | "walk" | "garden">("dev");
-  if (view === "garden") return <Show onDoor={() => setView("dev")} />;
+  const [view, setView] = useState<"dev" | "anne" | "night" | "in" | "rite" | "walk" | "garden">("rite");
+  if (view === "garden") return <Show onDoor={() => setView("rite")} />;
   if (view === "dev") return <Dev onAnne={() => setView("anne")} onGarden={() => setView("garden")} />;
   if (view === "night") return <Night onDay={() => setView("in")} />;
   if (view === "in") return <InGam onWalk={() => setView("walk")} onRite={() => setView("rite")} />;
-  if (view === "rite") return <Rite onWalk={() => setView("walk")} />;
+  if (view === "rite") return <Rite onWalk={() => setView("walk")} onDoor={() => setView("dev")} />;
   if (view === "walk") return <Player key="ring" />;
   return <Anne onNight={() => setView("night")} />;
 }
