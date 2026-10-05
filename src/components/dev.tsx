@@ -11,7 +11,7 @@ const STATIONS = [
   { id: "saelion", verb: "sync", line: "a little farther. the way home stays open.", src: "/beat06.jpg" },
 ] as const;
 
-export function Dev({ onAnne }: { onAnne: () => void }) {
+export function Dev({ onAnne, onGarden }: { onAnne: () => void; onGarden: () => void }) {
   const [at, setAt] = useState(0);
   const last = useRef(0);
   const station = STATIONS[at] ?? STATIONS[0];
@@ -60,6 +60,9 @@ export function Dev({ onAnne }: { onAnne: () => void }) {
           </button>
         ))}
       </nav>
+      <button type="button" className="nav-link garden-fold" onClick={onGarden}>
+        garden
+      </button>
       <button type="button" className="nav-link anne-night" onClick={onAnne}>
         anne
       </button>
