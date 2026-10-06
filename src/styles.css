@@ -2868,6 +2868,7 @@ html[data-eye="in"] .follow {
 @media (prefers-reduced-motion: reduce) {
   .dev-reel { transition: none !important; }
   .dev-hint { animation: none; }
+}
 
 /* garden fold */
 .show-root {
