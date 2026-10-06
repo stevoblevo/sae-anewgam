@@ -1,73 +1,364 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { TIM } from "@/lib/tim";
 
-/** Latest course, not the Anne loop. Still / side / rise / group / pass, then home. */
-const STATIONS = [
-  { id: "peach", verb: "grow", line: "a tale about time and friendship", src: "/peachfall-walk.jpg" },
-  { id: "reign", verb: "gather", line: "peachfall leads to red reign", src: "/weather.jpg" },
-  { id: "thea", verb: "dream", line: "under us, Thea.", src: "/depth-thea.jpg" },
-  { id: "dora", verb: "map", line: "look back this session", src: "/beat01.jpg" },
-  { id: "kk", verb: "gen", line: "the loom is the door", src: "/loom.png" },
-  { id: "saelion", verb: "sync", line: "a little farther. the way home stays open.", src: "/beat06.jpg" },
+/** Story and plates already in the project. Fallen beats, plus the course rooms they skip. */
+const STORY = [
+  {
+    src: "/peachfall-walk.jpg",
+    title: "Peach fall",
+    line: "The red-haired one looks down. Pink and purple walk beside her, on the golden path.",
+    over: "Rise and the blossoms are the weather.",
+  },
+  {
+    src: "/porchfight-gal.jpg",
+    title: "She is ready",
+    line: "The fight has not started. She is still, and the leaf is by her shoe.",
+    over: "The lantern is close enough to warm her face.",
+  },
+  {
+    src: "/peachfall-all.jpg",
+    title: "All of peach fall",
+    line: "Pink, red, and purple. None of them has gone ahead.",
+    over: "The path is gold under all three.",
+  },
+  {
+    src: "/red-horizon.jpg",
+    title: "Red horizon",
+    line: "The red is the sky. The deer stands beside her, not ahead.",
+    over: "The path meets the weather and does not end.",
+  },
+  {
+    src: "/reign-well.jpg",
+    title: "Into the well",
+    line: "The reign comes down to the water. She is not angry here.",
+    over: "The delve is quiet. The well keeps what it is given.",
+  },
+  {
+    src: "/depth-thea.jpg",
+    title: "Thea",
+    line: "under us, Thea.",
+    over: "",
+  },
+  {
+    src: "/scroll-doors.jpg",
+    title: "The corridor",
+    line: "Each doorway is a chapter. Down the hall is the scroll. Sideways still walks.",
+    over: "Delve and the floor remembers every step.",
+  },
+  {
+    src: "/scroll-dear.jpg",
+    title: "Dear",
+    line: "She is at the well. The deer stands beside her, not ahead.",
+    over: "Delve and the well keeps what it was given.",
+  },
+  {
+    src: "/scroll-meet.jpg",
+    title: "Orange, and red",
+    line: "The door is light. The circle takes the weather and stays whole.",
+    over: "Delve and the water holds both.",
+  },
+  {
+    src: "/scroll-leaf.jpg",
+    title: "The leaf, again",
+    line: "One leaf, where the orange path meets the rain. It is not a trophy.",
+    over: "Delve and the path does not ask you to take it.",
+  },
+  {
+    src: "/porch-face.jpg",
+    title: "The picture",
+    line: "The picture is the screen. The dark only shows where it ends.",
+    over: "Look up. The lantern is close enough to warm her face.",
+  },
+  {
+    src: "/small-one.jpg",
+    title: "The words",
+    line: "Peach and red, on the same step. The sentence sits on them and does not hide them.",
+    over: "Delve and the step is what they share.",
+  },
+  {
+    src: "/garden-porch.jpg",
+    title: "Ever fallen",
+    line: "She notices you. The lantern is already lit.",
+    over: "Look down. The boards are warm, and they remember shoes.",
+  },
+  {
+    src: "/stare.png",
+    title: "The minute before",
+    line: "She holds your eyes. The fight has not started.",
+    over: "Her shoes stay on the porch. That is the whole stance.",
+  },
+  {
+    src: "/ring.png",
+    title: "The ring",
+    line: "The boards are still dry. Nobody has been put down.",
+    over: "Delve and you find the second pair of shoes, still missing.",
+  },
+  {
+    src: "/weather.jpg",
+    title: "Red rain",
+    line: "The red is the weather. It is not a fall.",
+    over: "Under the rain the well is the same well.",
+  },
+  {
+    src: "/farther-well.jpg",
+    title: "Beside",
+    line: "The deer stands behind her shoulder, not ahead.",
+    over: "Delve and the deer stays. It does not become a path.",
+  },
+  {
+    src: "/beat05.jpg",
+    title: "The arch",
+    line: "The deer becomes a door of blossoms.",
+    over: "Step under the arch. It is a door, not a trophy.",
+  },
+  {
+    src: "/well-cry.jpg",
+    title: "The well",
+    line: "The anger stayed in the ring. Here she only cries.",
+    over: "Delve and the water keeps what she gives it.",
+  },
+  {
+    src: "/beat01.jpg",
+    title: "It remembers",
+    line: "The well was already awake.",
+    over: "Under that, two marks. Not a score.",
+  },
+  {
+    src: "/pink-forest.jpg",
+    title: "Pink, for rest",
+    line: "She went down into the weather and came up still herself.",
+    over: "Delve. The path is gold at the edges and quiet in the middle.",
+  },
+  {
+    src: "/loom.png",
+    title: "The door",
+    line: "This is the only layer that can cover the picture. The other plays are through it.",
+    over: "Under the loom, the floor is the way out.",
+  },
+  {
+    src: "/everdelve.jpg",
+    title: "Ever delve",
+    line: "Walk sideways. Rise and delve are the other wheel.",
+    over: "You delved. Same pictures. The underneath was always there.",
+  },
+  {
+    src: "/beat06.jpg",
+    title: "The way home",
+    line: "a little farther. the way home stays open.",
+    over: "Home stays open.",
+  },
 ] as const;
 
-export function Dev({ onAnne, onGarden, onHome }: { onAnne: () => void; onGarden: () => void; onHome: () => void }) {
+const MARKS = [
+  { id: "peach", verb: "grow", src: "/peachfall-walk.jpg" },
+  { id: "reign", verb: "gather", src: "/weather.jpg" },
+  { id: "thea", verb: "dream", src: "/depth-thea.jpg" },
+  { id: "dora", verb: "map", src: "/beat01.jpg" },
+  { id: "kk", verb: "gen", src: "/loom.png" },
+  { id: "saelion", verb: "sync", src: "/beat06.jpg" },
+] as const;
+
+export function Dev({
+  onAnne,
+  onGarden,
+  onHome,
+}: {
+  onAnne: () => void;
+  onGarden?: () => void;
+  onHome?: () => void;
+}) {
+  const len = STORY.length;
+  const stage = useRef<HTMLDivElement>(null);
+  const pointer = useRef<{ x: number; y: number; id: number } | null>(null);
+  const pending = useRef<number | null>(null);
+  const commitRef = useRef<(dir: 1 | -1) => void>(() => {});
   const [at, setAt] = useState(0);
-  const last = useRef(0);
-  const station = STATIONS[at] ?? STATIONS[0];
-  const step = (dir: number) => setAt((n) => (n + dir + STATIONS.length) % STATIONS.length);
+  const [shift, setShift] = useState(0);
+  const [glide, setGlide] = useState(true);
+  const [hint, setHint] = useState(true);
+
+  const prev = (at - 1 + len) % len;
+  const next = (at + 1) % len;
+  const beat = STORY[at] ?? STORY[0];
+
+  const width = () => stage.current?.clientWidth || window.innerWidth;
+
+  const settle = (to: number) => {
+    pending.current = null;
+    setGlide(false);
+    setAt(to);
+    setShift(0);
+  };
+
+  const slideTo = (px: number, to: number | null) => {
+    pending.current = to;
+    setGlide(true);
+    requestAnimationFrame(() => setShift(px));
+  };
+
+  const commit = (dir: 1 | -1) => {
+    if (pending.current !== null || pointer.current) return;
+    setHint(false);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setShift(0);
+      setAt((n) => (n + dir + len) % len);
+      return;
+    }
+    slideTo(dir === 1 ? -width() : width(), (at + dir + len) % len);
+  };
+  commitRef.current = commit;
+
+  const jump = (src: string) => {
+    const i = STORY.findIndex((item) => item.src === src);
+    if (i < 0 || i === at) return;
+    setHint(false);
+    settle(i);
+  };
+
+  useEffect(() => {
+    if (glide) return;
+    const id = requestAnimationFrame(() => setGlide(true));
+    return () => cancelAnimationFrame(id);
+  }, [glide, at]);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const id = window.setInterval(() => step(1), TIM.ms);
+    const id = window.setInterval(() => commitRef.current(1), TIM.ms);
     return () => window.clearInterval(id);
   }, [at]);
 
-  const onStage = (event: ReactPointerEvent) => {
-    if ((event.target as HTMLElement).closest("button, a")) return;
-    const startX = event.clientX;
-    const startY = event.clientY;
-    const up = (ev: PointerEvent) => {
-      window.removeEventListener("pointerup", up);
-      const now = performance.now();
-      if (now - last.current < 380) return;
-      last.current = now;
-      const dx = ev.clientX - startX;
-      const dy = ev.clientY - startY;
-      if (Math.abs(dx) < 28 && Math.abs(dy) < 28) step(1);
-      else if (Math.abs(dx) > Math.abs(dy)) step(dx < 0 ? 1 : -1);
-      else step(dy < 0 ? 1 : -1);
-    };
-    window.addEventListener("pointerup", up);
+  const onDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (pending.current !== null) return;
+    pointer.current = { x: event.clientX, y: event.clientY, id: event.pointerId };
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setGlide(false);
   };
 
+  const onMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const start = pointer.current;
+    if (!start || start.id !== event.pointerId) return;
+    const dx = event.clientX - start.x;
+    const dy = event.clientY - start.y;
+    if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+    if (Math.abs(dy) > Math.abs(dx)) return;
+    setShift(dx);
+  };
+
+  const onUp = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const start = pointer.current;
+    if (!start || start.id !== event.pointerId) return;
+    pointer.current = null;
+    const dx = event.clientX - start.x;
+    const dy = event.clientY - start.y;
+    const w = width();
+    if (Math.abs(dx) < 18 && Math.abs(dy) < 18) {
+      setHint(false);
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        setShift(0);
+        setGlide(false);
+        setAt((n) => (n + 1) % len);
+        return;
+      }
+      slideTo(-w, (at + 1) % len);
+      return;
+    }
+    if (Math.abs(dx) > 56 && Math.abs(dx) > Math.abs(dy)) {
+      const dir: 1 | -1 = dx < 0 ? 1 : -1;
+      setHint(false);
+      slideTo(dir === 1 ? -w : w, (at + dir + len) % len);
+      return;
+    }
+    slideTo(0, null);
+  };
+
+  const onTransitionEnd = (event: React.TransitionEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget || event.propertyName !== "transform") return;
+    const to = pending.current;
+    if (to === null) return;
+    settle(to);
+  };
+
+  const frames = [STORY[prev], STORY[at], STORY[next]];
+
   return (
-    <div className="dev-door" onPointerDown={onStage}>
-      <img key={station.src} className="dev-plate" src={station.src} alt="" />
-      <button type="button" className="nav-link dev-tag" onClick={onHome}>
-        home
+    <div className="dev-door">
+      <div
+        className="dev-viewport"
+        ref={stage}
+        onPointerDown={onDown}
+        onPointerMove={onMove}
+        onPointerUp={onUp}
+        onPointerCancel={onUp}
+      >
+        <div
+          className="dev-reel"
+          onTransitionEnd={onTransitionEnd}
+          style={{
+            transform: `translate3d(calc(-33.333% + ${shift}px), 0, 0)`,
+            transition: glide ? "transform 520ms cubic-bezier(.22,.7,.2,1)" : "none",
+          }}
+        >
+          {frames.map((item, n) => (
+            <div className="dev-slide" key={`${item.src}-${n}`}>
+              <img src={item.src} alt="" draggable={false} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="dev-progress" style={{ width: `${((at + 1) / len) * 100}%` }} />
+      {onHome ? (
+        <button type="button" className="nav-link dev-tag" onClick={onHome}>
+          home
+        </button>
+      ) : (
+        <p className="dev-tag">dev</p>
+      )}
+
+      <button type="button" className="dev-arrow prev" aria-label={`previous, ${STORY[prev].title}`} onClick={() => commit(-1)}>
+        <b>‹</b>
+        <small>{STORY[prev].title}</small>
       </button>
-      <p className="dev-line">{station.line}</p>
+      <button type="button" className="dev-arrow next" aria-label={`next, ${STORY[next].title}`} onClick={() => commit(1)}>
+        <b>›</b>
+        <small>{STORY[next].title}</small>
+      </button>
+
+      {hint ? <p className="dev-hint">swipe</p> : null}
+
+      <div className="dev-story">
+        <p className="dev-kicker">
+          {beat.title}
+          <span>
+            {at + 1} / {len}
+          </span>
+        </p>
+        <p className="dev-line">{beat.line}</p>
+        {beat.over ? <p className="dev-more">{beat.over}</p> : null}
+      </div>
+
       <nav className="anne-marks dev-marks" aria-label="course">
-        {STATIONS.map((item, n) => (
+        {MARKS.map((item) => (
           <button
             key={item.id}
             type="button"
-            className={n === at ? "on" : ""}
+            className={beat.src === item.src ? "on" : ""}
             aria-label={item.id}
-            onClick={() => setAt(n)}
+            onClick={() => jump(item.src)}
           >
             <i />
-            {n === at ? <span>{item.verb}</span> : null}
+            {beat.src === item.src ? <span>{item.verb}</span> : null}
           </button>
         ))}
       </nav>
-      <button type="button" className="nav-link garden-fold" onClick={onGarden}>
-        garden
-      </button>
       <button type="button" className="nav-link anne-night" onClick={onAnne}>
         anne
       </button>
+      {onGarden ? (
+        <button type="button" className="nav-link garden-fold" onClick={onGarden}>
+          garden
+        </button>
+      ) : null}
     </div>
   );
 }
