@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SaeDelves — Saelion 12</title>
+<style>
+:root{--bg:#08070d;--panel:rgba(22,18,31,.72);--line:rgba(255,210,238,.18);--ink:#fff8fc;--muted:#b9acbb;--pink:#ff92c9;--peach:#ffb78d;--mint:#9ef3d6;--violet:#b79cff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 72% 12%,#422340 0,transparent 28%),radial-gradient(circle at 12% 38%,#172b38 0,transparent 26%),var(--bg);color:var(--ink);font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;min-height:100vh}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:36px 36px;mask-image:linear-gradient(to bottom,black,transparent 82%)}
+main{max-width:1240px;margin:auto;padding:48px 24px 80px}.top{display:flex;justify-content:space-between;gap:24px;align-items:flex-start}.mark{font-size:64px;line-height:1;color:var(--pink);filter:drop-shadow(0 0 20px #ff92c966)}h1{font:600 clamp(44px,7vw,84px)/.95 Georgia,serif;margin:0;letter-spacing:-.04em}.alias{font:italic 28px Georgia,serif;color:var(--pink)}.sub{max-width:720px;font-size:21px;color:#e8dbe4;margin:20px 0 0}.tag{border:1px solid var(--line);background:rgba(255,255,255,.04);padding:8px 12px;border-radius:999px;color:#eedce8;white-space:nowrap}.hero{display:grid;grid-template-columns:1.4fr .8fr;gap:18px;margin:42px 0 18px}.card{background:var(--panel);border:1px solid var(--line);border-radius:24px;box-shadow:0 18px 80px #0006;backdrop-filter:blur(18px)}.promise{padding:34px;min-height:310px;display:flex;flex-direction:column;justify-content:space-between}.promise blockquote{font:italic clamp(28px,4vw,48px)/1.15 Georgia,serif;margin:0;max-width:750px}.promise small{color:var(--muted)}.quiet{padding:30px}.quiet h2,.section h2{font:500 26px Georgia,serif;margin:0 0 14px}.quiet p{color:var(--muted)}.meter{height:9px;background:#ffffff12;border-radius:10px;overflow:hidden;margin:18px 0}.meter span{display:block;width:36%;height:100%;background:linear-gradient(90deg,var(--mint),var(--pink))}.loop{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}.step{padding:20px;min-height:138px}.n{font:12px/1 monospace;color:var(--pink);letter-spacing:.12em}.step h3{margin:20px 0 5px;font-size:18px}.step p{margin:0;color:var(--muted);font-size:13px}.section{margin-top:52px}.owner-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.owner{padding:20px}.owner b{font-size:17px}.owner span{display:block;color:var(--muted);margin-top:8px;font-size:13px}.thread{padding:26px;display:grid;grid-template-columns:1.3fr .7fr;gap:24px}.thread h3{font:500 32px Georgia,serif;margin:0 0 6px}.thread .why{color:#ead9e3}.chips{display:flex;flex-wrap:wrap;gap:7px;margin:18px 0}.chip{font-size:12px;border:1px solid var(--line);padding:6px 9px;border-radius:999px;color:#dbcbd7}.timeline{border-left:1px solid var(--line);padding-left:18px}.event{margin:0 0 16px}.event b{display:block}.event small{color:var(--muted)}.attention{display:grid;gap:8px}.attn{display:flex;justify-content:space-between;padding:11px 14px;border-radius:12px;background:#ffffff08}.attn em{font-style:normal;color:var(--mint)}.road{display:grid;grid-template-columns:repeat(6,1fr);gap:9px}.phase{padding:16px;min-height:160px}.phase strong{display:block;color:var(--pink);font:12px monospace;margin-bottom:15px}.phase b{display:block;margin-bottom:6px}.phase p{color:var(--muted);font-size:12px;margin:0}.foot{margin-top:50px;padding-top:24px;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:var(--muted)}button{appearance:none;border:1px solid #ffb8dc66;background:linear-gradient(135deg,#ff92c928,#b79cff18);color:var(--ink);border-radius:999px;padding:12px 18px;font-weight:650;cursor:pointer}button:hover{border-color:var(--pink)}@media(max-width:850px){.hero,.thread{grid-template-columns:1fr}.loop,.owner-grid{grid-template-columns:repeat(2,1fr)}.road{grid-template-columns:repeat(2,1fr)}.top{flex-direction:column}}@media(max-width:520px){.loop,.owner-grid,.road{grid-template-columns:1fr}main{padding:28px 15px}.mark{font-size:42px}}
+</style>
+</head>
+<body>
+<main>
+<header class="top">
+<div>
+<div class="mark">✣</div>
+<h1>SaeDelves <span class="alias">$'elve</span></h1>
+<p class="sub">Saelion 12 — continuity as the computer. Notice widely. Remember selectively. Resume unfinished worlds without making Steven reconstruct the story.</p>
+</div>
+<div class="tag">candidate · v0.1 · local-first</div>
+</header>
+
+<section class="hero">
+<div class="card promise">
+<small>THE PRODUCT PROMISE</small>
+<blockquote>“The computer notices almost everything, remembers what matters, interrupts rarely, and gives you a beautiful world to enter when you choose.”</blockquote>
+<div><button onclick="document.querySelector('#thread').scrollIntoView({behavior:'smooth'})">Enter a thread ↓</button></div>
+</div>
+<div class="card quiet">
+<h2>Quiet by default.</h2>
+<p>Activity is not importance. saeDow separates what is hot from what deserves attention.</p>
+<div class="meter"><span></span></div>
+<p><b>Ambient:</b> three related signals found.<br><b>Surface:</b> one unfinished outcome changed.<br><b>Interrupt:</b> reserved for timing or consequence.</p>
+</div>
+</section>
+
+<div class="loop">
+<div class="card step"><span class="n">01 · NOTICE</span><h3>Signals</h3><p>Chats, links, GitHub, local systems, media, files.</p></div>
+<div class="card step"><span class="n">02 · UNDERSTAND</span><h3>Relations</h3><p>Entities, decisions, claims, contradictions, aesthetic seeds.</p></div>
+<div class="card step"><span class="n">03 · REMEMBER</span><h3>Sae Threads</h3><p>Source-backed continuity, including rejected approaches.</p></div>
+<div class="card step"><span class="n">04 · CONTINUE</span><h3>One outcome</h3><p>Home Base, Anewgam and workers receive different views of the same thread.</p></div>
+</div>
+
+<section class="section">
+<h2>Existing owners stay owners.</h2>
+<div class="owner-grid">
+<div class="card owner"><b>Saelion</b><span>Identity, meaning, relationship continuity, unfinished outcomes.</span></div>
+<div class="card owner"><b>Saedo</b><span>Planning, routing, coordination and durable operational lineage.</span></div>
+<div class="card owner"><b>Skein</b><span>Policy, consequence-sensitive authority, review, acceptance and recovery.</span></div>
+<div class="card owner"><b>Guardians + Native</b><span>Effects are enforced at the boundary; source systems remain truth.</span></div>
+<div class="card owner"><b>Memory / Context</b><span>Evidence and rebuildable projections. SaeDelves lives here.</span></div>
+<div class="card owner"><b>saeDow</b><span>Attention only. It decides what to surface, never what is permitted.</span></div>
+<div class="card owner"><b>Home Base</b><span>Minimum continuity packet for conversation and owner decisions.</span></div>
+<div class="card owner"><b>Anewgam</b><span>The same graph rendered as people, stories, worlds, scenes and possibility.</span></div>
+</div>
+</section>
+
+<section class="section" id="thread">
+<h2>A Sae Thread is the bridge.</h2>
+<div class="card thread">
+<div>
+<div class="tag">sae:anewgam-continuity</div>
+<h3>Anewgam — living world build</h3>
+<p class="why">Why it matters: turn creative fragments, characters, media and unfinished implementation into one explorable world that can keep growing without losing lineage.</p>
+<div class="chips"><span class="chip">evidence · 38</span><span class="chip">decisions · 7</span><span class="chip">rejected paths · 3</span><span class="chip">open outcomes · 4</span><span class="chip">visual seeds · 12</span></div>
+<div class="attention">
+<div class="attn"><span>important</span><em>.91</em></div>
+<div class="attn"><span>unresolved</span><em>.82</em></div>
+<div class="attn"><span>urgent</span><em>.18</em></div>
+</div>
+</div>
+<div class="timeline">
+<div class="event"><b>Evidence arrived</b><small>New design seed connected to existing world.</small></div>
+<div class="event"><b>Decision retained</b><small>Anewgam is a view/launcher, not another authority store.</small></div>
+<div class="event"><b>Rejected path retained</b><small>Do not create a parallel state graph for the visual client.</small></div>
+<div class="event"><b>Next outcome</b><small>Render this same thread as a constellation.</small></div>
+</div>
+</div>
+</section>
+
+<section class="section">
+<h2>Path to Saelion 12 v0.</h2>
+<div class="road">
+<div class="card phase"><strong>01 · DAYS 1–3</strong><b>Core projection</b><p>EvidenceRecord, thread builder, local store, Archive + Local Ops.</p></div>
+<div class="card phase"><strong>02 · DAYS 3–5</strong><b>Action bridge</b><p>GitHub evidence, context packs, governed mission proposals.</p></div>
+<div class="card phase"><strong>03 · WEEK 2</strong><b>Home Base</b><p>Thread view, attention, freshness and continuation packet.</p></div>
+<div class="card phase"><strong>04 · WEEK 2–3</strong><b>Anewgam</b><p>Constellations, tactile cards, scenes and aesthetic lineage.</p></div>
+<div class="card phase"><strong>05 · WEEK 3</strong><b>Continuity eval</b><p>New session, provider switch, restart and rejection-memory tests.</p></div>
+<div class="card phase"><strong>06 · WEEK 4</strong><b>v0 candidate</b><p>Evidence → decision → governed work → receipt → same thread.</p></div>
+</div>
+</section>
+
+<footer class="foot"><span>SaeDelves · Saelion 12</span><span>No new authority plane. No second lifecycle. No seventh cockpit. ♡</span></footer>
+</main>
+</body>
+</html>
