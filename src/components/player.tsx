@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Home, Pause, Play } from "lucide-react";
 import { useAskInstall } from "@/components/install-sheet";
 import { PLATES, platesIn, type Cast } from "@/lib/plates";
 import { PICTURES } from "@/lib/pictures";
-import { matchPicture } from "@/lib/find";
+import { mixPictures, rankPictures, relatedPictures } from "@/lib/find";
 import { markGamma } from "@/lib/seen";
 import { WAYS } from "@/lib/ways";
 import { TIM } from "@/lib/tim";
@@ -45,12 +45,17 @@ const CAST_NAME: Record<Cast, string> = {
   white: "white ring",
 };
 
+const RESURFACE_LENSES = ["copper mint", "bliss", "porch", "night garden", "house remembers"] as const;
+
 export function Player() {
   const [i, setI] = useState(START);
   const [playing, setPlaying] = useState(true);
   const [gallery, setGallery] = useState(false);
   const [q, setQ] = useState("");
   const [mode, setMode] = useState<"tile" | "bubble" | "scene">("tile");
+  const [resurface, setResurface] = useState<"search" | "match" | "mix">("search");
+  const [mixSeed, setMixSeed] = useState(0);
+  const [nextAt, setNextAt] = useState(0);
   const [whisper, setWhisper] = useState(false);
   const [marks, setMarks] = useState(0);
   const [motionChoice, setMotionChoice] = useState<boolean | null>(null);
@@ -94,6 +99,13 @@ export function Player() {
 
   const plate = PLATES[i] ?? PLATES[0];
   const shown = phone && plate.srcPhone ? plate.srcPhone : plate.src;
+  const galleryPictures = useMemo(() => {
+    if (resurface === "match") return relatedPictures(PICTURES, shown, PICTURES.length);
+    if (resurface === "mix") return mixPictures(PICTURES, q || `${plate.title} ${plate.note}`, mixSeed);
+    return rankPictures(PICTURES, q);
+  }, [mixSeed, plate.note, plate.title, q, resurface, shown]);
+  const nextPool = galleryPictures.filter((src) => src !== shown);
+  const nextPicture = nextPool.length ? nextPool[nextAt % nextPool.length] : undefined;
   const path = platesIn(cast, pink);
   const pathRef = useRef(path);
   pathRef.current = path;
@@ -103,6 +115,10 @@ export function Player() {
   });
   const ringRef = useRef(ring);
   ringRef.current = ring;
+
+  useEffect(() => {
+    setNextAt(0);
+  }, [mixSeed, q, resurface, shown]);
 
   const go = useCallback((n: number, keepPlay = false) => {
     const next = ((n % PLATES.length) + PLATES.length) % PLATES.length;
@@ -695,18 +711,21 @@ export function Player() {
       {gallery ? (
         <div className="gallery" onClick={(e) => e.target === e.currentTarget && setGallery(false)}>
           <div className="gallery-sheet">
-            <header>
-              <b>gallery · {PICTURES.length}</b>
-              <button type="button" onClick={() => setGallery(false)}>
-                close
+            <header className="gallery-window-bar">
+              <div>
+                <small>Sae // resurface</small>
+                <b>gallery · {PICTURES.length}</b>
+              </div>
+              <span className="gallery-place">this is a place.</span>
+              <button type="button" aria-label="close gallery" onClick={() => setGallery(false)}>
+                ×
               </button>
             </header>
             <form
               className="gallery-find"
               onSubmit={(e) => {
                 e.preventDefault();
-                if (mode !== "scene") return;
-                const hit = PICTURES.find((src) => matchPicture(src, q));
+                const hit = galleryPictures[0];
                 if (!hit) return;
                 const n = PLATES.findIndex((p) => p.src === hit);
                 if (n >= 0) go(n);
@@ -721,6 +740,62 @@ export function Player() {
                 </button>
               ))}
             </form>
+            <div className="resurface-tools">
+              <div className="resurface-tabs" role="tablist" aria-label="resurface mode">
+                {(["search", "match", "mix"] as const).map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    className={resurface === item ? "on" : ""}
+                    onClick={() => {
+                      if (item === "mix" && resurface === "mix") setMixSeed((seed) => seed + 1);
+                      setResurface(item);
+                    }}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+              <button
+                type="button"
+                className="show-next"
+                disabled={!nextPicture}
+                onClick={() => {
+                  if (!nextPicture) return;
+                  const n = PLATES.findIndex((p) => p.src === nextPicture);
+                  if (n >= 0) go(n, true);
+                  else navigate({ to: "/layers", search: { img: nextPicture } });
+                  setNextAt((at) => at + 1);
+                  setGallery(false);
+                }}
+              >
+                show next <ArrowRight size={16} strokeWidth={1.6} />
+              </button>
+            </div>
+            <div className="resurface-lenses" aria-label="saved lenses">
+              {RESURFACE_LENSES.map((lens) => (
+                <button
+                  key={lens}
+                  type="button"
+                  className={resurface === "search" && q === lens ? "on" : ""}
+                  onClick={() => {
+                    setQ(lens);
+                    setResurface("search");
+                  }}
+                >
+                  {lens}
+                </button>
+              ))}
+            </div>
+            <p className="resurface-note">
+              {resurface === "match"
+                ? "near this scene · shared motifs before novelty"
+                : resurface === "mix"
+                  ? "same ingredients · another arrangement"
+                  : q
+                    ? `semantic lens · ${galleryPictures.length} resurfaced`
+                    : "search a memory, material, mood, place, or character"}
+            </p>
             <details open>
               <summary>hearth</summary>
               <div className="gallery-grid bubbles">
@@ -741,9 +816,9 @@ export function Player() {
               </div>
             </details>
             <details open>
-              <summary>every picture · {PICTURES.filter((src) => matchPicture(src, q)).length}</summary>
+              <summary>resurfaced · {galleryPictures.length}</summary>
               <div className={`gallery-grid studies${mode === "bubble" ? " bubbles" : ""}`}>
-                {PICTURES.filter((src) => matchPicture(src, q)).map((src) => {
+                {galleryPictures.map((src) => {
                   const n = PLATES.findIndex((p) => p.src === src);
                   return (
                     <button
