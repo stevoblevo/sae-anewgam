@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { useEffect, useState } from "react";
 import { useAxis } from "@/components/glue";
+import { usePlateTouch } from "@/components/use-plate-touch";
 
 const CHAPTERS = [
   { id: "porchlight", src: "/anne-porch.jpg", line: "still here." },
@@ -12,9 +13,12 @@ export function Immerse({ onPlay, onFurther }: { onPlay: () => void; onFurther: 
   const [at, setAt] = useState(0);
   const [line, setLine] = useState("you came.");
   const [shown, setShown] = useState(true);
-  const last = useRef(0);
   const frame = CHAPTERS[at] ?? CHAPTERS[0];
   const step = (dir: number) => setAt((n) => (n + dir + CHAPTERS.length) % CHAPTERS.length);
+  const plate = usePlateTouch({
+    onSwipe: (dir) => step(dir),
+    onTap: () => step(1),
+  });
 
   useAxis(step, step);
 
@@ -30,31 +34,31 @@ export function Immerse({ onPlay, onFurther }: { onPlay: () => void; onFurther: 
   }, []);
 
   useEffect(() => {
-    const id = window.setInterval(() => step(1), 6400);
+    const id = window.setInterval(() => {
+      if (plate.blocked.current) return;
+      step(1);
+    }, 6400);
     return () => window.clearInterval(id);
   }, [at]);
 
-  const onStage = (event: ReactPointerEvent) => {
-    if ((event.target as HTMLElement).closest("button, a")) return;
-    const startX = event.clientX;
-    const startY = event.clientY;
-    const up = (ev: PointerEvent) => {
-      window.removeEventListener("pointerup", up);
-      const now = performance.now();
-      if (now - last.current < 380) return;
-      last.current = now;
-      const dx = ev.clientX - startX;
-      const dy = ev.clientY - startY;
-      if (Math.abs(dx) >= 28 && Math.abs(dx) > Math.abs(dy)) step(dx < 0 ? 1 : -1);
-      else step(1);
-    };
-    window.addEventListener("pointerup", up);
-  };
+  useEffect(() => {
+    plate.reset();
+  }, [at]);
 
   return (
-    <div className="immerse" onPointerDown={onStage}>
+    <div className="immerse" {...plate.handlers}>
       <div key={frame.src} className="immerse-world">
-        <img src={frame.src} alt="" />
+        <img
+          src={frame.src}
+          alt=""
+          draggable={false}
+          className={plate.live ? "zoomed" : ""}
+          style={
+            plate.live
+              ? { transform: `translate3d(${plate.frame.x}px, ${plate.frame.y}px, 0) scale(${plate.frame.z})` }
+              : undefined
+          }
+        />
       </div>
       <div className="immerse-veil" />
       <p className={shown ? "immerse-line on" : "immerse-line"}>{line}</p>
@@ -90,6 +94,10 @@ export function Immerse({ onPlay, onFurther }: { onPlay: () => void; onFurther: 
           <span>further</span>
         </button>
       </nav>
+      <p className="immerse-rooms">
+        <a href="/and-now/index.html">and now</a>
+        <a href="/everfallen/index.html">fall</a>
+      </p>
     </div>
   );
 }

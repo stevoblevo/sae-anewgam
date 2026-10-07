@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TIM } from "@/lib/tim";
+import { usePlateTouch } from "@/components/use-plate-touch";
 
 /** Story and plates already in the project. Fallen beats, plus the course rooms they skip. */
 const STORY = [
@@ -169,7 +170,6 @@ export function Dev({
 }) {
   const len = STORY.length;
   const stage = useRef<HTMLDivElement>(null);
-  const pointer = useRef<{ x: number; y: number; id: number } | null>(null);
   const pending = useRef<number | null>(null);
   const commitRef = useRef<(dir: 1 | -1) => void>(() => {});
   const [at, setAt] = useState(0);
@@ -197,7 +197,7 @@ export function Dev({
   };
 
   const commit = (dir: 1 | -1) => {
-    if (pending.current !== null || pointer.current) return;
+    if (pending.current !== null) return;
     setHint(false);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setShift(0);
@@ -207,6 +207,17 @@ export function Dev({
     slideTo(dir === 1 ? -width() : width(), (at + dir + len) % len);
   };
   commitRef.current = commit;
+
+  const plate = usePlateTouch({
+    canStart: () => pending.current === null,
+    onPull: (dx) => {
+      setGlide(false);
+      setShift(dx);
+    },
+    onSwipe: (dir) => commit(dir),
+    onCancel: () => slideTo(0, null),
+    onTap: () => commit(1),
+  });
 
   const jump = (src: string) => {
     const i = STORY.findIndex((item) => item.src === src);
@@ -223,53 +234,16 @@ export function Dev({
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const id = window.setInterval(() => commitRef.current(1), TIM.ms);
+    const id = window.setInterval(() => {
+      if (plate.blocked.current) return;
+      commitRef.current(1);
+    }, TIM.ms);
     return () => window.clearInterval(id);
   }, [at]);
 
-  const onDown = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (pending.current !== null) return;
-    pointer.current = { x: event.clientX, y: event.clientY, id: event.pointerId };
-    event.currentTarget.setPointerCapture(event.pointerId);
-    setGlide(false);
-  };
-
-  const onMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-    const start = pointer.current;
-    if (!start || start.id !== event.pointerId) return;
-    const dx = event.clientX - start.x;
-    const dy = event.clientY - start.y;
-    if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
-    if (Math.abs(dy) > Math.abs(dx)) return;
-    setShift(dx);
-  };
-
-  const onUp = (event: ReactPointerEvent<HTMLDivElement>) => {
-    const start = pointer.current;
-    if (!start || start.id !== event.pointerId) return;
-    pointer.current = null;
-    const dx = event.clientX - start.x;
-    const dy = event.clientY - start.y;
-    const w = width();
-    if (Math.abs(dx) < 18 && Math.abs(dy) < 18) {
-      setHint(false);
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        setShift(0);
-        setGlide(false);
-        setAt((n) => (n + 1) % len);
-        return;
-      }
-      slideTo(-w, (at + 1) % len);
-      return;
-    }
-    if (Math.abs(dx) > 56 && Math.abs(dx) > Math.abs(dy)) {
-      const dir: 1 | -1 = dx < 0 ? 1 : -1;
-      setHint(false);
-      slideTo(dir === 1 ? -w : w, (at + dir + len) % len);
-      return;
-    }
-    slideTo(0, null);
-  };
+  useEffect(() => {
+    plate.reset();
+  }, [at]);
 
   const onTransitionEnd = (event: React.TransitionEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget || event.propertyName !== "transform") return;
@@ -279,17 +253,11 @@ export function Dev({
   };
 
   const frames = [STORY[prev], STORY[at], STORY[next]];
+  const zoomed = plate.frame.z > 1;
 
   return (
     <div className="dev-door">
-      <div
-        className="dev-viewport"
-        ref={stage}
-        onPointerDown={onDown}
-        onPointerMove={onMove}
-        onPointerUp={onUp}
-        onPointerCancel={onUp}
-      >
+      <div className="dev-viewport" ref={stage} {...plate.handlers}>
         <div
           className="dev-reel"
           onTransitionEnd={onTransitionEnd}
@@ -300,7 +268,17 @@ export function Dev({
         >
           {frames.map((item, n) => (
             <div className="dev-slide" key={`${item.src}-${n}`}>
-              <img src={item.src} alt="" draggable={false} />
+              <img
+                src={item.src}
+                alt=""
+                draggable={false}
+                className={n === 1 && zoomed ? "zoomed" : ""}
+                style={
+                  n === 1 && zoomed
+                    ? { transform: `translate3d(${plate.frame.x}px, ${plate.frame.y}px, 0) scale(${plate.frame.z})` }
+                    : undefined
+                }
+              />
             </div>
           ))}
         </div>
@@ -324,7 +302,12 @@ export function Dev({
         <small>{STORY[next].title}</small>
       </button>
 
-      {hint ? <p className="dev-hint">swipe</p> : null}
+      {hint ? <p className="dev-hint">swipe · pinch</p> : null}
+
+      <p className="dev-rooms">
+        <a href="/and-now/index.html">and now</a>
+        <a href="/everfallen/index.html">fall</a>
+      </p>
 
       <div className="dev-story">
         <p className="dev-kicker">
