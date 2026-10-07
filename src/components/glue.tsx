@@ -30,6 +30,7 @@ const FOLLOW = [
     frames: [
       { src: "/portrait/pink.jpg", room: "/anna.jpg" },
       { src: "/anna-hearth.jpg", room: "/anna-hearth.jpg" },
+      { src: "/anna-on.jpg", room: "/anna-on.jpg" },
       { src: "/portrait/peach.jpg", room: "/peachfall-walk.jpg" },
     ],
   },

@@ -7,6 +7,7 @@ export const PICTURES = [
   "/anne-sand.jpg",
   "/anne-savanna.jpg",
   "/anna-hearth.jpg",
+  "/anna-on.jpg",
   "/approach.jpg",
   "/bambi.jpg",
   "/beat01.jpg",
