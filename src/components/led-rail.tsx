@@ -5,6 +5,7 @@ const WAYS = [
   { k: "now", href: "/and-now/index.html", label: "now", hint: "the light" },
   { k: "fall", href: "/everfallen/index.html", label: "fall", hint: "the garden" },
   { k: "further", href: "/?to=further", label: "further", hint: "the story" },
+  { k: "spring", href: "/spring/index.html", label: "spring", hint: "the meadow" },
 ] as const;
 
 export function LedRail() {
@@ -15,6 +16,7 @@ export function LedRail() {
       const path = window.location.pathname;
       if (path.includes("and-now")) setHere("now");
       else if (path.includes("everfallen")) setHere("fall");
+      else if (path.includes("/spring")) setHere("spring");
       else setHere(document.documentElement.dataset.room || "sae");
     };
     read();

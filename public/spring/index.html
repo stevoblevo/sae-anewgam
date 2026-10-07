@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spring</title>
+<link rel="stylesheet" href="/skin/led.css">
+<style>
+  html, body { margin: 0; height: 100%; background: #10140c; color: #f6efe8; font-family: Georgia, "Iowan Old Style", serif; }
+  body { overflow: hidden; }
+  .plate { position: fixed; inset: 0; }
+  .plate img { width: 100%; height: 100%; object-fit: cover; transition: filter 1.2s ease; }
+  body.under .plate img { filter: saturate(.35) brightness(.42) hue-rotate(210deg); }
+  body.back .plate img { filter: saturate(1.2) contrast(1.05); }
+  .veil { position: fixed; inset: 0; background: linear-gradient(transparent 40%, rgba(8,10,6,.72)); pointer-events: none; }
+  .say { position: fixed; left: 50%; bottom: calc(max(12px, env(safe-area-inset-bottom)) + 78px); transform: translateX(-50%); width: min(34rem, calc(100% - 32px)); text-align: center; }
+  .say p { margin: 0; font-size: clamp(1.25rem, 3.4vw, 1.9rem); line-height: 1.3; text-shadow: 0 2px 16px #10140c; }
+  .say small { display: block; margin-top: 10px; letter-spacing: .14em; font-size: .78rem; opacity: .8; }
+  .play { position: fixed; top: max(14px, env(safe-area-inset-top)); right: 14px; z-index: 5; }
+  button, .film {
+    border: 0; border-radius: 999px; background: rgba(16,20,12,.72); color: #f6efe8;
+    font: 15px/1 Georgia, serif; letter-spacing: .06em; text-decoration: none; cursor: pointer;
+    min-height: 44px; padding: 0 16px; display: inline-flex; align-items: center;
+  }
+  .note { position: fixed; left: 14px; top: max(14px, env(safe-area-inset-top)); z-index: 5; max-width: min(22rem, 46vw); font-size: 13px; line-height: 1.4; opacity: .85; }
+  .note a { color: #c6e39a; }
+  @media (max-width: 700px) {
+    .note { max-width: calc(100% - 120px); }
+  }
+  @media (prefers-reduced-motion: reduce) { .plate img { transition: none; } }
+</style>
+</head>
+<body>
+  <div class="plate"><img src="/spring/meadow.jpg" alt="A woman in a peach dress stands small in a spring meadow at dusk"></div>
+  <div class="veil"></div>
+  <p class="note">The 1934 film is still in copyright, until 2030. It plays on <a href="https://www.disneyplus.com/browse/entity-b738faa1-b367-460c-aef1-2e1e0959b477">Disney+</a>. The myth under it is older, and this meadow is ours.</p>
+  <button class="play" type="button" id="play">play</button>
+  <div class="say">
+    <p id="line">The meadow stays open while she is here.</p>
+    <small id="where">spring · 1 / 3</small>
+  </div>
+<script>
+  const beats = [
+    { cls: "", line: "The meadow stays open while she is here.", where: "spring" },
+    { cls: "under", line: "Half the year she goes under. The flowers wait.", where: "under" },
+    { cls: "back", line: "She comes back. That is the season.", where: "return" },
+  ];
+  let at = 0;
+  const line = document.getElementById("line");
+  const where = document.getElementById("where");
+  function show(i) {
+    at = (i + beats.length) % beats.length;
+    const beat = beats[at];
+    document.body.className = beat.cls;
+    line.textContent = beat.line;
+    where.textContent = beat.where + " · " + (at + 1) + " / " + beats.length;
+  }
+  document.getElementById("play").addEventListener("click", () => show(at + 1));
+  document.querySelector(".plate").addEventListener("click", () => show(at + 1));
+</script>
+<script src="/skin/led.js" defer></script>
+</body>
+</html>

@@ -4,14 +4,15 @@
     ["now", "/and-now/index.html", "now", "the light"],
     ["fall", "/everfallen/index.html", "fall", "the garden"],
     ["further", "/?to=further", "further", "the story"],
+    ["spring", "/spring/index.html", "spring", "the meadow"],
   ];
   const path = location.pathname;
   const here = path.includes("and-now")
     ? "now"
     : path.includes("everfallen")
       ? "fall"
-      : path.includes("sae-night")
-        ? ""
+      : path.includes("/spring")
+        ? "spring"
         : "";
   const nav = document.createElement("nav");
   nav.className = "led-rail";

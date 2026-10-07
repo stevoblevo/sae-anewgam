@@ -529,6 +529,9 @@ export function Player() {
           <button type="button" className="nav-link immerse" onClick={immerse}>
             {immersive ? "close" : "immerse"}
           </button>
+          <a className="nav-link" href="/spring/index.html">
+            spring
+          </a>
           <Link to="/fallen" className="nav-link">
             picture · page
           </Link>
