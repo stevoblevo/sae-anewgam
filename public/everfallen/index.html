@@ -97,10 +97,10 @@ button:focus-visible{outline:3px solid var(--rose);outline-offset:3px}
   color:var(--dim);font-family:var(--serif);font-style:italic;text-decoration:none;font-size:clamp(16px,2.2vmin,22px)}
 @media (prefers-reduced-motion: reduce){ .photo{animation:none} #cap{transition:none} }
 </style>
+<link rel="stylesheet" href="/skin/led.css">
 </head>
 <body>
 <canvas id="c" aria-label="Game field"></canvas>
-<a class="sae" href="/">sae</a>
 
 <div id="hud">
   <div id="threads" aria-label="Threads left"></div>
@@ -819,5 +819,6 @@ try{
 $('#play').focus();
 })();
 </script>
+<script src="/skin/led.js" defer></script>
 </body>
 </html>

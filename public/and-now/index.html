@@ -84,6 +84,7 @@
     .hint { bottom: auto; top: calc(12vh + 44px); }
   }
 </style>
+<link rel="stylesheet" href="/skin/led.css">
 </head>
 <body>
 <canvas id="c" aria-label="Interactive light piece"></canvas>
@@ -93,7 +94,6 @@
   <div class="subtitle serif">an immersive experience</div>
   <button class="btn enter" id="enter">Enter</button>
   <div class="fine serif">sound on. please touch the art.</div>
-  <a class="fine serif" href="/" style="margin-top:18px;color:inherit;text-decoration:none">back to sae</a>
 </div>
 
 <div class="caption serif" id="cap"></div>
@@ -105,8 +105,6 @@
 </div>
 
 <div class="controls" id="controls">
-  <button class="ctl" id="sae">sae</button>
-  <span class="sep">/</span>
   <button class="ctl" id="sound">sound: on</button>
   <span class="sep">/</span>
   <button class="ctl" id="shopBtn">exit through gift shop</button>
@@ -447,7 +445,6 @@
     setTimeout(() => caption('nobody needed it to.', 4000), 12600);
     setTimeout(() => caption('still here.', 4000), 52000);
   });
-  $('sae').addEventListener('click', () => { location.href = '/'; });
   soundBtn.addEventListener('click', () => {
     muted = !muted;
     soundBtn.textContent = muted ? 'sound: off' : 'sound: on';
@@ -784,5 +781,6 @@
   requestAnimationFrame(frame);
 })();
 </script>
+<script src="/skin/led.js" defer></script>
 </body>
 </html>

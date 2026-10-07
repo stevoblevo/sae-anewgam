@@ -304,11 +304,6 @@ export function Dev({
 
       {hint ? <p className="dev-hint">swipe · pinch</p> : null}
 
-      <p className="dev-rooms">
-        <a href="/and-now/index.html">and now</a>
-        <a href="/everfallen/index.html">fall</a>
-      </p>
-
       <div className="dev-story">
         <p className="dev-kicker">
           {beat.title}

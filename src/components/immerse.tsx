@@ -94,10 +94,6 @@ export function Immerse({ onPlay, onFurther }: { onPlay: () => void; onFurther: 
           <span>further</span>
         </button>
       </nav>
-      <p className="immerse-rooms">
-        <a href="/and-now/index.html">and now</a>
-        <a href="/everfallen/index.html">fall</a>
-      </p>
     </div>
   );
 }

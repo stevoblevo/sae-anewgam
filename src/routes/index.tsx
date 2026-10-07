@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Player } from "@/components/player";
 import { Rite } from "@/components/rite";
 import { InGam } from "@/components/ingam";
@@ -15,6 +15,28 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const [view, setView] = useState<"home" | "play" | "night" | "in" | "rite" | "dev" | "anne" | "garden">("home");
+
+  useEffect(() => {
+    const to = new URLSearchParams(window.location.search).get("to");
+    if (to === "further") setView("dev");
+    else if (to === "play") setView("play");
+    else if (to === "garden") setView("garden");
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.dataset.room = view === "dev" ? "further" : "sae";
+    window.dispatchEvent(new Event("sae-room"));
+  }, [view]);
+
+  useEffect(() => {
+    const onGo = (event: Event) => {
+      const key = (event as CustomEvent<string>).detail;
+      if (key === "further") setView("dev");
+      if (key === "sae") setView("home");
+    };
+    window.addEventListener("sae-go", onGo);
+    return () => window.removeEventListener("sae-go", onGo);
+  }, []);
   if (view === "play") {
     return (
       <>
